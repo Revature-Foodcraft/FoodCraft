@@ -10,9 +10,9 @@ app.use(express.json());
 
 
 
-app.get("/", async (req, res) => {
-  const response = await getUserByUsername("admin");
-  console.log(response)
+
+app.get("/", (req, res) => {
+
   res.json(response);
 });
 
