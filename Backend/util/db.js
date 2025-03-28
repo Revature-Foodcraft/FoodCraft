@@ -1,6 +1,7 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient } = require("@aws-sdk/lib-dynamodb");
-require('dotenv').config();
+
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import 'dotenv/config';
 
 
 const client = new DynamoDBClient({
@@ -12,4 +13,4 @@ const client = new DynamoDBClient({
 });
 const documentClient = DynamoDBDocumentClient.from(client);
 
-module.exports = { client, documentClient };
+export { client, documentClient };

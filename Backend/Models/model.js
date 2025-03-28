@@ -1,6 +1,7 @@
-const { documentClient } = require('../util/db');
-const { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
-const { logger } = require('../util/logger');
+import { documentClient } from '../util/db.js';
+import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { logger } from '../util/logger.js'
+
 
 const tableName = "FoodCraft"
 
@@ -134,7 +135,7 @@ async function getRecipe(params) {
 }
 
 
-module.exports = {
+export {
     createUser,
     getUser,
     getUserByUsername,
