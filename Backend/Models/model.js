@@ -14,7 +14,7 @@ async function createUser(user) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Succesfully created user ${user.username}`)
-        return response
+        return response.Attributes
     } catch (error) {
         logger.error(`Error while creating a user: ${error.message}`)
         return null;
@@ -92,7 +92,7 @@ async function updateUser(updatedUser) {
         TableName: tableName,
         Key: {
             PK: `${updatedUser.PK}`,
-            SK: "USER"
+            SK: "PROFILE"
         },
         UpdateExpression: updateExpression,
         ExpressionAttributeNames,
@@ -119,7 +119,7 @@ async function createRecipe(recipe) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Successfully created recipe with ID ${recipe.recipe_id}`);
-        return response;
+        return response.Attributes;
     } catch (error) {
         logger.error(`Error while creating a recipe: ${error.message}`);
         return null;
@@ -197,7 +197,7 @@ async function createReview(review) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Successfully created review with ID ${review.review_id}`);
-        return response;
+        return response.Attributes;
     } catch (error) {
         logger.error(`Error while creating a review: ${error.message}`);
         return null;
