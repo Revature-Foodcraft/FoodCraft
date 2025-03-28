@@ -6,7 +6,6 @@ import { logger } from '../util/logger.js'
 const tableName = "FoodCraft"
 
 async function createUser(user) {
-    //console.log(user)
     const command = new PutCommand({
         TableName: tableName,
         Item: user
@@ -15,7 +14,7 @@ async function createUser(user) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Succesfully created user ${user.username}`)
-        return response.Attributes
+        return response
     } catch (error) {
         logger.error(`Error while creating a user: ${error.message}`)
         return null;
