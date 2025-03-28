@@ -6,6 +6,7 @@ import { logger } from '../util/logger.js'
 const tableName = "FoodCraft"
 
 async function createUser(user) {
+    //console.log(user)
     const command = new PutCommand({
         TableName: tableName,
         Item: user
@@ -25,7 +26,7 @@ async function getUser(userId) {
     const command = new GetCommand({
         TableName: tableName,
         Key: {
-            PK: `USER#${userId}`,
+            PK: `${userId}`,
             SK: "PROFILE"
         }
     });
