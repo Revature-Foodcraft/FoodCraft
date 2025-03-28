@@ -27,7 +27,7 @@ export async function createUser ({username,password,email,firstname,lastname,pi
         const newUser = await model.createUser(userObj)
 
         if(newUser){
-            return {success:true, user:newUser}
+            return {success:true, user:userObj}
         }else{
             return {success:false, code: 500, message:"Failed creating new user"}
         }
