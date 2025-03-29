@@ -14,7 +14,7 @@ async function createUser(user) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Succesfully created user ${user.username}`)
-        return response.Attributes
+        return response
     } catch (error) {
         logger.error(`Error while creating a user: ${error.message}`)
         return null;
@@ -25,7 +25,7 @@ async function getUser(userId) {
     const command = new GetCommand({
         TableName: tableName,
         Key: {
-            PK: `USER#${userId}`,
+            PK: `${userId}`,
             SK: "PROFILE"
         }
     });
