@@ -1,11 +1,9 @@
-// src/Login.tsx
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   return (
     <div>
-      <h1>Login to FoodCraft</h1>
+      <h1>Register to FoodCraft</h1>
       <form>
         <div>
           <label>Username:</label>
@@ -15,13 +13,14 @@ const Login: React.FC = () => {
           <label>Password:</label>
           <input type="password" name="password" required />
         </div>
-        <button type="submit">Login</button>
+        <div>
+          <label>Confirm Password:</label>
+          <input type="password" name="confirmPassword" required />
+        </div>
+        <button type="submit">Register</button>
       </form>
-      <Link to="/register">
-        <button>Register</button>
-      </Link>
     </div>
   );
 };
 
-export default Login;
+export default Register;
