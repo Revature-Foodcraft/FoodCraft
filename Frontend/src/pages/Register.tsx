@@ -1,24 +1,48 @@
 import React from 'react';
+import styles from './Register.module.css';
+import foodcraftLogo from '../assets/FoodCraft-Logo.png';
+import backgroundVideo from '../assets/backroundRegister.mp4';
 
 const Register: React.FC = () => {
   return (
-    <div>
-      <h1>Register to FoodCraft</h1>
-      <form>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="username" required />
+    <div className={styles.pageWrapper}>
+      <video autoPlay loop muted className={styles.bgVideo}>
+        <source src={backgroundVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Overlay element */}
+      <div className={styles.overlay}></div>
+
+      <div className={styles.contentWrapper}>
+        <div className={styles.container}>
+          <img src={foodcraftLogo} alt="FoodCraft Logo" className={styles.logo} />
+          <h2 className={styles.title}>Register to FoodCraft</h2>
+          <form className={styles.form}>
+            <div className={styles.formGroup}>
+              <label>Email</label>
+              <input type="email" name="email" required />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Password:</label>
+              <input type="password" name="password" required />
+            </div>
+            <div className={styles.formGroup}>
+              <label>First Name</label>
+              <input type="text" name="firstName" required />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Last Name</label>
+              <input type="text" name="lastName" required />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Username:</label>
+              <input type="text" name="username" required />
+            </div>
+            <button type="submit" className={styles.button}>Register</button>
+          </form>
         </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" required />
-        </div>
-        <div>
-          <label>Confirm Password:</label>
-          <input type="password" name="confirmPassword" required />
-        </div>
-        <button type="submit">Register</button>
-      </form>
+      </div>
     </div>
   );
 };
