@@ -1,5 +1,6 @@
 import express from "express"
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import userRouter from "./Routes/userRoutes.js"
 import cors from "cors";
 const app = express();
@@ -8,14 +9,9 @@ app.use(cors())
  
 
 app.use(express.json());
-app.use("/",userRouter)
+app.use("/", userRouter)
 
 
-
-app.get("/", (req, res) => {
-
-  res.json(response);
-});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
