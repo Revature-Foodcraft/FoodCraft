@@ -1,5 +1,6 @@
 import express from "express"
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import userRouter from "./Routes/userRoutes.js"
 
 const app = express();
