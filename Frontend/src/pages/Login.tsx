@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../css/Login.css';
+import { Link } from 'react-router-dom';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/login-background.mp4';
 
@@ -10,7 +11,6 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Button Click')
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
@@ -70,7 +70,9 @@ const Login: React.FC = () => {
           </div>
           <div className="button-container">
             <button type="submit">Login</button>
-            <button type="button" className="register-button">Register</button>
+            <Link to="/register">
+              <button type="button" className="register-button">Register</button>
+            </Link>
           </div>
         </form>
       </div>

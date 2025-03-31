@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Register.module.css';
+import styles from '../css/Register.module.css';
 import foodcraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/backroundRegister.mp4';
 
