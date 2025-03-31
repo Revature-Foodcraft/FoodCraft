@@ -1,0 +1,36 @@
+.recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px;
+  width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fffbf5;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Adds space between child elements */
+}
+
+.metadata-text {
+  display: flex;
+  justify-content: space-between; /* Align title to the left and author to the right */
+  align-items: center; /* Vertically align content */
+  width: 100%;
+}
+
+.recipe-card h4 {
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem; /* Larger font for emphasis */
+  font-weight: bold; /* Bold for the title */
+  color: #000; /* Black text */
+  margin: 0; /* Remove extra margin */
+}
+
+.recipe-card p {
+  font-family: Arial, sans-serif;
+  font-size: 1rem; /* Slightly smaller font */
+  font-weight: normal; /* Normal weight for author text */
+  color: #555; /* Grayish text */
+  margin: 0; /* No extra margin */
+  text-align: right; /* Ensures alignment for the author's name */
+}

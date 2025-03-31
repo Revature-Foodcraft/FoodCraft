@@ -10,6 +10,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         height: '100vh',
     },
     mainContent: {
+        padding: '50px',
         display: 'flex',
         flex: 1,
         width: '100%',
