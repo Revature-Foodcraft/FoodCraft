@@ -157,10 +157,10 @@ async function updateRecipe(recipe) {
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully updated recipe with ID ${recipeId}`);
+        logger.info(`Successfully updated recipe with ID ${recipe.PK}`);
         return response.Attributes;
     } catch (error) {
-        logger.error(`Error updating recipe with ID ${recipeId}`, error.message);
+        logger.error(`Error updating recipe with ID ${recipe.PK}`, error.message);
         return null;
     }
 }

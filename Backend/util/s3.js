@@ -38,7 +38,7 @@ async function deleteImage(key) {
 
 // Function to generate a signed URL for an image
 async function getSignedImageUrl(key, expiresIn = 3600) {
-    const command = new PutObjectCommand({
+    const command = new GetObjectCommand({
         Bucket: BUCKET_NAME,
         Key: key
     });
