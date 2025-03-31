@@ -21,23 +21,48 @@ const Register: React.FC = () => {
           <form className={styles.form}>
             <div className={styles.formGroup}>
               <label>Email</label>
-              <input type="email" name="email" required />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
             </div>
             <div className={styles.formGroup}>
               <label>Password:</label>
-              <input type="password" name="password" required />
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
             </div>
             <div className={styles.formGroup}>
               <label>First Name</label>
-              <input type="text" name="firstName" required />
+              <input
+                type="text"
+                name="firstName"
+                placeholder="Enter your first name"
+                required
+              />
             </div>
             <div className={styles.formGroup}>
               <label>Last Name</label>
-              <input type="text" name="lastName" required />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Enter your last name"
+                required
+              />
             </div>
             <div className={styles.formGroup}>
               <label>Username:</label>
-              <input type="text" name="username" required />
+              <input
+                type="text"
+                name="username"
+                placeholder="Choose a username"
+                required
+              />
             </div>
             <button type="submit" className={styles.button}>Register</button>
           </form>
