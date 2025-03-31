@@ -675,6 +675,84 @@ async function deleteReview(reviewId) {
     }
 }
 
+/**
+ * Adds an ingredient to the user's fridge.
+ *
+ * @async
+ * @function addIngredientToFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @param {Object} ingredient - The ingredient object to add.
+ * @param {string} ingredient.name - The name of the ingredient.
+ * @param {number} ingredient.amount - The amount of the ingredient.
+ * @param {string} ingredient.category - The category of the ingredient.
+ * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ */
+async function addIngredientToFridge(userId, ingredient) {
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = list_append(if_not_exists(fridge, :emptyList), :ingredient)",
+        ExpressionAttributeValues: {
+            ":ingredient": [ingredient],
+            ":emptyList": []
+        },
+        ReturnValues: "ALL_NEW"
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully added ingredient to fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+/**
+ * Removes an ingredient from the user's fridge by name.
+ *
+ * @async
+ * @function removeIngredientFromFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @param {string} ingredientName - The name of the ingredient to remove.
+ * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ */
+async function removeIngredientFromFridge(userId, ingredientName) {
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty`);
+        return null;
+    }
+
+    const updatedFridge = user.fridge.filter(ingredient => ingredient.name !== ingredientName);
+
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updatedFridge": updatedFridge
+        },
+        ReturnValues: "ALL_NEW"
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully removed ingredient from fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error removing ingredient from fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
 export {
     createUser,
     getUser,
