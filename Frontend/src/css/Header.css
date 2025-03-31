@@ -1,0 +1,47 @@
+/* Header container */
+header {
+  padding: 10px 20px; /* Added horizontal padding */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wrapper {
+  background-color: #5b3e18; /* Dark brown */
+  padding: 0 20%; /* Increased side padding */
+}
+
+/* Logo styling */
+header img {
+  height: 50px;
+  margin-right: 20px; /* Added space to the right of the logo */
+  filter: invert(85%) sepia(20%) saturate(500%) hue-rotate(10deg)
+    brightness(100%) contrast(90%);
+}
+
+/* Navigation styling */
+header nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header nav ul li {
+  margin: 0 15px; /* Increased horizontal spacing between list items */
+}
+
+header nav ul li button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #edd2a8; /* Light beige */
+  font-weight: bold;
+  font-size: 16px;
+  transition: color 0.3s ease-in-out;
+}
+
+header nav ul li button:hover {
+  color: #ff9d00; /* Highlight color */
+}
