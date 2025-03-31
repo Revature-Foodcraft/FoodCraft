@@ -1,72 +1,130 @@
-import React from 'react';
-import styles from '../css/Register.module.css';
-import foodcraftLogo from '../assets/FoodCraft-Logo.png';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../css/Register.module.css';
+import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/backroundRegister.mp4';
 
 const Register: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+          firstname,
+          lastname
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Registration failed');
+
+      setSuccess('Registration successful! Please log in.');
+
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <div className={styles.pageWrapper}>
-      <video autoPlay loop muted className={styles.bgVideo}>
+    <div className="login-container">
+      <video autoPlay loop muted className="background-video">
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      {/* Overlay element */}
-      <div className={styles.overlay}></div>
-
-      <div className={styles.contentWrapper}>
-        <div className={styles.container}>
-          <img src={foodcraftLogo} alt="FoodCraft Logo" className={styles.logo} />
-          <h2 className={styles.title}>Register to FoodCraft</h2>
-          <form className={styles.form}>
-            <div className={styles.formGroup}>
-              <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Password:</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Enter your first name"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Enter your last name"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Username:</label>
-              <input
-                type="text"
-                name="username"
-                placeholder="Choose a username"
-                required
-              />
-            </div>
-            <button type="submit" className={styles.button}>Register</button>
-          </form>
+      <div className="login-box">
+        <div>
+          <img src={foodCraftLogo} alt="FoodCraft Logo" className="logo" />
         </div>
+
+        <h2 id="loginWords">Register to FoodCraft</h2>
+
+        {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
+
+        <form onSubmit={handleRegister}>
+          <div>
+            <label>Username:</label>
+            <input
+              type="text"
+              name="username"
+              required
+              className="input-field"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Choose a username"
+            />
+          </div>
+          <div>
+            <label>Password:</label>
+            <input
+              type="password"
+              name="password"
+              required
+              className="input-field"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+            />
+          </div>
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              required
+              className="input-field"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="johndoe@example.com"
+            />
+          </div>
+          <div>
+            <label>First Name:</label>
+            <input
+              type="text"
+              name="firstname"
+              required
+              className="input-field"
+              value={firstname}
+              onChange={(e) => setFirstname(e.target.value)}
+              placeholder="John"
+            />
+          </div>
+          <div>
+            <label>Last Name:</label>
+            <input
+              type="text"
+              name="lastname"
+              required
+              className="input-field"
+              value={lastname}
+              onChange={(e) => setLastname(e.target.value)}
+              placeholder="Doe"
+            />
+          </div>
+          <div className="button-container">
+            <button type="submit" className="auth-button">Register</button>
+            <Link to="/login" className="auth-button-link">
+              <button type="button" className="auth-button">Login</button>
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );
