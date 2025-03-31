@@ -4,7 +4,11 @@ const Header: React.FC = () => {
     return (
         <header>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', backgroundColor: '#5B3E18' }}>
-            <img src="./src/assets/logo.svg" alt="FoodCraft Logo" style={{ height: '50px', filter: 'invert(85%) sepia(20%) saturate(500%) hue-rotate(10deg) brightness(100%) contrast(90%)' }} />
+            <div style={{ display: 'flex', alignItems: 'center'}}>
+                <img src="./src/assets/logo.svg" alt="FoodCraft Logo" style={{ height: '50px', filter: 'invert(85%) sepia(20%) saturate(500%) hue-rotate(10deg) brightness(100%) contrast(90%)' }} />
+                <h1 style={{ marginLeft:"15px", textAlign:'left' ,color:'#EDD2A8'}}>FOODCRAFT</h1>
+            </div>
+            
             <nav>
             <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, color: '#EDD2A8' }}>
             <li style={{ margin: '0 10px' }}>
