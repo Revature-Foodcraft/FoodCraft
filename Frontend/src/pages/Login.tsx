@@ -69,9 +69,9 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="button-container">
-            <button type="submit">Login</button>
-            <Link to="/register">
-              <button type="button" className="register-button">Register</button>
+          <button type="submit" className="auth-button">Login</button>
+            <Link to="/register" className="auth-button-link">
+              <button type="button" className="auth-button register-button">Register</button>
             </Link>
           </div>
         </form>

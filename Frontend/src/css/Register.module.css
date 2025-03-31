@@ -9,9 +9,12 @@ html, body {
 /* Main page wrapper */
 .pageWrapper {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Background video */
@@ -40,24 +43,25 @@ html, body {
 
 /* Content wrapper to center the registration form */
 .contentWrapper {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 /* Registration container styling */
 .container {
   max-width: 400px;
-  padding: 20px;
+  padding: 30px;
   background-color: rgba(255, 255, 255, 0.9);
-  border: 3px solid #ff9d00; 
+  border: 3px solid #ff9d00;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
+  text-align: center;
+  min-height: 450px; /* Ensures better centering */
 }
 
 /* Logo styling */

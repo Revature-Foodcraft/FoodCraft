@@ -100,3 +100,37 @@
 .input-field:first-of-type {
   margin-bottom: 20px; /* Adjust the spacing */
 }
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 25px;
+}
+
+.auth-button {
+  background: #000000; /* Black */
+  color: white;
+  padding: 10px;
+  width: 48%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+  text-align: center;
+}
+
+.auth-button:hover {
+  background: #A0522D; /* Lighter brown */
+}
+
+.auth-button-link {
+  width: 48%;
+  text-decoration: none;
+  display: flex;
+}
+
+.auth-button-link button {
+  width: 100%;
+}
+
