@@ -7,7 +7,7 @@ import dotenv from "dotenv"
 
 dotenv.config({override:true})
 
-export async function createUser ({username,password,email,firstname,lastname,picture}){
+export async function createUser ({username,password,email="",firstname ="",lastname="",picture=""}){
     const hashPass = await hashPassword(password)
 
     const exist = await model.getUserByUsername(username)
