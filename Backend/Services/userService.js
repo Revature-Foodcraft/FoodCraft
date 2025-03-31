@@ -1,8 +1,13 @@
 import { hashPassword } from "../util/bcyrpt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
+import { comparePassword } from "../util/bcyrpt.js";
+import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
 
-export async function createUser ({username,password,email,firstname,lastname,picture}){
+dotenv.config({override:true})
+
+export async function createUser ({username,password,email="",firstname ="",lastname="",picture=""}){
     const hashPass = await hashPassword(password)
 
     const exist = await model.getUserByUsername(username)
@@ -12,7 +17,7 @@ export async function createUser ({username,password,email,firstname,lastname,pi
             PK:uuidv4(),
             SK:"PROFILE",
             username,
-            hashPass,
+            password:hashPass,
             account:{
                 firstname,
                 lastname,
@@ -27,11 +32,29 @@ export async function createUser ({username,password,email,firstname,lastname,pi
         const newUser = await model.createUser(userObj)
 
         if(newUser){
-            return {success:true, user:newUser}
+            return {success:true, user:userObj}
         }else{
             return {success:false, code: 500, message:"Failed creating new user"}
         }
     }else{
         return {success:false, code:400, message:"Username is already in use"}
+    }
+}
+
+export async function loginUser({username,password}) {
+    const user = await model.getUserByUsername(username)
+
+    if(user && await comparePassword(password,user.password)){
+        const token = jwt.sign({
+            userId:user.PK
+        },
+        process.env.SECRET_KEY,
+        {
+            expiresIn:'1h'
+        })
+        
+        return {success: true, message: "Login Successful", token:token}
+    }else{
+        return {success:false, message: "Login Failed: Incorrect Username or Password"}
     }
 }
