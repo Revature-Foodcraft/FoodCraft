@@ -14,15 +14,19 @@ const SavedRecipes: React.FC = () => {
                     title={'Title'}
                     author={'Author'}
                     onDelete={() => console.log("Delete recipe!")}
-                    description="A simple and tasty pancake recipe, perfect for a weekend breakfast." />
+                    description="A simple and tasty pancake recipe, perfect for a weekend breakfast."
+                    id={1}
+                />
                 <RecipeCard
                     title={'Title'}
                     author={'Author'}
+                    id={1}
                     onDelete={() => console.log("Delete recipe!")}
                     description="A simple and tasty pancake recipe, perfect for a weekend breakfast." />
                 <RecipeCard
                     title={'Title'}
                     author={'Author'}
+                     id={1}
                     onDelete={() => console.log("Delete recipe!")}
                     description="A simple and tasty pancake recipe, perfect for a weekend breakfast." />
             </div>
