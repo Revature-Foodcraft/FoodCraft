@@ -8,8 +8,10 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
+        background: '#e0eff4'
     },
     mainContent: {
+        padding: '50px',
         display: 'flex',
         flex: 1,
         width: '100%',
@@ -35,13 +37,11 @@ const Account: React.FC = () => {
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}
                 <section style={styles.smartFridgeSection}>
-                    <h2>Smart Fridge</h2>
                     <SmartFridge />
                 </section>
 
                 {/* SavedRecipes Section */}
                 <section style={styles.savedRecipesSection}>
-                    <h2>Saved Recipes</h2>
                     <SavedRecipes />
                 </section>
             </div>

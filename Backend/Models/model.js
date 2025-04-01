@@ -234,6 +234,7 @@ async function updateUser(updatedUser) {
  * {
  *   recipe_id: {string} - The unique identifier for the recipe (required).
  *   name: {string} - The name of the recipe (required).
+ *  
  *   review_id: {string} - The unique identifier for the review associated with the recipe (optional).
  *   ingredients: {Array<string>} - A list of ingredients for the recipe (optional).
  *   instructions: {Array<string>} - A list of instructions for preparing the recipe (optional).

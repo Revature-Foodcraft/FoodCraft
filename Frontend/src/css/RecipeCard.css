@@ -1,0 +1,54 @@
+/* Custom card styling */
+.custom-card {
+  position: relative; /* Enable positioning for child elements */
+  background-color: #fff7eb; /* Light beige background */
+  border: none; /* Remove default border */
+  border-radius: 10px; /* Soft rounded corners */
+  padding: 12px 18px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Full width */
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+/* Title styling */
+.card-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333333;
+  margin: 0;
+}
+
+/* Author text styling */
+.card-text {
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 5px;
+}
+
+/* Additional description text styling */
+.card-description {
+  font-size: 14px;
+  color: #666666;
+  margin-top: 5px;
+}
+
+/* Delete button styling */
+.delete-btn {
+  position: absolute; /* Position relative to .custom-card */
+  top: 50%; /* Vertical center */
+  right: 10px; /* Position from the right edge */
+  transform: translateY(-50%); /* Adjust vertical centering */
+  background: transparent;
+  border: none;
+  color: #dc3545; /* Red color for emphasis */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
