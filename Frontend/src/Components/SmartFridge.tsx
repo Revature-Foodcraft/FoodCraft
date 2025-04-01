@@ -1,4 +1,6 @@
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../css/SmartFridge.css'
 
 const SmartFridge: React.FC = () => {
     return (
