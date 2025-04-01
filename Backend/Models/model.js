@@ -1,5 +1,5 @@
 import { documentClient } from '../util/db.js';
-import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand, DeleteCommand, BatchGetCommand } from '@aws-sdk/lib-dynamodb';
 import { logger } from '../util/logger.js'
 
 
@@ -232,7 +232,8 @@ async function updateUser(updatedUser) {
  * @param {Object} recipe - The recipe object to be created. 
  * The object should be structured as follows:
  * {
- *   recipe_id: {string} - The unique identifier for the recipe (required).
+ *   PK: {string} - The unique identifier for the recipe (required).
+ *   SK: "RECIPE"
  *   name: {string} - The name of the recipe (required).
  *  
  *   review_id: {string} - The unique identifier for the review associated with the recipe (optional).
@@ -547,6 +548,73 @@ async function getRecipe(recipeId) {
     }
 }
 
+
+
+async function getSavedRecipeIds(userId) {
+
+
+    const profileParams = new GetCommand({
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: "PROFILE"
+        },
+    });
+
+    try {
+
+        let profileData;
+        try {
+            profileData = await documentClient.send(profileParams);
+        } catch (err) {
+            logger.error(`Error fetching user profile for user ${userId}: ${err.message}`);
+            throw err;
+        }
+
+        if (!profileData.Item) {
+            throw new Error("User profile not found");
+        }
+
+
+        const savedRecipeIds = profileData.Item.recipes || [];
+        if (savedRecipeIds.length === 0) {
+            return [];
+        }
+
+
+        const recipeKeys = savedRecipeIds.map(recipeId => ({
+            PK: recipeId,
+            SK: "RECIPE"
+        }));
+
+
+        const batchParams = {
+            RequestItems: {
+                [tableName]: {
+                    Keys: recipeKeys,
+                }
+            }
+        };
+
+        let recipesData;
+        try {
+            recipesData = await documentClient.send(new BatchGetCommand(batchParams));
+        } catch (err) {
+            logger.error('Error fetching recipes:', err);
+            throw err;
+        }
+
+        return recipesData.Responses[tableName];
+
+
+    } catch (error) {
+        logger.error(`Error while fetching saved recipe IDs for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+
+
 /**
  * Retrieves a review from the database based on the provided review ID.
  *
@@ -768,5 +836,6 @@ export {
     getRecipe,
     getReview,
     getAllReviews,
-    deleteReview
+    deleteReview,
+    getSavedRecipeIds
 }
