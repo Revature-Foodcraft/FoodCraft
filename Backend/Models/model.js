@@ -268,6 +268,7 @@ async function updateUser(updatedUser) {
  * @throws {Error} - Logs an error message if the operation fails.
  */
 async function createRecipe(recipe) {
+    console.log(recipe);
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe
