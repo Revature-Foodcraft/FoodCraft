@@ -8,6 +8,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
+        background: '#e0eff4'
     },
     mainContent: {
         padding: '50px',

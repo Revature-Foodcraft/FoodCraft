@@ -1,5 +1,6 @@
 import React from 'react';
 import RecipeCard from './RecipeCard';
+import "../css/SavedRecipes.css"
 
 const SavedRecipes: React.FC = () => {
     return (
@@ -13,8 +14,8 @@ const SavedRecipes: React.FC = () => {
                <RecipeCard title={'Title'} author={'Author'}/>
              
             </div>
-            <div className='createRecipe-button'>
-                <button>Create new recipe</button>
+            <div >
+                <button className='createRecipe-button'>Create new recipe</button>
             </div>
        </div>
     )

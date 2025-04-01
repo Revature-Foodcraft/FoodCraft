@@ -1,0 +1,27 @@
+.createRecipe-button {
+  background-color: #edd3a1; /* Beige background color */
+  border: none; /* No border */
+  border-radius: 25px; /* Rounded corners */
+  color: black; /* Black text */
+  font-family: Arial, sans-serif; /* Clean font */
+  font-size: 16px; /* Medium font size */
+  font-weight: bold; /* Bold text */
+  padding: 10px 20px; /* Padding for size */
+  cursor: pointer; /* Pointer cursor on hover */
+  text-align: center; /* Align text to the center */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth interactions */
+}
+
+.create-recipe-button:hover {
+  background-color: #e6c98e; /* Slightly darker beige on hover */
+  transform: translateY(-2px); /* Lift effect */
+}
+
+.create-recipe-button:active {
+  background-color: #d9bf86; /* Slightly darker when pressed */
+  transform: translateY(0); /* Reset lift */
+}
+
+.component-container {
+}
