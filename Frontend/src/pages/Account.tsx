@@ -37,13 +37,11 @@ const Account: React.FC = () => {
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}
                 <section style={styles.smartFridgeSection}>
-                    <h2>Smart Fridge</h2>
                     <SmartFridge />
                 </section>
 
                 {/* SavedRecipes Section */}
                 <section style={styles.savedRecipesSection}>
-                    <h2>Saved Recipes</h2>
                     <SavedRecipes />
                 </section>
             </div>
