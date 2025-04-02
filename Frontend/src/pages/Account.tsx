@@ -1,6 +1,6 @@
 import React from 'react';
 import SavedRecipes from '../Components/SavedRecipes';
-import SmartFridge from '../Components/SmartFridge';
+import SmartFridge from '../Components/SmartFridge/SmartFridge';
 import Header from '../Components/Header';
 
 const styles: { [key: string]: React.CSSProperties } = {
