@@ -1,5 +1,5 @@
 import express from 'express';
-import {login, register } from '../Controller/userController.js';
+import { login, register, getRecipe, createRecipe, getSavedRecipes } from '../Controller/userController.js';
 
 const userRouter = express.Router();
 /**
@@ -110,5 +110,7 @@ userRouter.post('/users', register);
  *                   example: Error message
  */
 userRouter.post('/login', login);
-
+userRouter.post('/addRecipe', createRecipe)
+userRouter.get('/recipe/:recipeId', getRecipe);
+userRouter.get('/account/recipes', getSavedRecipes)
 export default userRouter;

@@ -1,0 +1,65 @@
+#card-container {
+  max-height: 430px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden;
+  display: block; /* Stack cards vertically */
+
+  padding: 10px; /* Inner spacing around the wrapper */
+  gap: 0; /* Remove unnecessary horizontal spacing */
+  margin: 0 auto; /* Center the wrapper horizontally */
+}
+
+#card-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+#card-container::-webkit-scrollbar-thumb {
+  background-color: #edd3a1; /* Match the card colors */
+  border-radius: 4px;
+}
+
+.container {
+  padding: 20px; /* Add inner spacing around the container */
+  margin: 0 auto; /* Center the container horizontally */
+  padding: 20px; /* Add padding around the container */
+  background-color: #f9f9f9; /* Light gray background for contrast */
+  border-radius: 10px; /* Rounded corners for a soft look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.row {
+  margin-bottom: 15px; /* Add spacing between rows */
+}
+
+.row:first-child {
+  margin-bottom: 20px; /* Space below the header */
+  text-align: center; /* Center-align the title */
+}
+
+.row:first-child h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333; /* Darker text for contrast */
+}
+
+.btn-custom {
+  background-color: #edd2a8; /* Warm orange shade for emphasis */
+  color: #000000; /* White text for contrast */
+  border: none; /* Remove border */
+  border-radius: 20px; /* Rounded, pill-like shape */
+  padding: 10px 20px; /* Larger padding for aesthetics */
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-custom:hover {
+  background-color: #e6a902; /* Slightly darker shade on hover */
+  transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.btn-custom:active {
+  transform: translateY(0); /* Reset lift on click */
+  background-color: #d79902; /* Even darker shade */
+}
