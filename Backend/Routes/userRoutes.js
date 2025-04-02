@@ -1,6 +1,6 @@
 import express from 'express';
-import {login, register, getRecipe, createRecipe } from '../Controller/userController.js';
-
+import { login, register, getRecipe, createRecipe, getSavedRecipes } from '../Controller/userController.js';
+import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 const userRouter = express.Router();
 /**
  * @swagger
@@ -112,4 +112,5 @@ userRouter.post('/users', register);
 userRouter.post('/login', login);
 userRouter.post('/addRecipe', createRecipe)
 userRouter.get('/recipe/:recipeId', getRecipe);
+userRouter.get('/account/recipes', authenticateToken, getSavedRecipes)
 export default userRouter;

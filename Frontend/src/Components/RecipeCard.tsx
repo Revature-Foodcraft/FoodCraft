@@ -5,7 +5,7 @@ import '../css/RecipeCard.css';
 import { useNavigate } from "react-router-dom";
 
 interface RecipeCardProps {
-    id: number;
+    id: string;
     title: string;
     author: string;
     description?: string;  // Optional additional text

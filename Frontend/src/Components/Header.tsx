@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../css/Header.css'; // Import the CSS file
-import '../css/Register.module.css';
+import '../css/Header.css'; // Import the CSS file\
 import LoginRegisterPopup from './LoginRegisterPopup';
 import { Link } from "react-router-dom";
 

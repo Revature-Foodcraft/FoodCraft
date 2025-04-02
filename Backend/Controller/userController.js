@@ -1,7 +1,7 @@
-import Joi from "joi"
-import * as userService from "../Services/userService.js"
+import Joi from "joi";
+import * as userService from "../Services/userService.js";
 
-export const register = async (req,res) =>{
+export const register = async (req, res) => {
     const accountSchema = Joi.object({
         username: Joi.string().required(),
         password: Joi.string().pattern(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.{8,})/).required(),
@@ -11,51 +11,51 @@ export const register = async (req,res) =>{
         picture: Joi.string().optional()
     })
 
-    const {error,value} = accountSchema.validate(req.body)
+    const { error, value } = accountSchema.validate(req.body)
 
-    if(error){
+    if (error) {
         const messages = [];
 
-        error.details.forEach(detail =>{
-            const cleanMsg = detail.message.replace(/"/g,'')
+        error.details.forEach(detail => {
+            const cleanMsg = detail.message.replace(/"/g, '')
             messages.push(cleanMsg)
         })
-        return res.status(400).json({message:messages})
+        return res.status(400).json({ message: messages })
     }
 
     const user = await userService.createUser(value)
 
-    if(user.success){
-        return res.status(201).json({message:"User Created", user:user.user})
-    }else{
-        return res.status(user.code).json({message:user.message})
+    if (user.success) {
+        return res.status(201).json({ message: "User Created", user: user.user })
+    } else {
+        return res.status(user.code).json({ message: user.message })
     }
 }
 
-export const login = async (req,res)=>{
+export const login = async (req, res) => {
     const loginSchema = Joi.object({
         username: Joi.string().required(),
         password: Joi.string().pattern(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.{8,})/).required()
     })
 
-    const {error, value} = loginSchema.validate(req.body)
+    const { error, value } = loginSchema.validate(req.body)
 
-    if(error){
+    if (error) {
         const messages = [];
 
-        error.details.forEach(detail =>{
-            const cleanMsg = detail.message.replace(/"/g,'')
+        error.details.forEach(detail => {
+            const cleanMsg = detail.message.replace(/"/g, '')
             messages.push(cleanMsg)
         })
-        return res.status(400).json({message:messages})
+        return res.status(400).json({ message: messages })
     }
 
     const user = await userService.loginUser(value)
 
-    if(user.success){
-        res.status(200).json({message:user.message,token:user.token})
-    }else{
-        res.status(400).json({message:user.message})
+    if (user.success) {
+        res.status(200).json({ message: user.message, token: user.token })
+    } else {
+        res.status(400).json({ message: user.message })
     }
 }
 export const getRecipe = async (req, res) => {
@@ -79,7 +79,8 @@ export const getRecipe = async (req, res) => {
     }
 };
 export const createRecipe = async (req, res) => {
-    console.log(req.body);
+
+    //TODO add description and user_id
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
         review_id: Joi.string().optional(),
@@ -101,14 +102,13 @@ export const createRecipe = async (req, res) => {
     });
 
     const { error, value } = recipeSchema.validate(req.body);
-    console.log(value);
     if (error) {
         const messages = error.details.map(detail => detail.message.replace(/"/g, ''));
         return res.status(400).json({ message: messages });
     }
 
     const recipeObj = {
-        
+
         ...value,
         dateCreated: new Date().toISOString()
     };
@@ -116,17 +116,36 @@ export const createRecipe = async (req, res) => {
     try {
         console.log("Saving recipe:", recipeObj);
         const newRecipe = await userService.createRecipe(recipeObj);
-        
+
         if (!newRecipe) {
             console.error("Database insertion failed:", recipeObj);
             return res.status(500).json({ success: false, message: "Failed to create recipe in database" });
         }
-    
+
         console.log("Recipe saved successfully:", newRecipe);
         return res.status(201).json({ success: true, message: "Recipe created successfully", recipe: newRecipe });
     } catch (error) {
         console.error("Error creating recipe:", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
-    
+
+};
+
+
+export const getSavedRecipes = async (req, res) => {
+    try {
+
+        const { userId } = req.locals.tokenDetail;
+        console.log(userId)
+        const responses = await userService.getSavedRecipes(userId);
+
+        if (responses.success) {
+            return res.status(200).json({ success: true, recipes: responses.recipes });
+        } else {
+            return res.status(400).json({ success: false, message: responses.message });
+        }
+    } catch (error) {
+        console.error("Error fetching saved recipes:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
 };
