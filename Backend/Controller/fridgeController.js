@@ -21,7 +21,7 @@ export const addIngredientToFridge = async (req, res) => {
   
     const userId = req.user?.userId;
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized here" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
   
     try {
