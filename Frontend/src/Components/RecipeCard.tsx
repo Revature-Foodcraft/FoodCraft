@@ -29,7 +29,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, author, description, onD
       </div>
       {onDelete && (
         <button className="btn btn-sm btn-outline-danger delete-btn" onClick={onDelete}>
-          &#x2715;
+          &#x1f5d1;
         </button>
       )}
         </div>

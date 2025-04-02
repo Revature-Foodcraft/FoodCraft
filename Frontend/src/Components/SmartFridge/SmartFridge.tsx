@@ -1,195 +1,175 @@
-import React, { useState } from "react";
-import Ingredient, { IngredientType } from "./Ingredient";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge.css";
+import "../../css/SmartFridge/SmartFridge.css";
+import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
+import CategoryComponent from "./CategoryComponent";
 
-interface IngredientSection {
-  category: string;
-  items: IngredientType[];
-}
+
+const initialIngredients: Ingredient[] = [
+  { name: 'Chicken Breast', category: IngredientCategory.Meat, amount: '2 lb' },
+  { name: 'Pork Steak', category: IngredientCategory.Meat, amount: '3 lb' },
+  { name: 'Apple', category: IngredientCategory.Fruits, amount: '5 lb' },
+  { name: 'Cucumber', category: IngredientCategory.Vegetables, amount: "1 lb" },
+  { name: 'Onions', category: IngredientCategory.Vegetables, amount: "3 lb" },
+  { name: 'Cheese', category: IngredientCategory.Dairy, amount: "1 lb" },
+  { name: 'Milk', category: IngredientCategory.Dairy, amount: "2 qt" },
+];
+
+
+
+// Group ingredients by category while retaining their original index.
+const groupIngredientsByCategory = (ingredients: Ingredient[]): Record<IngredientCategory, { ingredient: Ingredient; index: number }[]> =>
+  ingredients.reduce((acc, ingredient, idx) => {
+    if (!acc[ingredient.category]) {
+      acc[ingredient.category] = [];
+    }
+    acc[ingredient.category].push({ ingredient, index: idx });
+    return acc;
+  }, {} as Record<IngredientCategory, { ingredient: Ingredient; index: number }[]>);
+
 
 const SmartFridge: React.FC = () => {
-  // State holds groups of ingredients sorted by their category.
-  const [ingredients, setIngredients] = useState<IngredientSection[]>([]);
-  // Controls whether the add form is shown.
-  const [isAdding, setIsAdding] = useState<boolean>(false);
-  // Form state for the new ingredient.
-  const [newIngredient, setNewIngredient] = useState<{
-    name: string;
-    category: string;
-    amount: string;
-  }>({ name: "", category: "", amount: "" });
 
-  // Adds an ingredient to its category or creates a new section.
-  const addIngredient = (
-    name: string,
-    amount: string,
-    category: string
-  ): void => {
-    setIngredients((prev) => {
-      const section = prev.find(
-        (s) => s.category.toLowerCase() === category.toLowerCase()
-      );
-      if (section) {
-        return prev.map((s) =>
-          s.category.toLowerCase() === category.toLowerCase()
-            ? { ...s, items: [...s.items, { name, amount }] }
-            : s
-        );
-      } else {
-        return [...prev, { category, items: [{ name, amount }] }];
+const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchIngredients()
+        {
+            try {
+                const response = await fetch("http://localhost/fridge");
+                if (!response) {
+                    throw new Error("No resonse");
+                }
+
+                const data = await response.json()
+                console.log(`Respose: ${data}`)
+
+                const ingredientsData: Ingredient[] = data.map((item: any) => ({
+          ...item,
+          category: item.category as IngredientCategory,
+        }));
+
+        setIngredients(ingredientsData);
+            } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    });
-  };
-
-  // Deletes an ingredient from a category.
-  const deleteIngredient = (category: string, name: string): void => {
-    setIngredients((prev) =>
-      prev
-        .map((section) =>
-          section.category.toLowerCase() === category.toLowerCase()
-            ? { ...section, items: section.items.filter((item) => item.name !== name) }
-            : section
-        )
-        .filter((section) => section.items.length > 0)
-    );
-  };
-
-  // Updates the amount for a given ingredient.
-  const updateAmount = (
-    category: string,
-    name: string,
-    newAmount: string
-  ): void => {
-    setIngredients((prev) =>
-      prev.map((section) =>
-        section.category.toLowerCase() === category.toLowerCase()
-          ? {
-              ...section,
-              items: section.items.map((item) =>
-                item.name === name ? { ...item, amount: newAmount } : item
-              ),
-            }
-          : section
-      )
-    );
-  };
-
-  // Handle changes for the add ingredient form.
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewIngredient((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // When the form is submitted, add the ingredient and reset form state.
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (
-      newIngredient.name.trim() &&
-      newIngredient.category.trim() &&
-      newIngredient.amount.trim()
-    ) {
-      addIngredient(newIngredient.name, newIngredient.amount, newIngredient.category);
-      setNewIngredient({ name: "", category: "", amount: "" });
-      setIsAdding(false);
+        
     }
+})
+    //TODO =============================================================
+    //      STUFF ON TOP ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   const [ingredientList, setIngredientList] = useState<Ingredient[]>(initialIngredients);
+
+  // State for the form inputs.
+  const [newIngredient, setNewIngredient] = useState({
+    name: '',
+    category: IngredientCategory.Meat, // default category selection
+    amount: "",
+  });
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewIngredient((prev) => ({
+      ...prev,
+      [name]: name === 'amount' ? Number(value) : value,
+    }));
   };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Append the new ingredient at the end of the parent's list.
+    const ingredientToAdd: Ingredient = {
+      name: newIngredient.name,
+      category: newIngredient.category as IngredientCategory,
+      amount: newIngredient.amount,
+    };
+
+    setIngredientList((prev) => [...prev, ingredientToAdd]);
+    setNewIngredient({ name: '', category: IngredientCategory.Meat, amount: "" });
+  };
+
+  // Removal using the parent's index.
+  const removeIngredient = (indexToRemove: number) => {
+    setIngredientList((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  // Group ingredients by category, retaining each ingredient’s original index.
+  const groupedIngredients = groupIngredientsByCategory(ingredientList);
 
   return (
-    <div className="container my-5">
-      <h1 className="text-center mb-4">Smart Fridge</h1>
-      {isAdding ? (
-        <form onSubmit={handleFormSubmit} className="mb-4 border p-3 rounded">
-          <div className="mb-3">
-            <label htmlFor="ingredientName" className="form-label">
-              Ingredient Name
-            </label>
+      <div className="container">
+           <div className='row text-center'>
+                <h3>Smart Fridge</h3>
+          </div>
+          <div className="row" id="fridge-container">
+<form
+        onSubmit={handleFormSubmit}
+        style={{ marginBottom: '20px', padding: '10px', border: '1px solid lightgray' }}
+      >
+        <div style={{ marginBottom: '8px' }}>
+          <label>
+            Name:&nbsp;
             <input
               type="text"
-              id="ingredientName"
               name="name"
-              className="form-control"
-              placeholder="Enter ingredient name"
               value={newIngredient.name}
               onChange={handleInputChange}
               required
             />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="ingredientCategory" className="form-label">
-              Category
-            </label>
-            <input
-              type="text"
-              id="ingredientCategory"
+          </label>
+        </div>
+        <div style={{ marginBottom: '8px' }}>
+          <label>
+            Category:&nbsp;
+            <select
               name="category"
-              className="form-control"
-              placeholder="Enter category (e.g., Dairy, Meat)"
               value={newIngredient.category}
               onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="ingredientAmount" className="form-label">
-              Amount
-            </label>
+            >
+              {Object.values(IngredientCategory).map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div style={{ marginBottom: '8px' }}>
+          <label>
+            Amount:&nbsp;
             <input
-              type="text"
-              id="ingredientAmount"
+              type="number"
               name="amount"
-              className="form-control"
-              placeholder="Enter amount (e.g., 1 qt, 500 g)"
               value={newIngredient.amount}
               onChange={handleInputChange}
               required
+              min="1"
             />
-          </div>
-          <div>
-            <button type="submit" className="btn btn-primary me-2">
-              Add Ingredient
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setIsAdding(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : ingredients.length === 0 ? (
-        <div className="text-center p-4">
-          <p>Your fridge is empty.</p>
-          <button className="btn btn-primary" onClick={() => setIsAdding(true)}>
-            Add Ingredient
-          </button>
+          </label>
         </div>
-      ) : (
-        <>
-          {ingredients.map((section) => (
-            <div key={section.category} className="mb-4">
-              <h2 className="border-bottom pb-2">{section.category}</h2>
-              {section.items.map((item) => (
-                <Ingredient
-                  key={item.name}
-                  ingredient={item}
-                  category={section.category}
-                  onDelete={deleteIngredient}
-                  onUpdate={updateAmount}
-                />
-              ))}
-            </div>
-          ))}
-          {/* Global button to add another ingredient */}
-          <div className="text-center mt-4">
-            <button className="btn btn-secondary" onClick={() => setIsAdding(true)}>
-              Add Ingredient
-            </button>
+        <button type="submit" style={{ marginTop: '10px' }}>
+          Add Ingredient
+        </button>
+      </form>
+
+          {Object.keys(groupedIngredients).map((catKey) => (
+        <CategoryComponent
+          key={catKey}
+          category={catKey as IngredientCategory}
+          items={groupedIngredients[catKey as IngredientCategory]}
+                  onRemove={removeIngredient}
+              />
+      ))}
+
+            
+             
           </div>
-        </>
-      )}
-    </div>
+      </div>
   );
 };
 
