@@ -19,24 +19,44 @@ const SavedRecipes: React.FC = () => {
 
     React.useEffect(() => {
     const fetchRecipes = async () => {
-      try { //TODO change to send info with tocken
-        const response = await fetch("http://localhost:5000/account/recipes?userId=fd84e637-be21-43cb-b655-0b9b72433576");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-          const data = await response.json();
-          if (!data.recipes) {
-          throw new Error("Response does not contain recipes");
-        }
-
-        setRecipes(data.recipes);
-      } catch (err:any) {
-        console.error("Error fetching recipes:", err);
-        setError("Failed to load recipes.");
-      } finally {
-        setLoading(false);
+  try { 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error("No token found in localStorage");
+    }
+    
+    const response = await fetch("http://localhost:5000/account/recipes", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       }
-    };
+    });
+    
+    if (!response.ok) {
+      let errorMessage = "";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message ? errorData.message : "";
+      } catch (jsonError) {
+        errorMessage = "An unknown error occurred";
+      }
+      throw new Error(`${errorMessage}`);
+    }
+    
+    const data = await response.json();
+    if (!data.recipes) {
+      throw new Error("Response does not contain recipes");
+    }
+    
+    setRecipes(data.recipes);
+  } catch (err: any) {
+    console.error("Error fetching recipes:", err);
+    setError(`Failed to load recipes. ${err.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchRecipes();
   }, []);
