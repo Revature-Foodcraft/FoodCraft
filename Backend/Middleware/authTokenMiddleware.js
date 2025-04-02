@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import logger from "../util/logger.js"
+import {logger} from "../util/logger.js"
 import dotenv from 'dotenv'
 
 dotenv.config({override:true})

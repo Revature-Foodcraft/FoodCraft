@@ -753,6 +753,84 @@ async function removeIngredientFromFridge(userId, ingredientName) {
     }
 }
 
+/**
+ * Updates an ingredient in the user's fridge.
+ * Only the amount and category of the ingredient will be updated.
+ *
+ * @async
+ * @function updateIngredientFromFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @param {Object} ingredientUpdate - The update data for the ingredient.
+ * @param {string} ingredientUpdate.name - The name of the ingredient to update.
+ * @param {number} ingredientUpdate.amount - The new amount of the ingredient.
+ * @param {string} ingredientUpdate.category - The new category of the ingredient.
+ * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ */
+async function updateIngredientFromFridge(userId, ingredientUpdate) {
+    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty`);
+        return null;
+    }
+
+    // Find the index of the ingredient to update using its name
+    const index = user.fridge.findIndex(ing => ing.name === ingredientUpdate.name);
+    if (index === -1) {
+        logger.warn(`Ingredient ${ingredientUpdate.name} not found in fridge for user ${userId}`);
+        return null;
+    }
+
+    // Update the ingredient's amount and category
+    user.fridge[index].amount = ingredientUpdate.amount;
+    user.fridge[index].category = ingredientUpdate.category;
+
+    // Build the update command to update the entire fridge list
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updatedFridge": user.fridge
+        },
+        ReturnValues: "ALL_NEW"
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+/**
+ * Retrieves all ingredients from the user's fridge.
+ *
+ * @async
+ * @function getAllIngredientsFromFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @returns {Promise<Array|null>} The array of ingredients if successful, or `null` if an error occurs.
+ */
+async function getAllIngredientsFromFridge(userId) {
+    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
+    const user = await getUser(userId);
+    if (!user) {
+        logger.warn(`User ${userId} not found`);
+        return null;
+    }
+    
+    // Return the fridge array or an empty list if it doesn't exist
+    return user.fridge || [];
+}
+
+
+
 export {
     createUser,
     getUser,
@@ -766,5 +844,9 @@ export {
     getRecipe,
     getReview,
     getAllReviews,
-    deleteReview
+    deleteReview,
+    addIngredientToFridge,
+    removeIngredientFromFridge,
+    getAllIngredientsFromFridge,
+    updateIngredientFromFridge
 }
