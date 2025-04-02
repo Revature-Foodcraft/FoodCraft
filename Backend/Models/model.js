@@ -1,5 +1,5 @@
 import { documentClient } from '../util/db.js';
-import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand, DeleteCommand, BatchGetCommand } from '@aws-sdk/lib-dynamodb';
 import { logger } from '../util/logger.js'
 
 
@@ -232,7 +232,8 @@ async function updateUser(updatedUser) {
  * @param {Object} recipe - The recipe object to be created. 
  * The object should be structured as follows:
  * {
- *   recipe_id: {string} - The unique identifier for the recipe (required).
+ *   PK: {string} - The unique identifier for the recipe (required).
+ *   SK: "RECIPE"
  *   name: {string} - The name of the recipe (required).
  *  
  *   review_id: {string} - The unique identifier for the review associated with the recipe (optional).
@@ -268,6 +269,7 @@ async function updateUser(updatedUser) {
  * @throws {Error} - Logs an error message if the operation fails.
  */
 async function createRecipe(recipe) {
+    console.log(recipe);
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe
@@ -546,6 +548,73 @@ async function getRecipe(recipeId) {
     }
 }
 
+
+
+async function getSavedRecipeIds(userId) {
+
+
+    const profileParams = new GetCommand({
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: "PROFILE"
+        },
+    });
+
+    try {
+
+        let profileData;
+        try {
+            profileData = await documentClient.send(profileParams);
+        } catch (err) {
+            logger.error(`Error fetching user profile for user ${userId}: ${err.message}`);
+            throw err;
+        }
+
+        if (!profileData.Item) {
+            throw new Error("User profile not found");
+        }
+
+
+        const savedRecipeIds = profileData.Item.recipes || [];
+        if (savedRecipeIds.length === 0) {
+            return [];
+        }
+
+
+        const recipeKeys = savedRecipeIds.map(recipeId => ({
+            PK: recipeId,
+            SK: "RECIPE"
+        }));
+
+
+        const batchParams = {
+            RequestItems: {
+                [tableName]: {
+                    Keys: recipeKeys,
+                }
+            }
+        };
+
+        let recipesData;
+        try {
+            recipesData = await documentClient.send(new BatchGetCommand(batchParams));
+        } catch (err) {
+            logger.error('Error fetching recipes:', err);
+            throw err;
+        }
+
+        return recipesData.Responses[tableName];
+
+
+    } catch (error) {
+        logger.error(`Error while fetching saved recipe IDs for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+
+
 /**
  * Retrieves a review from the database based on the provided review ID.
  *
@@ -754,6 +823,84 @@ async function removeIngredientFromFridge(userId, ingredientName) {
     }
 }
 
+/**
+ * Updates an ingredient in the user's fridge.
+ * Only the amount and category of the ingredient will be updated.
+ *
+ * @async
+ * @function updateIngredientFromFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @param {Object} ingredientUpdate - The update data for the ingredient.
+ * @param {string} ingredientUpdate.name - The name of the ingredient to update.
+ * @param {number} ingredientUpdate.amount - The new amount of the ingredient.
+ * @param {string} ingredientUpdate.category - The new category of the ingredient.
+ * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ */
+async function updateIngredientFromFridge(userId, ingredientUpdate) {
+    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty`);
+        return null;
+    }
+
+    // Find the index of the ingredient to update using its name
+    const index = user.fridge.findIndex(ing => ing.name === ingredientUpdate.name);
+    if (index === -1) {
+        logger.warn(`Ingredient ${ingredientUpdate.name} not found in fridge for user ${userId}`);
+        return null;
+    }
+
+    // Update the ingredient's amount and category
+    user.fridge[index].amount = ingredientUpdate.amount;
+    user.fridge[index].category = ingredientUpdate.category;
+
+    // Build the update command to update the entire fridge list
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updatedFridge": user.fridge
+        },
+        ReturnValues: "ALL_NEW"
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+/**
+ * Retrieves all ingredients from the user's fridge.
+ *
+ * @async
+ * @function getAllIngredientsFromFridge
+ * @param {string} userId - The unique identifier of the user.
+ * @returns {Promise<Array|null>} The array of ingredients if successful, or `null` if an error occurs.
+ */
+async function getAllIngredientsFromFridge(userId) {
+    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
+    const user = await getUser(userId);
+    if (!user) {
+        logger.warn(`User ${userId} not found`);
+        return null;
+    }
+    
+    // Return the fridge array or an empty list if it doesn't exist
+    return user.fridge || [];
+}
+
+
+
 export {
     createUser,
     getUser,
@@ -767,5 +914,10 @@ export {
     getRecipe,
     getReview,
     getAllReviews,
-    deleteReview
+    deleteReview,
+    getSavedRecipeIds,
+    addIngredientToFridge,
+    removeIngredientFromFridge,
+    getAllIngredientsFromFridge,
+    updateIngredientFromFridge
 }

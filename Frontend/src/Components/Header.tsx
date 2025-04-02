@@ -1,5 +1,6 @@
 import React from 'react';
-import '../css/Header.css'; // Import the CSS file
+import '../css/Header.css'; // Import the CSS file\
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const Header: React.FC = () => {
       <nav>
         <ul>
           <li>
-            <button>Home</button>
+              <Link to="/"><button>Home</button></Link>
           </li>
           <li>
             <button>About</button>
@@ -18,8 +19,11 @@ const Header: React.FC = () => {
             <button>Contact</button>
           </li>
           <li>
-            <button>Login</button>
+            <Link to='/login'>  <button>Login</button></Link>
           </li>
+            <li>
+              <Link to='/account'><button>Account</button></Link>
+              </li>
         </ul>
       </nav>
       </header>
