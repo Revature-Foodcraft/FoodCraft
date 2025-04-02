@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import Header from '../Components/Header'
 import Sidebar from "../Components/Homepage/Sidebar";
+import Dropdown from "../Components/Homepage/SortByDropdown";
 // Define the Home component
 
 const handleLogout = ()=>{
@@ -14,7 +15,7 @@ const handleLogout = ()=>{
 const Home: React.FC = () => {
     return (
       <div className="d-grid vh-100 container-fluid">
-        <div className="row">
+        <div className="row mb-0">
           <Header/>
         </div>
         
@@ -30,14 +31,7 @@ const Home: React.FC = () => {
                     <input type="text" className="form-control" aria-label="Text input with dropdown button"/>
                     </div>
                     <div className=" col-6 d-flex justify-content-end">
-                      <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>
-                      <div className="dropdown-menu">
-                        <a className="dropdown-item" href="#">Action</a>
-                        <a className="dropdown-item" href="#">Another action</a>
-                        <a className="dropdown-item" href="#">Something else here</a>
-                        <div role="separator" className="dropdown-divider"></div>
-                        <a className="dropdown-item" href="#">Separated link</a>
-                      </div>
+                      <Dropdown/>
                     </div>
               </div>
               <hr className="my-2"/>

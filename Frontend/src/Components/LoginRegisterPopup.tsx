@@ -6,7 +6,6 @@ const LoginRegisterPopup: React.FC = ()=>{
     const [showPopup,setShowPopup] = useState(false)
 
     const togglePopup = () =>{
-        console.log("pop")
         setShowPopup(!showPopup)
     }
 
