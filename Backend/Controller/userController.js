@@ -134,9 +134,9 @@ export const createRecipe = async (req, res) => {
 
 export const getSavedRecipes = async (req, res) => {
     try {
-        //  const userId = req.user.id; // Assuming user ID is extracted from the token and added to req.user
-        const { userId } = req.query;
 
+        const { userId } = req.locals.tokenDetail;
+        console.log(userId)
         const responses = await userService.getSavedRecipes(userId);
 
         if (responses.success) {
