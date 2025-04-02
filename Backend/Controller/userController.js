@@ -1,5 +1,5 @@
-import Joi from "joi"
-import * as userService from "../Services/userService.js"
+import Joi from "joi";
+import * as userService from "../Services/userService.js";
 
 export const register = async (req, res) => {
     const accountSchema = Joi.object({
