@@ -24,7 +24,7 @@ const SavedRecipes: React.FC = () => {
     if (!token) {
       throw new Error("No token found in localStorage");
     }
-    
+
     const response = await fetch("http://localhost:5000/account/recipes", {
       method: "GET",
       headers: {

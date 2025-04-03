@@ -1,46 +1,36 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import foodCraftLogo from './assets/FoodCraft-Logo.png';
+import React, { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
-import Recipe from './pages/Recipe';
+import Home from "./pages/Home";
+import Ratings from './pages/Ratings';
+import Header from './Components/Header';
+import Profile from './pages/Profile';
+import { AuthContext } from './Components/Contexts';
 
-// Define the Home component
-const Home: React.FC = () => {
+const App: React.FC = () => {
+  const [isLoggedIn,setLogInStatus] = useState(false)
+
   return (
     <div>
-      <img className="logo" src={foodCraftLogo} alt="FoodCraft Logo" />
-      <h1>Welcome to FoodCraft</h1>
-      <Link to="/login">
-        <button>Go to Login</button>
-      </Link>
-      <Link to="/register">
-          <button>Register</button>
-      </Link>
-      <Link to="/account">
-          <button>Account</button>
-      </Link>
-      <Link to="/recipe">
-      <button>Recipe</button>
-      </Link>
+      <AuthContext.Provider value={{isLoggedIn,setLogInStatus}}>
+        <div className="d-grid container-fluid" style={{backgroundColor:"lightblue"}}>
+          <div className="row mb-0">
+            <Header/>
+          </div>
+        </div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path='/profile' element={<Profile/>}/>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/account" element={<Account />} />
+        </Routes>
+      </AuthContext.Provider>
     </div>
-  );
-};
 
-// Main App component with routing
-const App: React.FC = () => {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/recipe" element={<Recipe />} />
-      </Routes>
-    </Router>
   );
 };
 

@@ -1,34 +1,50 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import '../css/Header.css'; // Import the CSS file\
-import { Link } from 'react-router-dom';
+import LoginRegisterPopup from './LoginRegisterPopup';
+import { Link } from "react-router-dom";
+import { AuthContext } from './Contexts';
 
 const Header: React.FC = () => {
-  return (
-      <div className='wrapper'>
-          <header>
-      <img src="./src/assets/logo.svg" alt="FoodCraft Logo" />
-      <nav>
-        <ul>
-          <li>
-              <Link to="/"><button>Home</button></Link>
-          </li>
-          <li>
-            <button>About</button>
-          </li>
-          <li>
-            <button>Contact</button>
-          </li>
-          <li>
-            <Link to='/login'>  <button>Login</button></Link>
-          </li>
-            <li>
-              <Link to='/account'><button>Account</button></Link>
-              </li>
-        </ul>
-      </nav>
-      </header>
-      </div>
-  );
+    const {isLoggedIn,setLogInStatus} = useContext(AuthContext)
+
+    return (
+        <div className='wrapper'>
+            
+            <header>
+                <div className='titleAndLogoWrapper'>
+                    <img src="./src/assets/logo.svg" alt="FoodCraft Logo" />
+                    <h1 >FoodCraft</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li>
+                            <Link to="/">
+                                <button>Home</button>
+                            </Link>
+                        </li>
+                        {isLoggedIn ? (
+                            <>
+                                <li>
+                                    <Link to="/profile">
+                                        <button>Profile</button>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/account">
+                                        <button>Account</button>
+                                    </Link>
+                                </li>
+                            </>
+                        ) : (
+                            <li>
+                                <LoginRegisterPopup />
+                            </li>
+                        )}
+                    </ul>
+                </nav>
+            </header>
+        </div>
+    );
 };
 
 export default Header;
