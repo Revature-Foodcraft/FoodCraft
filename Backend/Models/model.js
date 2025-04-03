@@ -791,14 +791,14 @@ async function addIngredientToFridge(userId, ingredient) {
  * @param {string} ingredientName - The name of the ingredient to remove.
  * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
  */
-async function removeIngredientFromFridge(userId, ingredientName) {
+async function removeIngredientFromFridge(userId, ingredientId) {
     const user = await getUser(userId);
     if (!user || !user.fridge) {
         logger.warn(`User ${userId} not found or fridge is empty`);
         return null;
     }
 
-    const updatedFridge = user.fridge.filter(ingredient => ingredient.name !== ingredientName);
+    const updatedFridge = user.fridge.filter(ingredient => ingredient.id !== ingredientId);
 
     const command = new UpdateCommand({
         TableName: tableName,
@@ -845,15 +845,15 @@ async function updateIngredientFromFridge(userId, ingredientUpdate) {
     }
 
     // Find the index of the ingredient to update using its name
-    const index = user.fridge.findIndex(ing => ing.name === ingredientUpdate.name);
+    const index = user.fridge.findIndex(ing => ing.id === ingredientUpdate.id);
     if (index === -1) {
-        logger.warn(`Ingredient ${ingredientUpdate.name} not found in fridge for user ${userId}`);
+        logger.warn(`Ingredient ${ingredientUpdate.id} not found in fridge for user ${userId}`);
         return null;
     }
 
     // Update the ingredient's amount and category
     user.fridge[index].amount = ingredientUpdate.amount;
-    user.fridge[index].category = ingredientUpdate.category;
+    //user.fridge[index].category = ingredientUpdate.category;
 
     // Build the update command to update the entire fridge list
     const command = new UpdateCommand({
@@ -894,7 +894,7 @@ async function getAllIngredientsFromFridge(userId) {
         logger.warn(`User ${userId} not found`);
         return null;
     }
-    
+
     // Return the fridge array or an empty list if it doesn't exist
     return user.fridge || [];
 }

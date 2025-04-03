@@ -1,8 +1,14 @@
 import * as model from "../Models/model.js";
+import { v4 as uuidv4 } from 'uuid';
+
 
 async function addIngredient(userId, ingredient) {
   try {
-    const fridge = await model.addIngredientToFridge(userId, ingredient);
+    const fullIngredient = {
+      ...ingredient,
+      id: uuidv4()
+    }
+    const fridge = await model.addIngredientToFridge(userId, fullIngredient);
     if (!fridge) {
       return { success: false, code: 500, message: "Unable to add ingredient." };
     }
@@ -17,9 +23,9 @@ async function addIngredient(userId, ingredient) {
   }
 }
 
-async function removeIngredient(userId, name) {
+async function removeIngredient(userId, ingredientId) {
   try {
-    const fridge = await model.removeIngredientFromFridge(userId, name);
+    const fridge = await model.removeIngredientFromFridge(userId, ingredientId);
     if (!fridge) {
       return { success: false, code: 500, message: "Unable to remove ingredient." };
     }
