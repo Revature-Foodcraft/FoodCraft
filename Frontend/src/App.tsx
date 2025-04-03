@@ -4,7 +4,8 @@ import { Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
-import Home from "./pages/Home"
+import Home from "./pages/Home";
+import Ratings from './pages/Ratings';
 import Header from './Components/Header';
 import Profile from './pages/Profile';
 import { AuthContext } from './Components/Contexts';
