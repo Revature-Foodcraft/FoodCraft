@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../Components/Header';
+
 import '../css/Recipe.css';
 import lasagna from "../assets/lasagna.jpg";
 import orangec from "../assets/orange-chicken.jpg";
@@ -24,7 +24,7 @@ const Recipe: React.FC = () => {
 
     return (
         <div className="containerRecipe">
-            <Header />
+         
             <h1>{recipe.name}</h1>
             <div className="recipe-layout">
                 <div className="ingredients-instructions">
