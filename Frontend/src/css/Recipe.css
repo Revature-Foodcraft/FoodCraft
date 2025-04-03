@@ -1,0 +1,186 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.containerRecipe {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: white;
+}
+
+.recipe-layout {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* Ensures better layout on smaller screens */
+    gap: 10px;
+    padding: 20px;
+    width: 100%;
+    min-height: fit-content;
+    margin-bottom: 30px;
+}
+
+
+.ingredients-instructions {
+    flex: 2;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    max-width: 800px;
+}
+
+.middle-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.middle-top, .middle-bottom {
+    flex: 1;
+    background-color: #e0e0e0;
+    padding: 20px;
+    border-radius: 10px;
+    max-height: 245px;
+    max-width: 600px;
+}
+
+.food-image {
+    flex: 2;
+    background-color: #d6d6d6;
+    padding: 20px;
+    border-radius: 10px;
+    max-height: 500px;
+    max-width: 600px;
+}
+
+.recipeSuggestions {
+    margin-top: 0; /* Remove unnecessary top margin */
+    padding-top: 10px; /* Add slight padding if needed */
+}
+
+.suggestions-container {
+    display: flex;
+    gap: 75px;
+    overflow-x: auto;
+    padding: 10px 0;
+    justify-content: center;
+}
+
+.suggestion-box {
+    width: 180px; /* Adjust width as needed */
+    height: 220px; /* Adjust height as needed */
+    background-color: #c7893e;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+}
+
+.suggestion-box img {
+    width: 100%;
+    height: 80%; /* Adjust height to fit well */
+    object-fit: cover; /* Ensures image scales while maintaining aspect ratio */
+    border-radius: 8px;
+}
+.food-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+}
+.suggestion-box p {
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+h1,h2{
+    text-align: center;
+}
+h1{
+    padding-top: 20px;
+}
+h2{
+    padding-bottom: 10px;
+}
+.recipe-author {
+    display: flex;
+    align-items: center; /* Align name with the bottom of the avatar */
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc; /* Placeholder color */
+    background-image: url('../assets/boy.png'); /* Replace with actual avatar image */
+    background-size: cover;
+    background-position: center;
+}
+
+.author-name {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1; /* Prevent extra spacing */
+}
+
+.review-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    height: 100%;
+}
+
+.review-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.review-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc; /* Placeholder */
+    background-image: url('../assets/avatar.jpg'); /* Replace with actual avatar */
+    background-size: cover;
+    background-position: center;
+}
+
+.review-author {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.review-text {
+    font-size: 14px;
+    margin-top: 5px;
+    color: #444;
+}
+
+.review-stars {
+    align-self: flex-end;
+    font-size: 16px;
+    color: #FFD700;
+}
+
