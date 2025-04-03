@@ -1,39 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { DisplayContext } from "../Contexts";
 
-interface Cuisine{
-    id:string;
-    value:string;
-}
 const CuisineSelect: React.FC = () => {
-    const [selectedCuisine, setSelectedCuisine] = useState<string|null>()
+    const {selectedCuisine, setSelectedCuisine} = useContext(DisplayContext)
 
-    const cuisines: Cuisine[] = [
-        { id: "americanCuisine", value: "American" },
-        { id: "britishCuisine", value: "British" },
-        { id: "indianCuisine", value: "Indian" },
-        { id: "frenchCuisine", value: "French" },
-    ]
+    const cuisines: string[]=["American","British", "Indian", "French"]
 
     const handleSelect = (cuisineId:string) =>{
-        setSelectedCuisine((prev)=>(prev===cuisineId?null:cuisineId))
+        setSelectedCuisine((prev:string)=>(prev===cuisineId?"":cuisineId))
     }
-
-    // useEffect(()=>{
-    //     if(selectedCuisine != null){
-    //         alert(`Selected Cuisine: ${selectedCuisine}`)
-    //     }else{
-    //         alert("No Cuisine Selected");
-    //     }
-    // },[selectedCuisine])
 
     return (
         <div>
             {cuisines.map((cuisine)=>{
                 return (
-                    <div className="form-check" key={cuisine.value}>
-                        <input className="form-check-input" type="checkbox" id={cuisine.value} checked={selectedCuisine === cuisine.value} onChange={()=> handleSelect(cuisine.value)}/>
-                        <label className="form-check-label" htmlFor={cuisine.value}>{cuisine.value}</label>
+                    <div className="form-check" key={cuisine}>
+                        <input className="form-check-input" type="checkbox" id={cuisine} checked={selectedCuisine === cuisine} onChange={()=> handleSelect(cuisine)}/>
+                        <label className="form-check-label" htmlFor={cuisine}>{cuisine}</label>
                     </div>
                 )
             })}
