@@ -1,6 +1,6 @@
 import React from 'react';
 import SavedRecipes from '../Components/SavedRecipes';
-import SmartFridge from '../Components/SmartFridge';
+import SmartFridge from '../Components/SmartFridge/SmartFridge';
 import Header from '../Components/Header';
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -30,9 +30,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 const Account: React.FC = () => {
     return (
         <div style={styles.container}>
-            {/* Header */}
-            <Header />
-
+           
             {/* Main Content */}
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}

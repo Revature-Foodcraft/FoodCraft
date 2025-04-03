@@ -1,8 +1,10 @@
 import express from 'express';
-import {authenticateToken} from "../Middleware/authTokenMiddleware.js"
+import { authenticateToken } from "../Middleware/authTokenMiddleware.js"
 
-import {addIngredientToFridge, removeIngredientFromFridge, 
-    getAllIngredientsFromFridge, updateIngredientFromFridge} from '../Controller/fridgeController.js';
+import {
+    addIngredientToFridge, removeIngredientFromFridge,
+    getAllIngredientsFromFridge, updateIngredientFromFridge
+} from '../Controller/fridgeController.js';
 
 const fridgeRoutes = express.Router();
 
@@ -43,7 +45,7 @@ fridgeRoutes.use(authenticateToken)
  *                   example: Ingredient added successfully
  *                 ingredient:
  *                   type: object
- *                   example: {"name":"beef", "amount": "1kg", "category": "meat"}
+ *                   example: {"name":"beef", "amount": "1kg", "category": "meat", "id":"knn124kjn124j"}
  *       400:
  *         description: Bad request due to invalid input.
  *         content:
@@ -77,7 +79,7 @@ fridgeRoutes.use(authenticateToken)
  */
 fridgeRoutes.post("/", addIngredientToFridge);
 
-
+//TODO change doc it's now taking id in body
 /**
  * @swagger
  * /fridge:
@@ -157,7 +159,7 @@ fridgeRoutes.delete("/", removeIngredientFromFridge);
  *                   type: array
  *                   items:
  *                     type: object
- *                     example: {"name": "beef", "amount": "1kg", "category": "meat"}
+ *                     example: {"name": "beef", "amount": "1kg", "category": "meat", "id":"kj134bjk124j"}
  *       401:
  *         description: Unauthorized.
  *         content:
@@ -194,9 +196,9 @@ fridgeRoutes.get("/", getAllIngredientsFromFridge);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               id:
  *                 type: string
- *                 description: The name of the ingredient to update.
+ *                 description: The id of the ingredient to update.
  *               amount:
  *                 type: string
  *                 description: The new amount for the ingredient.

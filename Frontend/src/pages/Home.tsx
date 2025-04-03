@@ -1,18 +1,9 @@
 import React, { useState } from "react";
-import {useNavigate } from "react-router-dom";
-import Header from '../Components/Header'
 import Sidebar from "../Components/Homepage/Sidebar";
 import Dropdown from "../Components/Homepage/SortByDropdown";
 import DisplayRecipe from "../Components/Homepage/DisplayRecipes";
 import "../assets/search.svg"
 import { DisplayContext } from "../Components/Contexts";
-// Define the Home component
-
-const handleLogout = ()=>{
-  let nav = useNavigate()
-  localStorage.removeItem("token")
-  nav('/')
-}
 
 const Home: React.FC = () => {
   const [searchQuery,setSearchQuery] = useState<null|string>(null)
@@ -36,10 +27,6 @@ const Home: React.FC = () => {
   }
   
     return (
-      <div className="d-grid vh-100 container-fluid" style={{backgroundColor:"lightblue"}}>
-        <div className="row mb-0">
-          <Header/>
-        </div>
         <DisplayContext.Provider value={{sortBy,setSortBy,invert,setInvert,selectedCuisine,setSelectedCuisine,mealType,setMealTypeSelect}}>
           <div className="row">
             <div className=" d-flex col-2 flex-grow-1" style={{ height: "calc(100vh - 5rem)" }}>
@@ -64,7 +51,6 @@ const Home: React.FC = () => {
             </div>
           </div>
         </DisplayContext.Provider>
-      </div>
     );
   };
 

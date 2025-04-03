@@ -31,10 +31,10 @@ const LoginRegisterPopup: React.FC = ()=>{
                         <div className='modal-footer justify-content-center align-item-center'>
                             <button className='btn btn-secondary' onClick={togglePopup}>Close</button>
                             <Link to="/login">
-                                <button className='btn btn-primary'>Login</button>
+                                <button className='btn btn-primary' onClick={togglePopup}>Login</button>
                             </Link>
                             <Link to="/Register">
-                                <button className='btn btn-primary'>Register</button>
+                                <button className='btn btn-primary' onClick={togglePopup}>Register</button>
                             </Link>
                         </div>
                     </div>
