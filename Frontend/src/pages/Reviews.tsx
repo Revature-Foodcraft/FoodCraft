@@ -1,7 +1,6 @@
 // src/Pages/Reviews.tsx
 import React, { useEffect, useState } from "react";
 import ReviewCard, { Review } from "../Components/ReviewCard";
-import Header from "../Components/Header";
 import "../css/Reviews.css";
 
 const dummyReviews: Review[] = [
@@ -163,7 +162,6 @@ const Reviews: React.FC = () => {
 
   return (
     <div className="reviews-page">
-      <Header />
       <h2>Reviews</h2>
       <div className="review-cards-container">
         {currentReviews.map((review) => (
