@@ -19,7 +19,7 @@ export const addIngredientToFridge = async (req, res) => {
       return res.status(400).json({ message: messages });
     }
   
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -54,7 +54,7 @@ export const addIngredientToFridge = async (req, res) => {
       return res.status(400).json({ message: messages });
     }
   
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -89,7 +89,7 @@ export const addIngredientToFridge = async (req, res) => {
       return res.status(400).json({ message: messages });
     }
   
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -111,7 +111,7 @@ export const addIngredientToFridge = async (req, res) => {
   
   // Get all ingredients from the user's fridge.
   export const getAllIngredientsFromFridge = async (req, res) => {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
