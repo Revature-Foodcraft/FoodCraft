@@ -186,71 +186,72 @@ const SmartFridge: React.FC = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
- return (
-    <div className="container">
-      <div className="row text-center">
-        <h3>Smart Fridge</h3>
-      </div>
-      {/* Show a button if modal is not displayed */}
-      {!showModal && (
-        <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", fontSize: "16px" }}>
-            Add Ingredient
-          </button>
-        </div>
-      )}
+  
+return (
+  <div className="container mt-5">
+    <div className="row text-center mb-4">
+      <h3 className="display-6">Smart Fridge</h3>
+    </div>
 
-      {/* Render the modal overlay if showModal is true */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Add Ingredient</h3>
+    {/* Add Ingredient Button */}
+    {!showModal && (
+      <div className="text-center mb-4">
+        <button className="btn btn-primary btn-lg" onClick={() => setShowModal(true)}>
+          Add Ingredient
+        </button>
+      </div>
+    )}
+
+    {/* Modal Overlay for Adding Ingredient */}
+    {showModal && (
+      <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h5 className="modal-title">Add Ingredient</h5>
+            <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+          </div>
+          <div className="modal-body">
             <form onSubmit={handleFormSubmit}>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Name:&nbsp;
-                  <input type="text" name="name" value={newIngredient.name} onChange={handleInputChange} required />
-                </label>
+              <div className="form-group mb-3">
+                <label>Name:</label>
+                <input type="text" name="name" value={newIngredient.name} onChange={handleInputChange} className="form-control" required />
               </div>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Category:&nbsp;
-                  <select name="category" value={newIngredient.category} onChange={handleInputChange}>
-                    {Object.values(IngredientCategory).map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+              <div className="form-group mb-3">
+                <label>Category:</label>
+                <select name="category" value={newIngredient.category} onChange={handleInputChange} className="form-select">
+                  {Object.values(IngredientCategory).map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Amount:&nbsp;
-                  <input type="text" name="amount" value={newIngredient.amount} onChange={handleInputChange} required />
-                </label>
+              <div className="form-group mb-3">
+                <label>Amount:</label>
+                <input type="text" name="amount" value={newIngredient.amount} onChange={handleInputChange} className="form-control" required />
               </div>
-              <div style={{ textAlign: "right" }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ marginRight: "10px" }}>
+              <div className="text-end">
+                <button type="button" className="btn btn-secondary me-2" onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
-                <button type="submit">Save</button>
+                <button type="submit" className="btn btn-primary">Save</button>
               </div>
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      {Object.keys(groupedIngredients).map((catKey) => (
-        <CategoryComponent
-          key={catKey}
-          category={catKey as IngredientCategory}
-          items={groupedIngredients[catKey as IngredientCategory]}
-          onRemove={removeIngredient}
-          onUpdate={updateIngredient}
-        />
-      ))}
-    </div>
-  );
+    {/* Display Categories and Ingredients */}
+    {Object.keys(groupedIngredients).map((catKey) => (
+      <CategoryComponent
+        key={catKey}
+        category={catKey as IngredientCategory}
+        items={groupedIngredients[catKey as IngredientCategory]}
+        onRemove={removeIngredient}
+        onUpdate={updateIngredient}
+      />
+    ))}
+  </div>
+);
+
 };
 export default SmartFridge;

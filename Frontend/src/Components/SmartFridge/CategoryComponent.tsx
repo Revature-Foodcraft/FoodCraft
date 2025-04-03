@@ -17,12 +17,17 @@ interface CategoryProps {
 }
 
 const CategoryComponent: React.FC<CategoryProps> = ({ category, items, onRemove, onUpdate }) => (
-  <div>
-    <h3>{category}</h3>
+  <div className="mb-4">
+  <h4 className="mb-3 text-uppercase">{category}</h4>
+  <div className="row">
     {items.map(({ ingredient }) => (
-      <IngredientComponent key={ingredient.id} ingredient={ingredient} onRemove={onRemove} onUpdate={onUpdate} />
+      <div key={ingredient.id} className="col-md-4 mb-3">
+        <IngredientComponent ingredient={ingredient} onRemove={onRemove} onUpdate={onUpdate} />
+      </div>
     ))}
   </div>
+</div>
+
 );
 
 export default CategoryComponent;

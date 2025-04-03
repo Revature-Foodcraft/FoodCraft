@@ -22,44 +22,35 @@ const IngredientComponent: React.FC<IngredientProps> = ({ ingredient, onRemove, 
   };
 
   return (
-    <div className="container">
-      <div className="ingredient-container">
-        <p>
-          {ingredient.name} - Amount&nbsp;
-          {isEditing ? (
-            <>
-              <input
-                type="text"
-                value={editedAmount}
-                onChange={(e) => setEditedAmount(e.target.value)}
-              />
-              <button onClick={handleSave} style={{ marginLeft: "5px" }}>
-                Save
-              </button>
-            </>
-          ) : (
-            <span
-              onClick={() => setIsEditing(true)}
-              style={{ cursor: "pointer", textDecoration: "underline" }}
-            >
-              {ingredient.amount}
-            </span>
-          )}
-        </p>
-        <button
-          onClick={() => onRemove(ingredient.id)}
-          title="Remove Ingredient"
-          style={{
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            fontSize: "18px",
-          }}
-        >
-          &#x1F5D1;
-        </button>
-      </div>
-    </div>
+    <div className="card h-100">
+  <div className="card-body">
+    <h5 className="card-title">{ingredient.name}</h5>
+    <p className="card-text">
+      Amount:{" "}
+      {isEditing ? (
+        <>
+          <input
+            type="text"
+            className="form-control d-inline-block w-auto"
+            value={editedAmount}
+            onChange={(e) => setEditedAmount(e.target.value)}
+          />
+          <button className="btn btn-success btn-sm ms-2" onClick={handleSave}>
+            Save
+          </button>
+        </>
+      ) : (
+        <span onClick={() => setIsEditing(true)} style={{ cursor: "pointer", textDecoration: "underline" }}>
+          {ingredient.amount}
+        </span>
+      )}
+    </p>
+    <button className="btn btn-danger btn-sm" onClick={() => onRemove(ingredient.id)}>
+      Delete
+    </button>
+  </div>
+</div>
+
   );
 };
 
