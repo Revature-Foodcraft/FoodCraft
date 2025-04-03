@@ -23,5 +23,14 @@ export const DisplayContext = createContext<SortByContextType>({
   setMealTypeSelect:() => {} 
 });
 
+interface AuthContextType{
+  isLoggedIn:boolean;
+  setLogInStatus:React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const AuthContext= createContext<AuthContextType>({
+  isLoggedIn:false,
+  setLogInStatus:() => {} 
+})
 
 
