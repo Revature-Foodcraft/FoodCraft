@@ -23,6 +23,7 @@
 
 /* Login box */
 .login-box {
+  all:unset;
   background: rgba(255, 255, 255, 0.9);
   padding: 2.5rem;
   border-radius: 12px;

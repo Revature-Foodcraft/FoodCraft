@@ -9,7 +9,7 @@ header {
 
 .wrapper {
   background-color: #5b3e18; /* Dark brown */
-  padding: 0 20%; /* Increased side padding */
+  padding: 0 10%; /* Increased side padding */
 }
 
 /* Logo styling */
@@ -44,4 +44,15 @@ header nav ul li button {
 
 header nav ul li button:hover {
   color: #ff9d00; /* Highlight color */
+}
+
+.titleAndLogoWrapper{
+  display: flex;
+  align-items: center;
+}
+
+.titleAndLogoWrapper h1{
+  color: #edd2a8;
+  font-weight: bolder;
+  font-family:'Courier New', Courier, monospace;
 }
