@@ -894,7 +894,7 @@ async function getAllIngredientsFromFridge(userId) {
         logger.warn(`User ${userId} not found`);
         return null;
     }
-    
+
     // Return the fridge array or an empty list if it doesn't exist
     return user.fridge || [];
 }

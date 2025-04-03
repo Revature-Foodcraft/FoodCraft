@@ -5,16 +5,6 @@ import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
 import CategoryComponent from "./CategoryComponent";
 
 
-const initialIngredients: Ingredient[] = [
-  { name: 'Chicken Breast', category: IngredientCategory.Meat, amount: '2 lb' },
-  { name: 'Pork Steak', category: IngredientCategory.Meat, amount: '3 lb' },
-  { name: 'Apple', category: IngredientCategory.Fruits, amount: '5 lb' },
-  { name: 'Cucumber', category: IngredientCategory.Vegetables, amount: "1 lb" },
-  { name: 'Onions', category: IngredientCategory.Vegetables, amount: "3 lb" },
-  { name: 'Cheese', category: IngredientCategory.Dairy, amount: "1 lb" },
-  { name: 'Milk', category: IngredientCategory.Dairy, amount: "2 qt" },
-];
-
 
 
 // Group ingredients by category while retaining their original index.
@@ -30,40 +20,47 @@ const groupIngredientsByCategory = (ingredients: Ingredient[]): Record<Ingredien
 
 const SmartFridge: React.FC = () => {
 
-const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+ const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchIngredients()
-        {
-            try {
-                const response = await fetch("http://localhost/fridge");
-                if (!response) {
-                    throw new Error("No resonse");
-                }
+     useEffect(() => {
+    async function fetchIngredients() {
+      try {
+        const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error("No token found in localStorage");
+    }
+        const response = await fetch("http://localhost:5000/fridge/", {
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${token}`, // Replace `token` with the actual token variable
+  },
+});
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-                const data = await response.json()
-                console.log(`Respose: ${data}`)
+        const data = await response.json();
+        console.log("Fetched data:", data);
 
-                const ingredientsData: Ingredient[] = data.map((item: any) => ({
+        // Extract the `ingredients` array from the API response
+        const ingredientsData: Ingredient[] = data.ingredients.map((item: any) => ({
           ...item,
           category: item.category as IngredientCategory,
         }));
 
-        setIngredients(ingredientsData);
-            } catch (err: any) {
+        setIngredientList(ingredientsData); // Update the state with fetched ingredients
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
-        
     }
-})
-    //TODO =============================================================
-    //      STUFF ON TOP ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   const [ingredientList, setIngredientList] = useState<Ingredient[]>(initialIngredients);
+    fetchIngredients();
+  }, []);
+    
 
   // State for the form inputs.
   const [newIngredient, setNewIngredient] = useState({

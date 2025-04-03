@@ -136,7 +136,6 @@ export const getSavedRecipes = async (req, res) => {
     try {
 
         const { userId } = req.locals.tokenDetail;
-        console.log(userId)
         const responses = await userService.getSavedRecipes(userId);
 
         if (responses.success) {
