@@ -30,9 +30,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 const Account: React.FC = () => {
     return (
         <div style={styles.container}>
-            {/* Header */}
-            <Header />
-
+           
             {/* Main Content */}
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}

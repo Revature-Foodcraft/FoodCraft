@@ -8,6 +8,7 @@ export enum IngredientCategory {
 }
 
 export interface Ingredient {
+  id: string;
   name: string;
   category: IngredientCategory;
   amount: string; 

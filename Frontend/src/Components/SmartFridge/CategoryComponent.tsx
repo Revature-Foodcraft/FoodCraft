@@ -1,29 +1,28 @@
 import React from "react";
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../css/SmartFridge/Category.css'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../../css/SmartFridge/Category.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
 import IngredientComponent from "./IngredientComponent";
 
 interface CategoryItem {
   ingredient: Ingredient;
-  index: number;
 }
 
 interface CategoryProps {
   category: IngredientCategory;
-  // The items here include both the ingredient and its parent's index.
+  // The items here include the ingredient.
   items: CategoryItem[];
-  onRemove: (index: number) => void;
+  onRemove: (id: string) => void; // onRemove now receives an id.
+   onUpdate: (id: string, newAmount: string) => void;
 }
-const CategoryComponent: React.FC<CategoryProps> = ({ category, items, onRemove }) => (
 
+const CategoryComponent: React.FC<CategoryProps> = ({ category, items, onRemove, onUpdate }) => (
   <div>
     <h3>{category}</h3>
-      {items.map(({ ingredient, index }) => (
-        <IngredientComponent key={index} ingredient={ingredient} index={index} onRemove={onRemove} />
-      ))}
+    {items.map(({ ingredient }) => (
+      <IngredientComponent key={ingredient.id} ingredient={ingredient} onRemove={onRemove} onUpdate={onUpdate} />
+    ))}
   </div>
-)
+);
 
 export default CategoryComponent;
