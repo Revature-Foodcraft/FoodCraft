@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import '../css/Header.css'; // Import the CSS file\
 import LoginRegisterPopup from './LoginRegisterPopup';
 import { Link } from "react-router-dom";
+import { AuthContext } from './Contexts';
 
 const Header: React.FC = () => {
-    const [isLoggedIn,setIsLoggin] = useState(false)
-
-    useEffect(()=>{
-        if(localStorage.getItem('token')){
-            setIsLoggin(true)
-        }
-    })
+    const {isLoggedIn,setLogInStatus} = useContext(AuthContext)
 
     return (
         <div className='wrapper'>
@@ -20,28 +15,31 @@ const Header: React.FC = () => {
                     <img src="./src/assets/logo.svg" alt="FoodCraft Logo" />
                     <h1 >FoodCraft</h1>
                 </div>
-                
                 <nav>
                     <ul>
                         <li>
                             <Link to="/">
                                 <button>Home</button>
                             </Link>
-                            
                         </li>
-                        <li>
-                            <button>About</button>
-                        </li>
-                        <li>
-                            {isLoggedIn ? (
-                                <Link to="/account">
-                                    <button>Account</button>
-                                </Link>
-                            ) :(
-                                <LoginRegisterPopup></LoginRegisterPopup>
-                                
-                            )}
-                        </li>
+                        {isLoggedIn ? (
+                            <>
+                                <li>
+                                    <Link to="/profile">
+                                        <button>Profile</button>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/account">
+                                        <button>Account</button>
+                                    </Link>
+                                </li>
+                            </>
+                        ) : (
+                            <li>
+                                <LoginRegisterPopup />
+                            </li>
+                        )}
                     </ul>
                 </nav>
             </header>

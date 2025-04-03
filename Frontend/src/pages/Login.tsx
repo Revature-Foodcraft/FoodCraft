@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import '../css/Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/login-background.mp4';
+import { AuthContext } from '../Components/Contexts';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
+  const {setLogInStatus} = useContext(AuthContext)
+  const nav = useNavigate()
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -24,7 +26,9 @@ const Login: React.FC = () => {
       if (!response.ok) throw new Error(data.message);
 
       localStorage.setItem('token', data.token);
-      alert('Login successful!');
+      
+      setLogInStatus(true)
+      nav('/')
     } catch (err: any) {
       setError(err.message);
     }
