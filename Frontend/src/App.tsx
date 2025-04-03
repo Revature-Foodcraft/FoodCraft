@@ -5,6 +5,7 @@ import foodCraftLogo from './assets/FoodCraft-Logo.png';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
+import Ratings from './pages/Ratings';
 
 // Define the Home component
 const Home: React.FC = () => {
@@ -21,6 +22,9 @@ const Home: React.FC = () => {
       <Link to="/account">
           <button>Account</button>
       </Link>
+      <Link to="/ratings">
+          <button>Ratings</button>
+      </Link>
     </div>
   );
 };
@@ -34,6 +38,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/ratings" element={<Ratings />} />
       </Routes>
     </Router>
   );
