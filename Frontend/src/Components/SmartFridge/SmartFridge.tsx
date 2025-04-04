@@ -187,70 +187,111 @@ const SmartFridge: React.FC = () => {
   if (error) return <p>Error: {error}</p>;
 
   
-return (
-  <div className="container mt-5">
-    <div className="row text-center mb-4">
-      <h3 className="display-6">Smart Fridge</h3>
-    </div>
+return (<div className="fridge-container">
+      <header className="fridge-header">
+        <h3 className="fridge-title">Smart Fridge</h3>
+      </header>
 
-    {/* Add Ingredient Button */}
-    {!showModal && (
-      <div className="text-center mb-4">
-        <button className="btn btn-primary btn-lg" onClick={() => setShowModal(true)}>
-          Add Ingredient
-        </button>
-      </div>
-    )}
+      {/* Add Ingredient Button */}
+      {!showModal && (
+        <div className="btn-container">
+          <button
+            className="btn fridge-btn add-btn"
+            onClick={() => setShowModal(true)}
+          >
+            Add Ingredient
+          </button>
+        </div>
+      )}
 
-    {/* Modal Overlay for Adding Ingredient */}
-    {showModal && (
-      <div className="modal-overlay" onClick={() => setShowModal(false)}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <h5 className="modal-title">Add Ingredient</h5>
-            <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
-          </div>
-          <div className="modal-body">
-            <form onSubmit={handleFormSubmit}>
-              <div className="form-group mb-3">
-                <label>Name:</label>
-                <input type="text" name="name" value={newIngredient.name} onChange={handleInputChange} className="form-control" required />
-              </div>
-              <div className="form-group mb-3">
-                <label>Category:</label>
-                <select name="category" value={newIngredient.category} onChange={handleInputChange} className="form-select">
-                  {Object.values(IngredientCategory).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group mb-3">
-                <label>Amount:</label>
-                <input type="text" name="amount" value={newIngredient.amount} onChange={handleInputChange} className="form-control" required />
-              </div>
-              <div className="text-end">
-                <button type="button" className="btn btn-secondary me-2" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">Save</button>
-              </div>
-            </form>
+      {/* Modal Overlay for Adding Ingredient */}
+      {showModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h5 className="modal-title">Add Ingredient</h5>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleFormSubmit}>
+                <div className="form-group">
+                  <label>Name:</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newIngredient.name}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Category:</label>
+                  <select
+                    name="category"
+                    value={newIngredient.category}
+                    onChange={handleInputChange}
+                    className="input-field"
+                  >
+                    {Object.values(IngredientCategory).map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Amount:</label>
+                  <input
+                    type="text"
+                    name="amount"
+                    value={newIngredient.amount}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
-    {/* Display Categories and Ingredients */}
-    {Object.keys(groupedIngredients).map((catKey) => (
-      <CategoryComponent
-        key={catKey}
-        category={catKey as IngredientCategory}
-        items={groupedIngredients[catKey as IngredientCategory]}
-        onRemove={removeIngredient}
-        onUpdate={updateIngredient}
-      />
-    ))}
-  </div>
+      {/* Display Categories and Ingredients */}
+      {Object.keys(groupedIngredients).map((catKey) => (
+        <CategoryComponent
+          key={catKey}
+          category={catKey as IngredientCategory}
+          items={groupedIngredients[catKey as IngredientCategory]}
+          onRemove={removeIngredient}
+          onUpdate={updateIngredient}
+        />
+      ))}
+    </div>
 );
 
 };

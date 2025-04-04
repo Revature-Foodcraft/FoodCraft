@@ -1,6 +1,6 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge/Category.css";
+import "../../css/SmartFridge/SmartFridge.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
 import IngredientComponent from "./IngredientComponent";
 

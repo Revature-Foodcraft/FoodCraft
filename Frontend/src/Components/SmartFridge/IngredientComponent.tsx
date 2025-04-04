@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge/Ingredient.css";
+import "../../css/SmartFridge//SmartFridge.css";
 import { Ingredient } from "../../Types/Ingredient";
 
 interface IngredientProps {
@@ -22,34 +22,43 @@ const IngredientComponent: React.FC<IngredientProps> = ({ ingredient, onRemove, 
   };
 
   return (
-    <div className="card h-100">
-  <div className="card-body">
-    <h5 className="card-title">{ingredient.name}</h5>
-    <p className="card-text">
-      Amount:{" "}
-      {isEditing ? (
-        <>
-          <input
-            type="text"
-            className="form-control d-inline-block w-auto"
-            value={editedAmount}
-            onChange={(e) => setEditedAmount(e.target.value)}
-          />
-          <button className="btn btn-success btn-sm ms-2" onClick={handleSave}>
-            Save
-          </button>
-        </>
-      ) : (
-        <span onClick={() => setIsEditing(true)} style={{ cursor: "pointer", textDecoration: "underline" }}>
-          {ingredient.amount}
-        </span>
-      )}
-    </p>
-    <button className="btn btn-danger btn-sm" onClick={() => onRemove(ingredient.id)}>
-      Delete
-    </button>
-  </div>
-</div>
+      <div className="ingredient-card">
+      <div className="ingredient-body">
+        <h5 className="ingredient-title">{ingredient.name}</h5>
+        <p className="ingredient-text">
+          Amount:&nbsp;
+          {isEditing ? (
+            <>
+              <input
+                type="text"
+                className="input-field inline-input"
+                value={editedAmount}
+                onChange={(e) => setEditedAmount(e.target.value)}
+              />
+              <button
+                className="btn btn-success btn-sm inline-btn"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </>
+          ) : (
+            <span
+              className="editable-text"
+              onClick={() => setIsEditing(true)}
+            >
+              {ingredient.amount}
+            </span>
+          )}
+        </p>
+        <button
+          className="btn btn-danger btn-sm ingredient-delete"
+          onClick={() => onRemove(ingredient.id)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
 
   );
 };
