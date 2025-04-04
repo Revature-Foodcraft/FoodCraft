@@ -66,7 +66,7 @@ const Recipe: React.FC = () => {
                     <div className="middle-bottom">Middle Bottom</div>
                 </div>
                 <div className="food-image">
-                    <img src={recipe.pictures[0]?.link} alt={recipe.pictures[0]?.name || "Recipe Image"} />
+                <img src={recipe.pictures?.link} alt={recipe.name || "Recipe Image"} />
                 </div>
             </div>
             <div className="recipeSuggestions">
