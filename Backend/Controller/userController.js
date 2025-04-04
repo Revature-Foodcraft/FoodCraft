@@ -1,5 +1,6 @@
 import Joi from "joi";
 import * as userService from "../Services/userService.js";
+import multer from "multer"
 
 export const register = async (req, res) => {
     const accountSchema = Joi.object({
@@ -57,4 +58,39 @@ export const login = async (req, res) => {
     } else {
         res.status(400).json({ message: user.message })
     }
+}
+
+export const getProfile = async (req,res) => {
+    const userInfo = await userService.getUser(req.user?.userId)
+
+    if(userInfo.success){
+        res.status(200).json({username:userInfo.user.username,account:userInfo.user.account, picture:userInfo.user?.picture})
+    } else{
+        res.status(500).json({message:userInfo.message})
+    }
+}
+
+export const updateProfile = async (req,res) =>{
+    const updateSchema = Joi.object({
+        username: Joi.string().optional(),
+        firstname: Joi.string().optional(),
+        lastname: Joi.string().optional(),
+        email: Joi.string().email().optional(),
+    })
+    
+    const { error, value } = updateSchema.validate(req.body)
+
+    if (error) {
+        const messages = [];
+
+        error.details.forEach(detail => {
+            const cleanMsg = detail.message.replace(/"/g, '')
+            messages.push(cleanMsg)
+        })
+        return res.status(400).json({ message: messages })
+    }
+
+    const result = await userService.updateProfile(value,{userId:req.user.userId,picture:req.file})
+    
+    res.status(200).json(req.file)
 }

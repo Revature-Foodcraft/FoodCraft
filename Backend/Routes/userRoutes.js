@@ -1,9 +1,11 @@
 import express from 'express';
-import { login, register} from '../Controller/userController.js';
+import { login, register, getProfile, updateProfile} from '../Controller/userController.js';
+import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
+import { upload } from '../util/multer.js';
 const userRouter = express.Router();
 /**
  * @swagger
- * /user:
+ * /users:
  *   post:
  *     summary: Create a new user and store in the database.
  *     requestBody:
@@ -110,4 +112,70 @@ userRouter.post('/users', register);
  */
 userRouter.post('/login', login);
 
+/**
+ * @swagger
+ * /user/profile:
+ *   post:
+ *     summary: fetch users username, and account info
+ *     responses:
+ *       201:
+ *         description: User Found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   username: string
+ *                   firstname: string
+ *                   lastname: string
+ *                   email: string
+ *                   picture: string
+ *       403:
+ *         description: Missing token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error message
+ */
+userRouter.get('/user/profile',authenticateToken, getProfile)
+
+/**
+ * @swagger
+ * /user/profile:
+ *   put:
+ *     summary: fetch users username, and account info
+ *     responses:
+ *       201:
+ *         description: User Found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User Created
+ *                 user:
+ *                   username: string
+ *                   firstname: string
+ *                   lastname: string
+ *                   email: string
+ *                   picture: string
+ *       :
+ *         description: Missing token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error message
+ */
+userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture"), updateProfile)
 export default userRouter;

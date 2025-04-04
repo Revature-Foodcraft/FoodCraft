@@ -1,7 +1,7 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3"
+import { S3Client, PutObjectCommand, DeleteObjectCommand,GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { logger } from './logger'
 import dotenv from 'dotenv';
+import { logger } from "./logger.js";
 dotenv.config({ override: true });
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
