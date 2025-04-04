@@ -5,9 +5,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
 import Home from "./pages/Home";
-import Ratings from './pages/Ratings';
 import Header from './Components/Header';
 import Profile from './pages/Profile';
+import Recipe from './pages/Recipe';
+import Reviews from './pages/Reviews'
 import { AuthContext } from './Components/Contexts';
 
 const App: React.FC = () => {
@@ -27,6 +28,8 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/recipes" element={<Recipe />} />
+          <Route path="/recipes/reviews" element={<Reviews />}/>
         </Routes>
       </AuthContext.Provider>
     </div>

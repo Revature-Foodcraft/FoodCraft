@@ -1,6 +1,5 @@
 import express from 'express';
-import { login, register, getRecipe, createRecipe, getSavedRecipes } from '../Controller/userController.js';
-import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
+import { login, register} from '../Controller/userController.js';
 const userRouter = express.Router();
 /**
  * @swagger
@@ -110,7 +109,5 @@ userRouter.post('/users', register);
  *                   example: Error message
  */
 userRouter.post('/login', login);
-userRouter.post('/addRecipe', createRecipe)
-userRouter.get('/recipe/:recipeId', getRecipe);
-userRouter.get('/account/recipes', authenticateToken, getSavedRecipes)
+
 export default userRouter;

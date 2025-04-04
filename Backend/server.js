@@ -6,6 +6,7 @@ import {fridgeRoutes} from "./Routes/fridgeRoutes.js"
 import cors from "cors";
 import swaggerUi from "swagger-ui-express"
 import { swaggerSpec } from "./util/swagger.js";
+import recipeRoutes from "./Routes/recipeRoutes.js"
 
 const app = express();
 const PORT = 5000;
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/",userRouter);
 app.use("/fridge", fridgeRoutes);
+app.use("/recipe", recipeRoutes)
 
 
 
