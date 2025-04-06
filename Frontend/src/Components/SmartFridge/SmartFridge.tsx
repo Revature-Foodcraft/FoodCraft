@@ -186,61 +186,102 @@ const SmartFridge: React.FC = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
- return (
-    <div className="container">
-      <div className="row text-center">
-        <h3>Smart Fridge</h3>
-      </div>
-      {/* Show a button if modal is not displayed */}
+  
+return (<div className="fridge-container">
+      <header className="fridge-header">
+        <h3 className="fridge-title">Smart Fridge</h3>
+      </header>
+
+      {/* Add Ingredient Button */}
       {!showModal && (
-        <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", fontSize: "16px" }}>
+        <div className="btn-container">
+          <button
+            className="btn fridge-btn add-btn"
+            onClick={() => setShowModal(true)}
+          >
             Add Ingredient
           </button>
         </div>
       )}
 
-      {/* Render the modal overlay if showModal is true */}
+      {/* Modal Overlay for Adding Ingredient */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Add Ingredient</h3>
-            <form onSubmit={handleFormSubmit}>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Name:&nbsp;
-                  <input type="text" name="name" value={newIngredient.name} onChange={handleInputChange} required />
-                </label>
-              </div>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Category:&nbsp;
-                  <select name="category" value={newIngredient.category} onChange={handleInputChange}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h5 className="modal-title">Add Ingredient</h5>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleFormSubmit}>
+                <div className="form-group">
+                  <label>Name:</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newIngredient.name}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Category:</label>
+                  <select
+                    name="category"
+                    value={newIngredient.category}
+                    onChange={handleInputChange}
+                    className="input-field"
+                  >
                     {Object.values(IngredientCategory).map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
                     ))}
                   </select>
-                </label>
-              </div>
-              <div style={{ marginBottom: "8px" }}>
-                <label>
-                  Amount:&nbsp;
-                  <input type="text" name="amount" value={newIngredient.amount} onChange={handleInputChange} required />
-                </label>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ marginRight: "10px" }}>
-                  Cancel
-                </button>
-                <button type="submit">Save</button>
-              </div>
-            </form>
+                </div>
+                <div className="form-group">
+                  <label>Amount:</label>
+                  <input
+                    type="text"
+                    name="amount"
+                    value={newIngredient.amount}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
+      {/* Display Categories and Ingredients */}
       {Object.keys(groupedIngredients).map((catKey) => (
         <CategoryComponent
           key={catKey}
@@ -251,6 +292,7 @@ const SmartFridge: React.FC = () => {
         />
       ))}
     </div>
-  );
+);
+
 };
 export default SmartFridge;

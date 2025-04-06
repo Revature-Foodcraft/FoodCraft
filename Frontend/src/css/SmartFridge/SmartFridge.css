@@ -1,21 +1,28 @@
-modal-overlay {
+/* Modal Overlay */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* dimmed background */
+  background-color: rgba(0, 0, 0, 0.5); /* Dim background */
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000; /* on top of everything */
+  justify-content: center;
+  z-index: 1050;
 }
 
+/* Modal Content */
 .modal-content {
-  background-color: white;
+  background: #fff;
   padding: 20px;
   border-radius: 8px;
+  width: 100%;
   max-width: 500px;
-  width: 90%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+/* card adjustments if needed */
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
