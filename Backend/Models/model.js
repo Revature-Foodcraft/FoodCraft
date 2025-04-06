@@ -215,10 +215,10 @@ async function updateUser(updatedUser) {
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully updated user: ${updatedUser.userId}`);
+        logger.info(`Successfully updated user: ${updatedUser.PK}`);
         return response.Attributes;
     } catch (error) {
-        logger.error(`Error updating user: ${updatedUser.userId}`, error.message);
+        logger.error(`Error updating user: ${updatedUser.PK}`, error.message);
         return null;
     }
 }
