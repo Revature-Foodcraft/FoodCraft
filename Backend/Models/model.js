@@ -27,9 +27,9 @@ PROFILE methods
  * password: {string} - (required)
  * account: {
  *
- *      email: {string} - (oprional)
- *      first_name: {string} - (oprional)
- *      last_name: {strting} - (oprional)
+ *      email: {string} - (optional)
+ *      first_name: {string} - (optional)
+ *      last_name: {string} - (optional)
  *      } - (oprional),
  * picture: {string} - (optional) - name of picture in s3 bucket
  * }
@@ -41,12 +41,13 @@ async function createUser(user) {
     const command = new PutCommand({
         TableName: tableName,
         Item: user,
+        ReturnValues: "NONE",
     });
 
     try {
-        const response = await documentClient.send(command);
-        logger.info(`Succesfully created user ${user.username}`);
-        return response.Attributes;
+        await documentClient.send(command);
+        logger.info(`Successfully created user ${user.username}`);
+        return user;
     } catch (error) {
         logger.error(`Error while creating a user: ${error.message}`);
         return null;
@@ -96,7 +97,7 @@ async function getUser(userId) {
             return null;
         }
     } catch (error) {
-        logger.error(`Error getting user ${userId}`, error);
+        logger.error(`Error getting user ${userId}: ${error.message}`);
         return null;
     }
 }
@@ -181,6 +182,11 @@ async function getUserByUsername(username) {
  * }
  */
 async function updateUser(updatedUser) {
+    if (!updatedUser || !updatedUser.PK) {
+        logger.error("The 'updatedUser' object must contain a 'PK' field.");
+        return null;
+    }
+
     let updateExpression = "SET ";
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
@@ -230,8 +236,8 @@ async function updateUser(updatedUser) {
  *       { "PK": "recipe-1",
  *  "SK": "RECIPE",
  * "name": "Pasta",
- * "ingredients": ["9,4,7,2],
- * descriiption:{"some description"},
+ * "ingredients": ["9","4","7","2"],
+ * description:{"some description"},
  * instruction:["1 instruction","2 instruction"],
  * pictures:[],
  * rating:4.4,
@@ -241,8 +247,8 @@ async function updateUser(updatedUser) {
  *   { "PK": "recipe-1",
  *  "SK": "RECIPE",
  * "name": "Pasta",
- * "ingredients": ["9,4,7,2],
- * descriiption:{"some description"},
+ * "ingredients": ["9","4","7","2"],
+ * description:{"some description"},
  * instruction:["1 instruction","2 instruction"],
  * pictures:[],
  * rating:4.4,
@@ -299,7 +305,12 @@ async function getSavedRecipes(userId) {
             throw err;
         }
 
-        return recipesData.Responses[tableName];
+        if (Array.isArray(recipesData.Responses[tableName])) {
+            return recipesData.Responses[tableName];
+        } else {
+            logger.warn("Recipes data is not an array or is missing.");
+            return [];
+        }
     } catch (error) {
         logger.error(
             `Error while fetching saved recipe IDs for user ${userId}: ${error.message}`
@@ -311,7 +322,7 @@ async function getSavedRecipes(userId) {
 /**
  * @async
  * @function addIngredientToFridge
- * @description Adds an ingredient to the user's fridge.
+ * @description Adds an ingredient to the user's fridge if not there. if ingredient already in the fridge add amount to it
  * @param {string} userId - The ID of the user.
  * @param {Object} ingredient - The ingredient object to add.
  * {
@@ -322,30 +333,63 @@ async function getSavedRecipes(userId) {
  * @returns {Promise<Array|null>} - Updated fridge array or null if an error occurs.
  */
 async function addIngredientToFridge(userId, ingredient) {
-    const command = new UpdateCommand({
+    const getCommand = new GetCommand({
         TableName: tableName,
         Key: {
             PK: userId,
-            SK: `PROFILE`,
+            SK: "PROFILE",
         },
-        UpdateExpression:
-            "SET fridge = list_append(if_not_exists(fridge, :emptyList), :ingredient)",
-        ExpressionAttributeValues: {
-            ":ingredient": [ingredient],
-            ":emptyList": [],
-        },
-        ReturnValues: "ALL_NEW",
+        ProjectionExpression: "fridge",
     });
+
     try {
-        const response = await documentClient.send(command);
+        const currentResponse = await documentClient.send(getCommand);
+        const currentFridge = (currentResponse.Item && currentResponse.Item.fridge) || [];
+
+        const existingIndex = currentFridge.findIndex((item) => item.id === ingredient.id);
+        if (existingIndex !== -1) {
+            currentFridge[existingIndex].amount += ingredient.amount;
+            const updateExistingCommand = new UpdateCommand({
+                TableName: tableName,
+                Key: {
+                    PK: userId,
+                    SK: "PROFILE",
+                },
+                UpdateExpression: "SET fridge = :newFridge",
+                ExpressionAttributeValues: {
+                    ":newFridge": currentFridge,
+                },
+                ReturnValues: "ALL_NEW",
+            });
+            const updateResponse = await documentClient.send(updateExistingCommand);
+            logger.info(`Updated ingredient amount in fridge for user ${userId}`);
+            return updateResponse.Attributes.fridge;
+
+        }
+
+        const addCommand = new UpdateCommand({
+            TableName: tableName,
+            Key: {
+                PK: userId,
+                SK: "PROFILE",
+            },
+            UpdateExpression:
+                "SET fridge = list_append(if_not_exists(fridge, :emptyList), :ingredient)",
+            ExpressionAttributeValues: {
+                ":ingredient": [ingredient],
+                ":emptyList": [],
+            },
+            ReturnValues: "ALL_NEW",
+        });
+
+        const addResponse = await documentClient.send(addCommand);
         logger.info(`Successfully added ingredient to fridge for user ${userId}`);
-        return response.Attributes.fridge;
+        return addResponse.Attributes.fridge;
     } catch (error) {
-        logger.error(
-            `Error adding ingredient to fridge for user ${userId}: ${error.message}`
-        );
+        logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
         return null;
     }
+
 }
 
 /**
@@ -409,11 +453,12 @@ async function removeIngredientFromFridge(userId, ingredientId) {
 async function updateIngredientFromFridge(userId, ingredient) {
     const user = await getUser(userId);
     if (!user || !user.fridge) {
-        logger.warn(`User ${userId} not found or fridge is empty`);
+        logger.warn(`User ${userId} not found or fridge is empty.`);
         return null;
     }
 
-    const index = user.fridge.findIndex((ing) => ing.id === ingredient.id);
+    const fridgeCopy = [...user.fridge];
+    const index = fridgeCopy.findIndex((ing) => ing.id === ingredient.id);
     if (index === -1) {
         logger.warn(
             `Ingredient ${ingredient.id} not found in fridge for user ${userId}`
@@ -421,7 +466,7 @@ async function updateIngredientFromFridge(userId, ingredient) {
         return null;
     }
 
-    user.fridge[index].amount = ingredient.amount;
+    fridgeCopy[index].amount = ingredient.amount;
 
     const command = new UpdateCommand({
         TableName: tableName,
@@ -431,7 +476,7 @@ async function updateIngredientFromFridge(userId, ingredient) {
         },
         UpdateExpression: "SET fridge = :updatedFridge",
         ExpressionAttributeValues: {
-            ":updatedFridge": user.fridge,
+            ":updatedFridge": fridgeCopy,
         },
         ReturnValues: "ALL_NEW",
     });
@@ -498,15 +543,15 @@ RECIPE methods
  *   macros: { calories: 500, fats: 20, carbs: 60, protein: 15 },
  *   dateCreated: "2025-04-07T14:10:00.000Z"
  *   category:"Pasta",
- *   cuisine:"Italiian"
- * }
- * @returns {Promise<Object|null>} - Returns the dynamoDb response object or null if an error occurs.
  */
 async function createRecipe(recipe) {
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe,
+        ReturnValues: "ALL_NEW", // Ensures attributes are returned
     });
+
+
 
     try {
         const response = await documentClient.send(command);
@@ -597,10 +642,15 @@ async function getRecipe(recipeId) {
  *   reviews: [],
  *   user_id: "kj124kb1231231jbjk",
  *   macros: { calories: 520, fats: 22, carbs: 62, protein: 16 },
- *   dateCreated: "2025-04-07T14:10:00.000Z",
- *   category: "Pasta",
- *   cuisine: "Italian"
- * }
+async function updateRecipe(recipe) {
+    if (!recipe || !recipe.PK) {
+        logger.error("Invalid recipe object. 'PK' is required.");
+        return null;
+    }
+
+    let updateExpression = "SET ";
+    const ExpressionAttributeNames = {};
+    const ExpressionAttributeValues = {};
  */
 async function updateRecipe(recipe) {
     let updateExpression = "SET ";
@@ -655,6 +705,7 @@ async function deleteRecipe(recipeId) {
             PK: `${recipeId}`,
             SK: "RECIPE",
         },
+        ReturnValues: "ALL_OLD",
     });
 
     try {
@@ -864,6 +915,7 @@ async function deleteReview(reviewId) {
             PK: `${reviewId}`,
             SK: "REVIEW",
         },
+        ReturnValues: "ALL_OLD",
     });
 
     try {
@@ -894,7 +946,7 @@ INGREDIENT methods
  *   PK: {string} - autogenerated by service,
  *   SK: "INGREDIENT" - (required) unique identifier for the ingredient,
  *   name: {string} - (required) name of the ingredient,
- *   unit:{string} - (optional) unit of mesurement(lb, qt, etc.)
+ *   unit:{string} - (optional) unit of measurement(lb, qt, etc.)
  * }
  * @returns {Promise<Object|null>} - Returns the dynamoDb response object or null if an error occurs.
  *
@@ -993,22 +1045,28 @@ async function getAllIngredients() {
         return null;
     }
 }
-
 export {
+    // User-related functions
     createUser,
     getUser,
     getUserByUsername,
     updateUser,
     getSavedRecipes,
+
+    // Recipe-related functions
     createRecipe,
     getRecipe,
     updateRecipe,
     deleteRecipe,
     getAllRecipes,
+
+    // Review-related functions
     createReview,
     getReview,
     getAllReviews,
     deleteReview,
+
+    // Ingredient-related functions
     createIngredient,
     getIngredientByName,
     getAllIngredients,
@@ -1018,6 +1076,4 @@ export {
     getAllIngredientsFromFridge,
 };
 
-//TODO
 
-//TODO

@@ -6,7 +6,6 @@ async function addIngredient(userId, ingredient) {
   try {
     const fullIngredient = {
       ...ingredient,
-      id: uuidv4()
     }
     const fridge = await model.addIngredientToFridge(userId, fullIngredient);
     if (!fridge) {

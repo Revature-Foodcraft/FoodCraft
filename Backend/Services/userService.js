@@ -1,4 +1,4 @@
-import { hashPassword } from "../util/bcyrpt.js"
+import { hashPassword } from "../util/bcrypt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from "../util/bcyrpt.js";
@@ -45,29 +45,30 @@ export async function createUser({ username, password, email = "", firstname = "
 export async function loginUser({ username, password }) {
     const user = await model.getUserByUsername(username)
 
-    if (user && await comparePassword(password, user.password)) {
-        const token = jwt.sign({
-            userId: user.PK
-        },
-            process.env.SECRET_KEY,
-            {
-                expiresIn: '1h'
-            })
+    try {
+        if (user && await comparePassword(password, user.password)) {
+            const token = jwt.sign({
+                userId: user.PK
+            },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: '1h'
+                })
 
-        return { success: true, message: "Login Successful", token: token }
-    } else {
-        return { success: false, message: "Login Failed: Incorrect Username or Password" }
+            return { success: true, message: "Login Successful", token: token }
+        } else {
+            return { success: false, message: "Login Failed: Incorrect Username or Password" }
+        }
+    } catch (error) {
+        return { success: false, message: "An error occurred during login", error: error.message }
     }
 }
 
 export async function getUser(userId) {
     const user = await model.getUser(userId)
 
-    if (user.picture) {
-        user.picture = await getSignedImageUrl(user.picture);
-    } else {
-        user.picture = await getSignedImageUrl("default-avatar-icon.jpg");
-    }
+    const pictureUrl = await getSignedImageUrl(user.picture || "default-avatar-icon.jpg");
+    user.picture = pictureUrl;
     if (user) {
         return { success: true, user: user }
     } else {
@@ -75,21 +76,14 @@ export async function getUser(userId) {
     }
 }
 
-export async function updateProfile({ username, firstname, lastname, email }, { userId, picture }) {
-    const filename = picture ? `${userId}/${Date.now()}_${picture.originalname}` : null;
+export async function updateProfile({ userId, firstname, lastname, email, picture }) {
+
+    const userDB = await model.getUser(userId);
     const updateUser = {
-        PK: userId
+        PK: userDB.PK
     }
 
-    if (username) {
-        const exist = model.getUserByUsername(username)
-        if (!exist) {
-            updateUser.username = username;
-        } else {
-            return { success: false, message: "username in use" }
-        }
 
-    }
     if (firstname) {
         updateUser.account.firstname = firstname;
     }
@@ -100,10 +94,20 @@ export async function updateProfile({ username, firstname, lastname, email }, { 
         updateUser.account.email = email;
     }
     if (picture) {
-        await uploadImage(filename, picture.buffer, picture.mimeType)
-        updateUser.picture = filename
+        const filename = `${userId}/${Date.now()}_${picture.originalname}`;
+        try {
+            await uploadImage(filename, picture.buffer, picture.mimeType);
+            updateUser.picture = filename;
+        } catch (error) {
+            return { success: false, message: "Failed to upload picture", error: error.message };
+        }
     }
 
+    const user = await model.updateUser(updateUser);
 
-    const user = await model.updateUser(updateUser)
+    if (user) {
+        return { success: true, message: "Profile updated successfully", user };
+    } else {
+        return { success: false, message: "Failed to update profile" };
+    }
 }
