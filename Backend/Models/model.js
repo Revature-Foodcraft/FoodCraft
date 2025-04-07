@@ -779,6 +779,118 @@ async function upsertRecipeFromExternalDB(APIResponse) {
     //TODO
 }
 
+
+/**
+ * @async
+ * @function getRecipesByCategory
+ * @description Retrieves all recipes belonging to a specific category.
+ * @param {string} category - The category of recipes to retrieve.
+ * @returns {Promise<Array|null>} - An array of recipes in the specified category or null if an error occurs.
+ * @example
+ * [
+ *   {
+ *     PK: "recipe-123",
+ *     SK: "RECIPE",
+ *     name: "Pasta",
+ *     ingredients: [
+ *       { id: "31", amount: 2 },
+ *       { id: "12", amount: 5 }
+ *     ],
+ *     description: "A delicious pasta recipe",
+ *     instructions: ["Boil water", "Cook pasta", "Serve"],
+ *     pictures: [],
+ *     rating: 4.5,
+ *     reviews: [],
+ *     user_id: "kj124kb1231231jbjk",
+ *     macros: { calories: 500, fats: 20, carbs: 60, protein: 15 },
+ *     dateCreated: "2025-04-07T14:10:00.000Z",
+ *     category: "Pasta",
+ *     cuisine: "Italian"
+ *   }
+ * ]
+ */
+async function getRecipesByCategory(category) {
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :sk",
+        FilterExpression: "category = :category",
+        ExpressionAttributeValues: {
+            ":sk": "RECIPE",
+            ":category": category,
+        },
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved recipes by category ${category}: ${JSON.stringify(response.Items)}`);
+            return response.Items;
+        } else {
+            logger.warn(`No recipes found for category ${category}`);
+            return [];
+        }
+    } catch (error) {
+        logger.error(`Error while retrieving recipes by category ${category}: ${error.message}`);
+        return null;
+    }
+}
+/**
+ * @async
+ * @function getRecipesByCuisine
+ * @description Retrieves all recipes belonging to a specific cuisine.
+ * @param {string} cuisine - The cuisine of recipes to retrieve.
+ * @returns {Promise<Array|null>} - An array of recipes in the specified cuisine or null if an error occurs.
+ * @example
+ * [
+ *   {
+ *     PK: "recipe-123",
+ *     SK: "RECIPE",
+ *     name: "Pasta",
+ *     ingredients: [
+ *       { id: "31", amount: 2 },
+ *       { id: "12", amount: 5 }
+ *     ],
+ *     description: "A delicious pasta recipe",
+ *     instructions: ["Boil water", "Cook pasta", "Serve"],
+ *     pictures: [],
+ *     rating: 4.5,
+ *     reviews: [],
+ *     user_id: "kj124kb1231231jbjk",
+ *     macros: { calories: 500, fats: 20, carbs: 60, protein: 15 },
+ *     dateCreated: "2025-04-07T14:10:00.000Z",
+ *     category: "Pasta",
+ *     cuisine: "Italian"
+ *   }
+ * ]
+ */
+async function getRecipesByCuisine(cuisine) {
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :sk",
+        FilterExpression: "cuisine = :cuisine",
+        ExpressionAttributeValues: {
+            ":sk": "RECIPE",
+            ":cuisine": cuisine,
+        },
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved recipes by cuisine ${cuisine}: ${JSON.stringify(response.Items)}`);
+            return response.Items;
+        } else {
+            logger.warn(`No recipes found for cuisine ${cuisine}`);
+            return [];
+        }
+    } catch (error) {
+        logger.error(`Error while retrieving recipes by cuisine ${cuisine}: ${error.message}`);
+        return null;
+    }
+}
+
 /* 
 ========================
 REVIEW methods
@@ -1059,6 +1171,8 @@ export {
     updateRecipe,
     deleteRecipe,
     getAllRecipes,
+    getRecipesByCategory,
+    getRecipesByCuisine,
 
     // Review-related functions
     createReview,
