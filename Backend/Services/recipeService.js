@@ -21,12 +21,14 @@ export async function getRecipe({ recipeId }) {
 export async function createRecipe({
     name,
     description,
-    review_id = null,
+    reviews = [],
     ingredients = [],
     instructions = [],
     pictures = [],
-    rating = null,
-    macros = {}
+    rating = 0,
+    macros = {},
+    category,
+    cuisine
 }) {
     if (!name || ingredients.length === 0 || instructions.length === 0) {
         return { success: false, code: 400, message: "Missing required fields" };
@@ -36,13 +38,15 @@ export async function createRecipe({
         PK: uuidv4(),
         SK: "RECIPE",
         name,
-        review_id,
+        reviews,
         description,
         ingredients,
         instructions,
         pictures,
         rating,
         macros,
+        category,
+        cuisine,
         dateCreated: new Date().toISOString()
     };
 
@@ -63,7 +67,7 @@ export async function getSavedRecipes(userId) {
     }
 
     try {
-        const response = await model.getSavedRecipeIds(userId);
+        const response = await model.getSavedRecipes(userId);
 
         if (!response || response.length === 0) {
             logger.warn("No saved recipes found for user:", userId);
@@ -75,6 +79,24 @@ export async function getSavedRecipes(userId) {
 
     } catch (error) {
         console.error("Error fetching saved recipes:", error);
+        return { success: false, code: 500, message: "Internal server error" };
+    }
+}
+
+export async function getAllRecipes() {
+    try {
+        const recipes = await model.getAllRecipes();
+
+        if (!recipes || recipes.length === 0) {
+            logger.warn("No recipes found in the database");
+            return { success: false, code: 404, message: "No recipes found" };
+        }
+
+        logger.info(`Fetched ${recipes.length} recipes from the database`);
+        return { success: true, recipes };
+
+    } catch (error) {
+        console.error("Error fetching all recipes:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }

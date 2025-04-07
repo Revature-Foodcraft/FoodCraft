@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
-import { uploadImage,getSignedImageUrl } from "../util/s3.js";
+import { uploadImage, getSignedImageUrl } from "../util/s3.js";
 
 dotenv.config({ override: true })
 
@@ -60,30 +60,35 @@ export async function loginUser({ username, password }) {
     }
 }
 
-export async function getUser(userId){
+export async function getUser(userId) {
     const user = await model.getUser(userId)
-    user.picture = await getSignedImageUrl(user.picture)
-    if(user){
-        return {success: true, user:user}
-    }else{
-        return {success: false, message:"Failed to get user"}
+
+    if (user.picture) {
+        user.picture = await getSignedImageUrl(user.picture);
+    } else {
+        user.picture = await getSignedImageUrl("default-avatar-icon.jpg");
+    }
+    if (user) {
+        return { success: true, user: user }
+    } else {
+        return { success: false, message: "Failed to get user" }
     }
 }
 
-export async function updateProfile({username, firstname, lastname, email},{userId, picture}){
-    const filename = `${Date.now()}-${picture.originalname}`;
+export async function updateProfile({ username, firstname, lastname, email }, { userId, picture }) {
+    const filename = picture ? `${userId}/${Date.now()}_${picture.originalname}` : null;
     const updateUser = {
-        PK:userId
+        PK: userId
     }
 
     if (username) {
         const exist = model.getUserByUsername(username)
-        if (!exist){
+        if (!exist) {
             updateUser.username = username;
-        }else{
-            return {success:false, message:"username in use"}
+        } else {
+            return { success: false, message: "username in use" }
         }
-        
+
     }
     if (firstname) {
         updateUser.account.firstname = firstname;
@@ -94,11 +99,11 @@ export async function updateProfile({username, firstname, lastname, email},{user
     if (email) {
         updateUser.account.email = email;
     }
-    if (picture){
-        await uploadImage(filename,picture.buffer,picture.mimeType)
+    if (picture) {
+        await uploadImage(filename, picture.buffer, picture.mimeType)
         updateUser.picture = filename
     }
 
-    
+
     const user = await model.updateUser(updateUser)
 }
