@@ -41,6 +41,7 @@ const App: React.FC = () => {
           <Route path="/recipes" element={<Recipe />} />
           <Route path="/recipes/reviews" element={<Reviews />}/>
           <Route path="/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Account/></ProtectedRoute>} />
+          <Route path="/recipe/:id" element={<Recipe/>}/>
           {/* <Route path='*' element={<Navigate to="/404"/>}/> */}
         </Routes>
       </AuthContext.Provider>

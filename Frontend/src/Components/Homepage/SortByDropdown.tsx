@@ -1,7 +1,7 @@
 import React, { useState,useContext } from "react";
 import { DisplayContext } from "../Contexts";
 
-const Dropdown: React.FC = () => {
+const SortByDropdown: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { sortBy, setSortBy, invert,setInvert } = useContext(DisplayContext);
     
@@ -46,4 +46,4 @@ const Dropdown: React.FC = () => {
     );
 };
 
-export default Dropdown;
+export default SortByDropdown;

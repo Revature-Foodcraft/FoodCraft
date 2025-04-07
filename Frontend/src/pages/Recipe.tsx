@@ -7,10 +7,12 @@ import salad from "../assets/salad.jpg";
 import pizza from "../assets/pizza.jpg";
 import chickens from "../assets/chicken sandwich.jpg";
 import fishtacos from "../assets/fishTacos.jpg";
+import { useParams } from 'react-router-dom';
 
 const Recipe: React.FC = () => {
     const [recipe, setRecipe] = useState<any>(null);
-    
+    const {id} = useParams();
+    console.log(id)
     useEffect(() => {
         fetch('http://localhost:5000/recipe/recipe/2') // Replace with actual API URL
             .then(response => response.json())
@@ -24,7 +26,6 @@ const Recipe: React.FC = () => {
 
     return (
         <div className="containerRecipe">
-         
             <h1>{recipe.name}</h1>
             <div className="recipe-layout">
                 <div className="ingredients-instructions">
