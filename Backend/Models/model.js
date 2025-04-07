@@ -2,38 +2,31 @@ import { documentClient } from '../util/db.js';
 import { GetCommand, PutCommand, UpdateCommand, ScanCommand, QueryCommand, DeleteCommand, BatchGetCommand } from '@aws-sdk/lib-dynamodb';
 import { logger } from '../util/logger.js'
 
-
 const tableName = "FoodCraft"
 
-//TODO picture upload and change picture view in recipe
+/*
+========================
+PROFILE methods
+========================
+*/
+
 /**
- * Asynchronously creates a new user in the database.
- *
  * @async
  * @function createUser
- * @param {Object} user - The user object to be created. 
- * The object should be structured as follows:
+ * @param {Object} user  - The user object to be created.
  * {
- *   username: {string} - The username of the user (required).
- *   password: {string} - The password for the user (required).
- *   email: {string} - The email of the user (optional).
- *   firstname: {string} - The firstname of the user (optional).
- *   lastname: {string} - The lastname of the user (optional). 
- *   picture: {string} - The url of the profile picture of the user (optional) || later change to picture name that will be in the s3 bucket
+ * username: {string} - (required)
+ * password: {string} - (required)
+ * account: {
+ * 
+ *      email: {string} - (oprional)
+ *      first_name: {string} - (oprional)
+ *      last_name: {strting} - (oprional)
+ *      picture: {string} - (optional) - name of picture in s3 bucket
+ *      } - (oprional)
  * }
- * @returns {Promise<Object|null>} - Returns the response object from the database operation if successful, 
- * or `null` if an error occurs. The response object from the PutCommand in DynamoDB typically contains:
- * {
- *   $metadata: {
- *     httpStatusCode: {number} - The HTTP status code of the operation.
- *     requestId: {string} - The unique identifier for the request.
- *     extendedRequestId: {string} - Additional request identifier (if available).
- *     cfId: {string} - CloudFront ID (if applicable).
- *     attempts: {number} - The number of retry attempts made.
- *     totalRetryDelay: {number} - The total delay (in milliseconds) due to retries.
- *   }
- * }
- *
+ * @returns {Promise<Object|null>} - Return DynamoDB response object if operation successful or 'null' when there was an error
+ * 
  * @throws {Error} - Logs an error message if the operation fails.
  */
 async function createUser(user) {
@@ -44,8 +37,8 @@ async function createUser(user) {
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully created user ${user.username}`)
-        return response
+        logger.info(`Succesfully created user ${user.username}`)
+        return response.Attributes
     } catch (error) {
         logger.error(`Error while creating a user: ${error.message}`)
         return null;
@@ -53,31 +46,28 @@ async function createUser(user) {
 }
 
 /**
- * Retrieves a user profile from the database based on the provided user ID.
- *
  * @async
  * @function getUser
- * @param {string} userId - The unique identifier of the user to retrieve.
- * @returns {Promise<Object|null>} A promise that resolves to the user profile object if found,
- * or `null` if the user does not exist or an error occurs.
- *
- * Example structure of `response.Item`:
+ * @param {string} userId - The id of the requested user
+ * @returns {Promise<Object|null>} - object that contains user from db or 'null' if user not exist or an error occurs
  * {
- *   PK: "12345",
- *   SK: "PROFILE",
- *   account: {
- *     firstname: "John",
- *     email: "johndoe@example.com",
- *     lastname: "Doe"
- *   },
- *   daily_macros: {},
- *   fridge: [],
- *   password: "some_hashed_password",
- *   recipes: [],
- *   username: "user1"
- * }
+ * 
+ * PK: {string},
+ * SK: "PROFILE",
+ * account:{
+ * 
+ *      first_name: {string},
+ *      last_name: {string},
+ *      email: {string}
+ * },
+ * fridge:[] - list of objects that contais id of ingredients and amount stored,
+ * password:{string},
+ * recipes:[] - list of recipe ids,
+ * username:{string}
  *
- * @throws {Error} Logs an error if there is an issue with the database operation.
+ * }
+ * 
+ * @throws {Error} - Logs an error if there is an issue with the database operation.
  */
 async function getUser(userId) {
     const command = new GetCommand({
@@ -105,35 +95,28 @@ async function getUser(userId) {
 
 
 /**
- * Retrieves a user from the database by their username.
- *
- * This function queries the database using the "username-index" to find a user
- * that matches the provided username. If a user is found, it returns the user object.
- * If no user is found or an error occurs, it logs the appropriate message and returns null.
- *
  * @async
  * @function getUserByUsername
- * @param {string} username - The username of the user to retrieve.
- * @returns {Promise<Object|null>} A promise that resolves to the user object if found,
- * or `null` if the user does not exist or an error occurs.
+ * @param {string} username - The username of the requested user
+ * @returns {Promise<Object|null>} - object that contains user from db or 'null' if user not exist or an error occurs
+ * @example {
+ * 
+ * PK: {string},
+ * SK: "PROFILE",
+ * account:{
+ * 
+ *      first_name: {string},
+ *      last_name: {string},
+ *      email: {string}
+ * },
+ * fridge:[] - list of objects that contais id of ingredients and amount stored,
+ * password:{string},
+ * recipes:[] - list of recipe ids,
+ * username:{string}
  *
- * Example structure of `response.Items[0]`:
- * {
- *   PK: "12345",
- *   SK: "PROFILE",
- *   account: {
- *     firstname: "John",
- *     email: "johndoe@example.com",
- *     lastname: "Doe"
- *   },
- *   daily_macros: {},
- *   fridge: [],
- *   password: "some_hashed_password",
- *   recipes: [],
- *   username: "user1"
  * }
- *
- * @throws {Error} Logs an error if there is an issue with the database operation.
+ * 
+ * @throws {Error} - Logs an error if there is an issue with the database operation.
  */
 async function getUserByUsername(username) {
 
@@ -163,26 +146,31 @@ async function getUserByUsername(username) {
 
 
 /**
- * Updates a user in the database with the provided updated user data.
- *
  * @async
- * @function
- * @param {Object} updatedUser - The user object containing updated fields.
- * @param {string} updatedUser.PK - The primary key of the user.
- * @param {string} updatedUser.SK - The sort key of the user (should be "PROFILE").
- * @param {string} [updatedUser.user_id] - The user ID (excluded from update).
- * @param {Object} [updatedUser.<otherFields>] - Other fields to update in the user profile.
- * @returns {Promise<Object|null>} - The updated user attributes if successful, or null if an error occurs.
- * @throws {Error} - Throws an error if the update operation fails.
- *
+ * @function updateUser
+ * @param {Object} updatedUser - object of upsed with updated info
+ * {
+ * PK: {string} - (required)
+ * ...otherProperties - (optional)
+ * }
+ * @returns {Promise<Object|null>} object that contain updated user or 'null' if error occured
  * @example
- * const updatedUser = {
- *   PK: "USER#123",
- *   SK: "PROFILE",
- *   name: "John Doe",
- *   email: "john.doe@example.com"
- * };
+ * {
  * 
+ * PK: {string},
+ * SK: "PROFILE",
+ * account:{
+ * 
+ *      first_name: {string},
+ *      last_name: {string},
+ *      email: {string}
+ * },
+ * fridge:[] - list of objects that contais id of ingredients and amount stored,
+ * password:{string},
+ * recipes:[] - list of recipe ids,
+ * username:{string}
+ *
+ * }
  */
 async function updateUser(updatedUser) {
     let updateExpression = "SET ";
@@ -223,64 +211,218 @@ async function updateUser(updatedUser) {
     }
 }
 
-
 /**
- * Asynchronously creates a new recipe in the database.
- *
  * @async
- * @function createRecipe
- * @param {Object} recipe - The recipe object to be created. 
- * The object should be structured as follows:
- * {
- *   PK: {string} - The unique identifier for the recipe (required).
- *   SK: "RECIPE"
- *   name: {string} - The name of the recipe (required).
- *  
- *   review_id: {string} - The unique identifier for the review associated with the recipe (optional).
- *   ingredients: {Array<string>} - A list of ingredients for the recipe (optional).
- *   instructions: {Array<string>} - A list of instructions for preparing the recipe (optional).
- *   pictures: {Array<Object>} - A list of pictures, where each picture is an object with the following structure (optional):
- *     {
- *       name: {string} - The name of the picture.
- *       link: {string} - The URL link to the picture.
- *     }
- *   rating: {number} - The rating for the recipe (e.g., 1-5 stars) (optional).
- *   macros: {Object} - An object representing the macronutrients of the recipe, with the following structure (optional):
- *     {
- *       calories: {number} - The number of calories.
- *       protein: {number} - The amount of protein in grams.
- *       carbs: {number} - The amount of carbohydrates in grams.
- *       fat: {number} - The amount of fat in grams.
- *     }
- * }
- * @returns {Promise<Object|null>} - Returns the response object from the database operation if successful, 
- * or `null` if an error occurs. The response object from the PutCommand in DynamoDB typically contains:
- * {
- *   $metadata: {
- *     httpStatusCode: {number} - The HTTP status code of the operation.
- *     requestId: {string} - The unique identifier for the request.
- *     extendedRequestId: {string} - Additional request identifier (if available).
- *     cfId: {string} - CloudFront ID (if applicable).
- *     attempts: {number} - The number of retry attempts made.
- *     totalRetryDelay: {number} - The total delay (in milliseconds) due to retries.
- *   }
- * }
- *
- * @throws {Error} - Logs an error message if the operation fails.
+ * @function getSavedRecipes
+ * @param {string} userId - id of the user from whom recipes are requested
+ * @returns {Promise<Array|null>} - A promise that resolves to an array of saved recipes or null if an error occurs.
+ * 
+ * @example
+ * [
+ *       { "PK": "recipe-1",
+ *  "SK": "RECIPE", 
+ * "name": "Pasta", 
+ * "ingredients": ["9,4,7,2], 
+ * descriiption:{"some description"}, 
+ * instruction:["1 instruction","2 instruction"], 
+ * pictures:[], 
+ * rating:4.4, 
+ * macros:{calories:500, fats:20,carbs:20,protein:20}, 
+ * dateCreated:"2025-04-07T14:10:00.000Z"},
+ * 
+ *   { "PK": "recipe-1",
+ *  "SK": "RECIPE", 
+ * "name": "Pasta", 
+ * "ingredients": ["9,4,7,2], 
+ * descriiption:{"some description"}, 
+ * instruction:["1 instruction","2 instruction"], 
+ * pictures:[], 
+ * rating:4.4, 
+ * macros:{calories:500, fats:20,carbs:20,protein:20}, 
+ * dateCreated:"2025-04-07T14:10:00.000Z"}
+ *       
  */
-async function createRecipe(recipe) {
-    console.log(recipe);
-    const command = new PutCommand({
+async function getSavedRecipes(userId) {
+    const profileParams = new GetCommand({
         TableName: tableName,
-        Item: recipe
+        Key: {
+            PK: userId,
+            SK: "PROFILE"
+        },
     });
 
     try {
-        const response = await documentClient.send(command);
-        logger.info(`Successfully created recipe ${recipe.name}`);
-        return response;
+        let profileData;
+        try {
+            profileData = await documentClient.send(profileParams);
+        } catch (err) {
+            logger.error(`Error fetching user profile for user ${userId}: ${err.message}`);
+            throw err;
+        }
+        if (!profileData.Item) {
+            throw new Error("User profile not found");
+        }
+
+        const savedRecipeIds = profileData.Item.recipes || [];
+        if (savedRecipeIds.length === 0) {
+            return [];
+        }
+
+        const recipeKeys = savedRecipeIds.map(recipeId => ({
+            PK: recipeId,
+            SK: "RECIPE"
+        }));
+
+        const batchParams = {
+            RequestItems: {
+                [tableName]: {
+                    Keys: recipeKeys,
+                }
+            }
+        };
+
+        let recipesData;
+        try {
+            recipesData = await documentClient.send(new BatchGetCommand(batchParams));
+        } catch (err) {
+            logger.error('Error fetching recipes:', err);
+            throw err;
+        }
+
+        return recipesData.Responses[tableName];
+
     } catch (error) {
-        logger.error(`Error while creating a recipe: ${error.message}`);
+        logger.error(`Error while fetching saved recipe IDs for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+
+
+async function addIngredientToFridge(userId, ingredient) {
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: `PROFILE`
+        },
+        UpdateExpression: "SET fridge = list_append(if_not_exist(fridge, :emptyList), :ingredient)",
+        ExpressionAttributeValues: {
+            ":ingredient": [ingredient],
+            ":emptyList": []
+        },
+        ReturnValues: "ALL_NEW"
+    });
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully added ingredient to fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+
+}
+
+async function removeIngredientFromFridge(userId, ingredientId) {
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty`);
+        return null;
+    }
+
+    const updatedFridge = user.fridge.filter(ingredient => ingredient.id !== ingredientId);
+
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updatedFridge": updatedFridge
+        },
+        ReturnValues: "ALL_NEW"
+    });
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully removed ingredient from fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error removing ingredient from fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+
+}
+
+async function updateIngredientFromFridge(userId, ingredient) {
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty`);
+        return null;
+    }
+
+    const index = user.fridge.findIndex(ing => ing.id === ingredient.id);
+    if (index === -1) {
+        logger.warn(`Ingredient ${ingredient.id} not found in fridge for user ${userId}`);
+        return null;
+    }
+
+    user.fridge[index].amount = ingredient.amount;
+
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE"
+        },
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updateFridge": user.fridge
+        },
+        ReturnValues: "ALL_NEW"
+    })
+
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
+        return response.Attributes.fridge;
+    } catch (error) {
+        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+async function getAllIngredientsFromFridge(userId) {
+    const user = await getUser(userId);
+    if (!user) {
+        logger.warn(`User ${userId} not found`);
+        return null;
+    };
+    return user.fridge || [];
+}
+
+/*
+========================
+RECIPE methods
+========================
+*/
+
+
+async function createRecipe(recipe) {
+    const command = new PutCommand({
+        TableName: tableName,
+        Item: recipe
+    })
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Succesfully created recipe ${recipe.PK}`)
+        return response.Attributes
+    } catch (error) {
+        logger.error(`Error while creating a recipe: ${error.message}`)
         return null;
     }
 }
@@ -288,38 +430,32 @@ async function createRecipe(recipe) {
 
 
 
-/**
- * Updates a recipe in the database.
- *
- * This function takes a recipe object and updates the corresponding record in the database.
- * It dynamically generates the update expression and attribute mappings based on the provided
- * recipe object, excluding certain keys like "recipe_id", "PK", and "SK".
- *
- * @async
- * @function
- * @param {Object} recipe - The recipe object containing the updated data.
- * @param {string} recipe.PK - The partition key of the recipe.
- * @param {string} recipe.SK - The sort key of the recipe (should be "RECIPE").
- * @param {string} [recipe.recipe_id] - The unique identifier of the recipe (excluded from updates).
- * @param {Object} recipe - Other key-value pairs representing the fields to update dynamically.
- * @returns {Promise<Object|null>} The updated recipe attributes if successful, or `null` if an error occurs.
- *
- * @throws {Error} If there is an issue with the database update operation.
- *
- * @example
- * const updatedRecipe = {
- *   PK: "RECIPE#123",
- *   SK: "RECIPE",
- *   name: "Updated Recipe Name",
- *   ingredients: ["ingredient1", "ingredient2"],
- *   macros: {
- *     calories: 500,
- *     protein: 30,
- *     carbs: 50,
- *     fat: 20
- *   }
- * };
- */
+async function getRecipe(recipeId) {
+    const command = new GetCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${recipeId}`,
+            SK: "RECIPE"
+        }
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Item) {
+            logger.info(`Retrieved recipe: ${JSON.stringify(response.Item)}`);
+            return response.Item;
+        } else {
+            logger.warn(`Recipe with ID ${recipeId} not found`);
+            return null;
+        }
+    } catch (error) {
+        logger.error(`Error getting recipe with ID ${recipeId}: ${error.message}`);
+        return null;
+    }
+}
+
+
+
 async function updateRecipe(recipe) {
     let updateExpression = "SET ";
     const ExpressionAttributeNames = {};
@@ -360,38 +496,6 @@ async function updateRecipe(recipe) {
 }
 
 
-
-/**
- * Deletes a recipe from the database based on the provided recipe ID.
- *
- * @async
- * @function deleteRecipe
- * @param {string} recipeId - The unique identifier of the recipe to be deleted.
- * @returns {Promise<Object|null>} A promise that resolves to the response object if the recipe was successfully deleted,
- * or `null` if the recipe was not found or an error occurred.
- * @throws {Error} Logs an error message if the deletion fails.
- * 
- * Example of response
- * 
- * {
-  "Attributes": {
-    "PK": "12345",
-    "SK": "RECIPE",
-    "Name": "Chocolate Cake",
-    "Ingredients": ["Flour", "Sugar", "Cocoa Powder"]
-  },
-  "ConsumedCapacity": {
-    "TableName": "RecipesTable",
-    "CapacityUnits": 1
-  },
-  "ItemCollectionMetrics": {
-    "ItemCollectionKey": {
-      "PK": "12345"
-    },
-    "SizeEstimateRangeGB": [0.1, 0.2]
-  }
-}
- */
 async function deleteRecipe(recipeId) {
     const command = new DeleteCommand({
         TableName: tableName,
@@ -415,95 +519,13 @@ async function deleteRecipe(recipeId) {
     }
 }
 
-/**
- * Creates a new review in the database.
- *
- * @async
- * @function createReview
- * @param {Object} review - The review object to be created. 
- * The object should be structured as follows:
- * {
- *   user_id: {string} - The ID of the user creating the review (required).
- *   recipe_id: {string} - The ID of the recipe being reviewed (required).
- *   text: {string} - The text content of the review (optional).
- *   rating: {number} - The rating given to the recipe (e.g., 1-5) (optional).
- *   review_id: {string} - The unique identifier for the review (required).
- * }
- * @returns {Promise<Object|null>} The created review object if successful, or null if an error occurs.
- */
-async function createReview(review) {
-    const command = new PutCommand({
-        TableName: tableName,
-        Item: review
-    });
-
-    try {
-        const response = await documentClient.send(command);
-        logger.info(`Successfully created review with ID ${review.review_id}`);
-        return response.Attributes;
-    } catch (error) {
-        logger.error(`Error while creating a review: ${error.message}`);
-        return null;
-    }
-}
-
-/**
- * Retrieves all recipes from the database.
- *
- * This function scans the database table for items where the sort key (SK)
- * begins with the prefix "RECIPE". It returns an array of recipe items if found,
- * or an empty array if no recipes are present.
- *
- * @async
- * @function
- * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
- *                              Returns an empty array if no recipes are found.
- * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
- *
- * Example response:
- * [
- *   {
- *     recipe_id: "RECIPE#001",
- *     name: "Spaghetti Bolognese",
- *     review_id: "REVIEW#001",
- *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
- *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
- *     pictures: [
- *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
- *     ],
- *     rating: 4.5,
- *     macros: {
- *       calories: 600,
- *       protein: 25,
- *       carbs: 75,
- *       fat: 20
- *     }
- *   },
- *   {
- *     recipe_id: "RECIPE#002",
- *     name: "Chicken Salad",
- *     review_id: "REVIEW#002",
- *     ingredients: ["Chicken Breast", "Lettuce", "Tomatoes", "Cucumber", "Dressing"],
- *     instructions: ["Grill chicken", "Chop vegetables", "Mix together"],
- *     pictures: [
- *       { name: "chickensalad.jpg", link: "https://example.com/chickensalad.jpg" }
- *     ],
- *     rating: 4.8,
- *     macros: {
- *       calories: 350,
- *       protein: 30,
- *       carbs: 10,
- *       fat: 15
- *     }
- *   }
- * ]
- */
 async function getAllRecipes() {
-    const command = new ScanCommand({
+    const command = new QueryCommand({
         TableName: tableName,
-        FilterExpression: "begins_with(SK, :recipe)",
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :sk",
         ExpressionAttributeValues: {
-            ":recipe": "RECIPE"
+            ":sk": "RECIPE"
         }
     });
 
@@ -513,127 +535,41 @@ async function getAllRecipes() {
             logger.info(`Retrieved all recipes: ${JSON.stringify(response.Items)}`);
             return response.Items;
         } else {
-            logger.warn("No recipes found in the database");
+            logger.warn("No recipes found");
             return [];
         }
     } catch (error) {
         logger.error(`Error while retrieving all recipes: ${error.message}`);
-        return [];
+        return null;
     }
 }
 
-//TODO write methods for more precice recipe fetching
 
-async function getRecipe(recipeId) {
-    const command = new GetCommand({
+/* 
+========================
+REVIEW methods
+========================
+*/
+
+
+
+async function createReview(review) {
+    const command = new PutCommand({
         TableName: tableName,
-        Key: {
-            PK: `${recipeId}`,
-            SK: "RECIPE"
-        }
-    });
+        Item: review
+    })
 
     try {
         const response = await documentClient.send(command);
-        if (response.Item) {
-            logger.info(`Retrieved recipe: ${JSON.stringify(response.Item)}`);
-            return response.Item;
-        } else {
-            logger.warn(`Recipe with ID ${recipeId} not found`);
-            return null;
-        }
+        logger.info(`Succesfully created review ${review.PK}`)
+        return response.Attributes
     } catch (error) {
-        logger.error(`Error getting recipe with ID ${recipeId}: ${error.message}`);
+        logger.error(`Error while creating a review: ${error.message}`)
         return null;
     }
 }
 
 
-
-async function getSavedRecipeIds(userId) {
-
-
-    const profileParams = new GetCommand({
-        TableName: tableName,
-        Key: {
-            PK: userId,
-            SK: "PROFILE"
-        },
-    });
-
-    try {
-
-        let profileData;
-        try {
-            profileData = await documentClient.send(profileParams);
-        } catch (err) {
-            logger.error(`Error fetching user profile for user ${userId}: ${err.message}`);
-            throw err;
-        }
-
-        if (!profileData.Item) {
-            throw new Error("User profile not found");
-        }
-
-
-        const savedRecipeIds = profileData.Item.recipes || [];
-        if (savedRecipeIds.length === 0) {
-            return [];
-        }
-
-
-        const recipeKeys = savedRecipeIds.map(recipeId => ({
-            PK: recipeId,
-            SK: "RECIPE"
-        }));
-
-
-        const batchParams = {
-            RequestItems: {
-                [tableName]: {
-                    Keys: recipeKeys,
-                }
-            }
-        };
-
-        let recipesData;
-        try {
-            recipesData = await documentClient.send(new BatchGetCommand(batchParams));
-        } catch (err) {
-            logger.error('Error fetching recipes:', err);
-            throw err;
-        }
-
-        return recipesData.Responses[tableName];
-
-
-    } catch (error) {
-        logger.error(`Error while fetching saved recipe IDs for user ${userId}: ${error.message}`);
-        return null;
-    }
-}
-
-
-
-/**
- * Retrieves a review from the database based on the provided review ID.
- *
- * @async
- * @function getReview
- * @param {string} reviewId - The unique identifier of the review to retrieve.
- * @returns {Promise<Object|null>} A promise that resolves to the review object if found,
- * or `null` if the review does not exist or an error occurs.
- *
- * Example response:
- * {
- *   PK: "1",
- *   SK: "REVIEW",
- *   user_id: "123",
- *   recipe_id: "456",
- *   text: "This recipe was amazing!",
- *   rating: 5,
- * }
- */
 async function getReview(reviewId) {
     const command = new GetCommand({
         TableName: tableName,
@@ -657,38 +593,8 @@ async function getReview(reviewId) {
         return null;
     }
 }
-/**
- * Retrieves all reviews from the database.
- *
- * This function scans the database table for items where the sort key (SK)
- * begins with the prefix "REVIEW". It returns an array of review items if found,
- * or an empty array if no reviews are present.
- *
- * @async
- * @function getAllReviews
- * @returns {Promise<Object[]>} A promise that resolves to an array of review objects.
- *                              Returns an empty array if no reviews are found.
- *
- * Example response:
- * [
- *   {
- *     PK: "REVIEW#001",
- *     SK: "REVIEW",
- *     user_id: "USER#123",
- *     recipe_id: "RECIPE#456",
- *     text: "This recipe was amazing!",
- *     rating: 5
- *   },
- *   {
- *     PK: "REVIEW#002",
- *     SK: "REVIEW",
- *     user_id: "USER#124",
- *     recipe_id: "RECIPE#457",
- *     text: "Not bad, but could use more seasoning.",
- *     rating: 3
- *   }
- * ]
- */
+
+
 async function getAllReviews() {
     const command = new ScanCommand({
         TableName: tableName,
@@ -713,15 +619,7 @@ async function getAllReviews() {
     }
 }
 
-/**
- * Deletes a review from the database based on the provided review ID.
- *
- * @async
- * @function deleteReview
- * @param {string} reviewId - The unique identifier of the review to be deleted.
- * @returns {Promise<Object|null>} A promise that resolves to the response object if the review was successfully deleted,
- * or `null` if the review was not found or an error occurred.
- */
+
 async function deleteReview(reviewId) {
     const command = new DeleteCommand({
         TableName: tableName,
@@ -745,179 +643,144 @@ async function deleteReview(reviewId) {
     }
 }
 
+
+
+
+/*
+========================
+INGREDIENT methods
+========================
+*/
+
+
 /**
- * Adds an ingredient to the user's fridge.
- *
  * @async
- * @function addIngredientToFridge
- * @param {string} userId - The unique identifier of the user.
- * @param {Object} ingredient - The ingredient object to add.
- * @param {string} ingredient.name - The name of the ingredient.
- * @param {number} ingredient.amount - The amount of the ingredient.
- * @param {string} ingredient.category - The category of the ingredient.
- * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ * @function createIngredient
+ * @param {Object} ingredient - The ingredient object to be created.
+ * {
+ *   PK: {string} - autogenerated by service,
+ *   SK: "INGREDIENT" - (required) unique identifier for the ingredient,
+ *   name: {string} - (required) name of the ingredient,
+ *   unit:{string} - (optional) unit of mesurement(lb, qt, etc.)
+ * }
+ * @returns {Promise<Object|null>} - Returns the dynamoDb response object or null if an error occurs.
+ * 
+ * @throws {Error} - Logs an error message if the operation fails.
  */
-async function addIngredientToFridge(userId, ingredient) {
-    const command = new UpdateCommand({
+async function createIngredient(ingredient) {
+    const command = new PutCommand({
         TableName: tableName,
-        Key: {
-            PK: `${userId}`,
-            SK: "PROFILE"
-        },
-        UpdateExpression: "SET fridge = list_append(if_not_exists(fridge, :emptyList), :ingredient)",
-        ExpressionAttributeValues: {
-            ":ingredient": [ingredient],
-            ":emptyList": []
-        },
-        ReturnValues: "ALL_NEW"
+        Item: ingredient
     });
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully added ingredient to fridge for user ${userId}`);
-        return response.Attributes.fridge;
+        logger.info(`Successfully created ingredient ${ingredient.name}`);
+        return response.Attributes;
     } catch (error) {
-        logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
+        logger.error(`Error while creating an ingredient: ${error.message}`);
         return null;
     }
 }
-
 /**
- * Removes an ingredient from the user's fridge by name.
- *
  * @async
- * @function removeIngredientFromFridge
- * @param {string} userId - The unique identifier of the user.
- * @param {string} ingredientName - The name of the ingredient to remove.
- * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ * @function getIngredientByName
+ * @param {string} name - name of the ingredient
+ * @returns {Promise<Object|null>} - ingredient object or 'null' if no ingredient found or error occur
+ * @example
+ * {
+ *   PK: '124',
+ *   SK: "INGREDIENT",
+ *   name: "Red onions",
+ *   unit: 'lb'
+ * }
  */
-async function removeIngredientFromFridge(userId, ingredientId) {
-    const user = await getUser(userId);
-    if (!user || !user.fridge) {
-        logger.warn(`User ${userId} not found or fridge is empty`);
-        return null;
-    }
-
-    const updatedFridge = user.fridge.filter(ingredient => ingredient.id !== ingredientId);
-
-    const command = new UpdateCommand({
+async function getIngredientByName(name) {
+    const command = new QueryCommand({
         TableName: tableName,
-        Key: {
-            PK: `${userId}`,
-            SK: "PROFILE"
-        },
-        UpdateExpression: "SET fridge = :updatedFridge",
+        IndexName: "SK-name-index",
+        KeyConditionExpression: "SK = :sk AND name = :name",
         ExpressionAttributeValues: {
-            ":updatedFridge": updatedFridge
-        },
-        ReturnValues: "ALL_NEW"
+            ":sk": "INGREDIENT",
+            ":name": name
+        }
     });
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully removed ingredient from fridge for user ${userId}`);
-        return response.Attributes.fridge;
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved ingredient: ${JSON.stringify(response.Items[0])}`);
+            return response.Items[0];
+        } else {
+            logger.warn(`No ingredient found with name ${name}`);
+            return null;
+        }
     } catch (error) {
-        logger.error(`Error removing ingredient from fridge for user ${userId}: ${error.message}`);
+        logger.error(`Error while getting ingredient with name ${name}: ${error.message}`);
         return null;
     }
 }
 
 /**
- * Updates an ingredient in the user's fridge.
- * Only the amount and category of the ingredient will be updated.
- *
  * @async
- * @function updateIngredientFromFridge
- * @param {string} userId - The unique identifier of the user.
- * @param {Object} ingredientUpdate - The update data for the ingredient.
- * @param {string} ingredientUpdate.name - The name of the ingredient to update.
- * @param {number} ingredientUpdate.amount - The new amount of the ingredient.
- * @param {string} ingredientUpdate.category - The new category of the ingredient.
- * @returns {Promise<Object|null>} The updated fridge array if successful, or `null` if an error occurs.
+ * @function getAllIngredients
+ * @description Retrieves all ingredients from the database.
+ * @returns {Promise<Array|null>} - A promise that resolves to an array of ingredient objects or null if an error occurs.
+ * @example
+ * [
+ *   { PK: '123', SK: 'INGREDIENT', name: 'Tomato', unit: 'lb' },
+ *   { PK: '124', SK: 'INGREDIENT', name: 'Onion', unit: 'lb' }
+ * ]
  */
-async function updateIngredientFromFridge(userId, ingredientUpdate) {
-    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
-    const user = await getUser(userId);
-    if (!user || !user.fridge) {
-        logger.warn(`User ${userId} not found or fridge is empty`);
-        return null;
-    }
-
-    // Find the index of the ingredient to update using its name
-    const index = user.fridge.findIndex(ing => ing.id === ingredientUpdate.id);
-    if (index === -1) {
-        logger.warn(`Ingredient ${ingredientUpdate.id} not found in fridge for user ${userId}`);
-        return null;
-    }
-
-    // Update the ingredient's amount and category
-    user.fridge[index].amount = ingredientUpdate.amount;
-    //user.fridge[index].category = ingredientUpdate.category;
-
-    // Build the update command to update the entire fridge list
-    const command = new UpdateCommand({
+async function getAllIngredients() {
+    const command = new QueryCommand({
         TableName: tableName,
-        Key: {
-            PK: `${userId}`,
-            SK: "PROFILE"
-        },
-        UpdateExpression: "SET fridge = :updatedFridge",
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :sk",
         ExpressionAttributeValues: {
-            ":updatedFridge": user.fridge
-        },
-        ReturnValues: "ALL_NEW"
+            ":sk": "INGREDIENT"
+        }
     });
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
-        return response.Attributes.fridge;
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved all ingredients: ${JSON.stringify(response.Items)}`);
+            return response.Items;
+        } else {
+            logger.warn("No ingredients found");
+            return [];
+        }
     } catch (error) {
-        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
+        logger.error(`Error while retrieving all ingredients: ${error.message}`);
         return null;
     }
 }
-
-/**
- * Retrieves all ingredients from the user's fridge.
- *
- * @async
- * @function getAllIngredientsFromFridge
- * @param {string} userId - The unique identifier of the user.
- * @returns {Promise<Array|null>} The array of ingredients if successful, or `null` if an error occurs.
- */
-async function getAllIngredientsFromFridge(userId) {
-    // Retrieve the user data (assuming getUser is defined elsewhere in your DAO)
-    const user = await getUser(userId);
-    if (!user) {
-        logger.warn(`User ${userId} not found`);
-        return null;
-    }
-
-    // Return the fridge array or an empty list if it doesn't exist
-    return user.fridge || [];
-}
-
-
 
 export {
     createUser,
     getUser,
     getUserByUsername,
     updateUser,
+    getSavedRecipes,
     createRecipe,
+    getRecipe,
     updateRecipe,
     deleteRecipe,
-    createReview,
     getAllRecipes,
-    getRecipe,
+    createReview,
     getReview,
     getAllReviews,
     deleteReview,
-    getSavedRecipeIds,
+    createIngredient,
+    getIngredientByName,
+    getAllIngredients,
     addIngredientToFridge,
     removeIngredientFromFridge,
-    getAllIngredientsFromFridge,
-    updateIngredientFromFridge
+    updateIngredientFromFridge,
+    getAllIngredientsFromFridge
 }
+
+//TODO
+
+//TODO
