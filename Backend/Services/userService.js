@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
-import { uploadImage,getSignedImageUrl } from "../util/s3.js";
+import { uploadImage,getSignedImageUrl, deleteImage } from "../util/s3.js";
 
 dotenv.config({ override: true })
 
@@ -81,10 +81,10 @@ export async function updateProfile({username, firstname, lastname, email},{user
         if (!exist){
             updateUser.username = username;
         }else{
-            return {success:false, message:"username in use"}
+            return {success:false, code:400, message:"Username in use"}
         }
-        
     }
+
     if (firstname) {
         updateUser.account.firstname = firstname;
     }
@@ -95,10 +95,20 @@ export async function updateProfile({username, firstname, lastname, email},{user
         updateUser.account.email = email;
     }
     if (picture){
+        const hasPicture = await model.getUser(userId)
+
+        if(hasPicture.picture){
+            await deleteImage(hasPicture.picture)
+        }
         await uploadImage(filename,picture.buffer,picture.mimeType)
         updateUser.picture = filename
     }
 
-    
     const user = await model.updateUser(updateUser)
+
+    if(user){
+        return {success:true}
+    }else{
+        return {success:false, code:500, message:"Failed to update"}
+    }
 }

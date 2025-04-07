@@ -92,5 +92,9 @@ export const updateProfile = async (req,res) =>{
 
     const result = await userService.updateProfile(value,{userId:req.user.userId,picture:req.file})
     
-    res.status(200).json(req.file)
+    if(result.success){
+        res.status(200).json({message:"Update Successful"})
+    }else{
+        res.status(result.code).json({message:result.message})
+    }
 }
