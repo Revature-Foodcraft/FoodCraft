@@ -8,8 +8,8 @@ interface SortByContextType {
     setInvert: React.Dispatch<React.SetStateAction<boolean>>;
     selectedCuisine:string;
     setSelectedCuisine:React.Dispatch<React.SetStateAction<string>>;
-    mealType:string;
-    setMealTypeSelect:React.Dispatch<React.SetStateAction<string>>;
+    mealCategory:string;
+    setMealCategorySelect:React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const DisplayContext = createContext<SortByContextType>({
@@ -19,8 +19,8 @@ export const DisplayContext = createContext<SortByContextType>({
   setInvert: () => {},
   selectedCuisine: "", 
   setSelectedCuisine: () => {} ,
-  mealType:"",
-  setMealTypeSelect:() => {} 
+  mealCategory:"",
+  setMealCategorySelect:() => {} 
 });
 
 interface AuthContextType{

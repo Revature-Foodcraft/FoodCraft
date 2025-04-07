@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Sidebar from "../Components/Homepage/Sidebar";
-import Dropdown from "../Components/Homepage/SortByDropdown";
+import SortByDropdown from "../Components/Homepage/SortByDropdown";
 import DisplayRecipe from "../Components/Homepage/DisplayRecipes";
 import "../assets/search.svg"
 import { DisplayContext } from "../Components/Contexts";
@@ -42,7 +42,7 @@ const Home: React.FC = () => {
                     </div>
                   </div>
                   <div className=" col-6 d-flex justify-content-end">
-                    <Dropdown/>
+                    <SortByDropdown/>
                   </div>
                 </div>
                 <hr className="my-2"/>

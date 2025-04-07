@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CuisineSelect from "./CuisineSelect";
-import MealTypeSelect from "./MealTypeSelect";
+import MealCategorySelect from "./MealCategorySelect";
 import "../../css/Homepage.css"
 const Sidebar: React.FC = () => {
     
@@ -10,9 +10,9 @@ const Sidebar: React.FC = () => {
             <h5>Cuisines</h5>
             <hr className="my-0"></hr>
             <CuisineSelect/>
-            <h5 className="mt-3">Meal Type</h5>
+            <h5 className="mt-3">Meal Categories</h5>
             <hr className="my-0"></hr>
-            <MealTypeSelect/>
+            <MealCategorySelect/>
         </div>
     )
 };
