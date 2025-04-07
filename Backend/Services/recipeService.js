@@ -78,3 +78,25 @@ export async function getSavedRecipes(userId) {
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
+
+export async function updateRecipe(recipe) {
+    const updatedRecipe = await recipeService.updateRecipe(recipe);
+
+    return updatedRecipe;
+}
+
+export async function getRecipes(cuisine,category) {
+    
+    let recipes;
+    if(cuisine || category){
+        recipes = await model.getRecipesByParameters(cuisine,category)
+    }else{
+        recipes = await model.getAllRecipes()
+    }
+
+    if(recipes){
+        return {success:true, recipes:recipes}
+    }else{
+        return {success:false, message:"Failed to Retrieve All Recipes"}
+    }
+}

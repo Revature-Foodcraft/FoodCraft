@@ -450,8 +450,7 @@ async function createReview(review) {
 /**
  * Retrieves all recipes from the database.
  *
- * This function scans the database table for items where the sort key (SK)
- * begins with the prefix "RECIPE". It returns an array of recipe items if found,
+ * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
  * or an empty array if no recipes are present.
  *
  * @async
@@ -499,12 +498,100 @@ async function createReview(review) {
  * ]
  */
 async function getAllRecipes() {
-    const command = new ScanCommand({
+    const command = new QueryCommand({
         TableName: tableName,
-        FilterExpression: "begins_with(SK, :recipe)",
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :SK",
         ExpressionAttributeValues: {
-            ":recipe": "RECIPE"
+            ":SK": "RECIPE"
         }
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved all recipes: ${JSON.stringify(response.Items)}`);
+            return response.Items;
+        } else {
+            logger.warn("No recipes found in the database");
+            return [];
+        }
+    } catch (error) {
+        logger.error(`Error while retrieving all recipes: ${error.message}`);
+        return [];
+    }
+}
+
+/**
+ * Retrieves all recipes from the database depending on cuisine and category.
+ *
+ * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
+ * or an empty array if no recipes are present.
+ *
+ * @async
+ * @function
+ * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
+ *                              Returns an empty array if no recipes are found.
+ * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
+ *
+ * Example response:
+ * [
+ *   {
+ *     recipe_id: "RECIPE#001",
+ *     name: "Spaghetti Bolognese",
+ *     review_id: "REVIEW#001",
+ *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
+ *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
+ *     pictures: [
+ *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
+ *     ],
+ *     rating: 4.5,
+ *     macros: {
+ *       calories: 600,
+ *       protein: 25,
+ *       carbs: 75,
+ *       fat: 20
+ *     }
+ *   },
+ *   {
+ *     recipe_id: "RECIPE#002",
+ *     name: "Chicken Salad",
+ *     review_id: "REVIEW#002",
+ *     ingredients: ["Chicken Breast", "Lettuce", "Tomatoes", "Cucumber", "Dressing"],
+ *     instructions: ["Grill chicken", "Chop vegetables", "Mix together"],
+ *     pictures: [
+ *       { name: "chickensalad.jpg", link: "https://example.com/chickensalad.jpg" }
+ *     ],
+ *     rating: 4.8,
+ *     macros: {
+ *       calories: 350,
+ *       protein: 30,
+ *       carbs: 10,
+ *       fat: 15
+ *     }
+ *   }
+ * ]
+ */
+async function getRecipesByParameters(cuisine,category) {
+    const filterExpression = []
+    const expressionAttributeValue ={
+        ":SK": "RECIPE"
+    }
+
+    if(cuisine){
+        filterExpression.push("cuisine = :cuisine")
+        expressionAttributeValue[":cuisine"] = cuisine
+    }
+    if(category){
+        filterExpression.push("category = :category")
+        expressionAttributeValue[":category"] = category
+    }
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :SK",
+        FilterExpression: filterExpression.join("AND"),
+        ExpressionAttributeValues: expressionAttributeValue
     });
 
     try {
@@ -911,6 +998,7 @@ export {
     deleteRecipe,
     createReview,
     getAllRecipes,
+    getRecipesByParameters,
     getRecipe,
     getReview,
     getAllReviews,
