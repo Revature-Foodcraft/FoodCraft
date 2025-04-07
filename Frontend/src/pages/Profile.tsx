@@ -10,6 +10,7 @@ const Profile: React.FC = () => {
 
   const handleLogout = ()=>{
     localStorage.removeItem("token")
+    localStorage.removeItem("userInfo")
     setLogInStatus(false)
     nav('/')
   }
