@@ -24,6 +24,7 @@ export const getRecipe = async (req, res) => {
 };
 
 export const createRecipe = async (req, res) => {
+    //FIXME
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string.optional(),
@@ -91,10 +92,9 @@ export const getSavedRecipes = async (req, res) => {
 };
 
 export async function updateRecipe(req, res) {
-    const { recipe } = req.body; // Assuming the recipe data is sent in the body of the request
+    const { recipe } = req.body;
 
     try {
-        // Call the updateRecipe service function with the received recipe data
         const updatedRecipe = await model.updateRecipe(recipe);
         if (updatedRecipe) {
             res.status(200).json({
@@ -115,3 +115,45 @@ export async function updateRecipe(req, res) {
         });
     }
 }
+
+export const getRecipesByCuisine = async (req, res) => {
+    const { cuisine } = req.params;
+
+    if (!cuisine) {
+        return res.status(400).json({ message: "Cuisine is required" });
+    }
+
+    try {
+        const recipes = await model.getRecipesByCuisine(cuisine);
+
+        if (recipes && recipes.length > 0) {
+            return res.status(200).json({ success: true, recipes });
+        } else {
+            return res.status(404).json({ success: false, message: "No recipes found for the specified cuisine" });
+        }
+    } catch (error) {
+        console.error("Error fetching recipes by cuisine:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export const getRecipesByCategory = async (req, res) => {
+    const { category } = req.params;
+
+    if (!category) {
+        return res.status(400).json({ message: "Category is required" });
+    }
+
+    try {
+        const recipes = await model.getRecipesByCategory(category);
+
+        if (recipes && recipes.length > 0) {
+            return res.status(200).json({ success: true, recipes });
+        } else {
+            return res.status(404).json({ success: false, message: "No recipes found for the specified category" });
+        }
+    } catch (error) {
+        console.error("Error fetching recipes by category:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
