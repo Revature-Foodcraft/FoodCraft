@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Header from './Components/Header';
 import Profile from './pages/Profile';
 import Recipe from './pages/Recipe';
+import CreateRecipe from './pages/createRecipe';
 import Reviews from './pages/Reviews'
 import { AuthContext } from './Components/Contexts';
 
@@ -28,7 +29,8 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/recipes" element={<Recipe />} />
+          <Route path="/recipe/:id" element={<Recipe />} />
+          <Route path="/createRecipe" element={<CreateRecipe />} />
           <Route path="/recipes/reviews" element={<Reviews />}/>
         </Routes>
       </AuthContext.Provider>

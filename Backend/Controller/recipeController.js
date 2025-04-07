@@ -26,9 +26,16 @@ export const getRecipe = async (req, res) => {
 export const createRecipe = async (req, res) => {
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
-        description: Joi.string.optional(),
+        description: Joi.string().optional(),
         review_id: Joi.string().optional(),
-        ingredients: Joi.array().items(Joi.string()).optional(),
+        ingredients: Joi.array().items(
+            Joi.object({
+                category: Joi.string().required(),
+                name: Joi.string().required(),
+                amount: Joi.string().required()
+            })
+        ).optional(),
+        
         instructions: Joi.array().items(Joi.string()).optional(),
         pictures: Joi.array().items(
             Joi.object({
