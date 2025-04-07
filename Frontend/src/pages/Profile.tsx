@@ -10,23 +10,31 @@ const Profile: React.FC = () => {
 
   const handleLogout = ()=>{
     localStorage.removeItem("token")
+    localStorage.removeItem("userInfo")
     setLogInStatus(false)
     nav('/')
   }
 
   async function getUserInfo() {
     try{
-      const userInfo = await fetch("http://localhost:5000/user/profile",{
-        method:"GET",
-        headers:{"Authorization": `Bearer ${localStorage.getItem('token')}`}
-      })
-      
-      const data = await userInfo.json()
-      if(userInfo.status == 200){
-        setProfileInfo(data)
+      const cachedUserInfo = JSON.parse(localStorage.getItem("userInfo") || "null")
+      if(cachedUserInfo){
+        setProfileInfo(cachedUserInfo)
       }else{
-        setProfileInfo(null)
+        const userInfo = await fetch("http://localhost:5000/user/profile",{
+          method:"GET",
+          headers:{"Authorization": `Bearer ${localStorage.getItem('token')}`}
+        })
+        
+        const data = await userInfo.json()
+        if(userInfo.status == 200){
+          localStorage.setItem("userInfo",JSON.stringify(data))
+          setProfileInfo(data)
+        }else{
+          setProfileInfo(null)
+        }
       }
+      
       
 
     }catch (err){
@@ -39,14 +47,14 @@ const Profile: React.FC = () => {
     getUserInfo()
     
   },[])
-  console.log(profileInfo)
+
   return (
     <>
     <div className="card container mt-3">
       <div className="card-body">
         <div className="d-flex justify-content-center">
-          {/* <img className="rounded mt-3" src="/src/assets/boy.png" style={{ width: "30%", height: "auto", objectFit:"contain" }}/> */}
-          <img className="rounded mt-3" src={profileInfo.picture} style={{ width: "30%", height: "auto", objectFit:"contain" }}/>
+          
+          <img className="rounded mt-3" src={profileInfo ? profileInfo.picture: "/src/assets/boy.png"} style={{ width: "30%", height: "auto", objectFit:"contain" }}/>
         </div>
         <div className="container">
           <ul className="list-group">
@@ -65,7 +73,7 @@ const Profile: React.FC = () => {
           </ul>
         </div>
         <div className="mt-4 d-flex justify-content-around align-item-center">
-          <UpdatePopup/>
+          <UpdatePopup onUpdate={getUserInfo}/>
           <button className="btn btn-danger col-2" onClick={handleLogout}>Logout</button>
       </div>
       </div>
