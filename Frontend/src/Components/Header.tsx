@@ -1,19 +1,31 @@
-import React, { useContext, useEffect } from 'react';
-import '../css/Header.css'; // Import the CSS file\
+import React, { useState, useContext } from 'react';
+import '../css/Header.css';
 import LoginRegisterPopup from './LoginRegisterPopup';
 import { Link } from "react-router-dom";
 import { AuthContext } from './Contexts';
+import DisplayRecipe from '../Components/Homepage/DisplayRecipes'; // Import your DisplayRecipe component
+import MealTypeSelect from './Homepage/MealTypeSelect';
+import CuisineSelect from './Homepage/CuisineSelect';
 
 const Header: React.FC = () => {
-    const {isLoggedIn,setLogInStatus} = useContext(AuthContext)
+    const { isLoggedIn, setLogInStatus } = useContext(AuthContext);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string | null>(null);
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(prevState => !prevState); // Toggle dropdown visibility
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value); // Set the search query based on user input
+    };
 
     return (
         <div className='wrapper'>
-            
             <header>
                 <div className='titleAndLogoWrapper'>
                     <img src="./src/assets/logo.svg" alt="FoodCraft Logo" />
-                    <h1 >FoodCraft</h1>
+                    <h1>FoodCraft</h1>
                 </div>
                 <nav>
                     <ul>
@@ -21,6 +33,31 @@ const Header: React.FC = () => {
                             <Link to="/">
                                 <button>Home</button>
                             </Link>
+                        </li>
+                        <li>
+                            <button onClick={toggleDropdown}>Search</button>
+                            {isDropdownOpen && (
+                                <div className="dropdownMenu">
+                                    <div className="filter-section">
+                                    {/* Meal Type Tabs */}
+                                    <div className="meal-type-tabs">
+                                        <MealTypeSelect />
+                                    </div>
+
+                                    {/* Cuisine Checkboxes */}
+                                    <div className="cuisine-checkboxes">
+                                        <CuisineSelect />
+                                    </div>
+                                    </div>
+
+                                    <input
+                                        type="text"
+                                        placeholder="Search for recipes..."
+                                        onChange={handleSearchChange} // Handle search input
+                                    />
+                                    <DisplayRecipe searchQuery={searchQuery} /> {/* Display recipes inside the dropdown */}
+                                </div>
+                            )}
                         </li>
                         {isLoggedIn ? (
                             <>
