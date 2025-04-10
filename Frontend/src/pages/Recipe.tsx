@@ -7,12 +7,12 @@ import salad from "../assets/salad.jpg";
 import pizza from "../assets/pizza.jpg";
 import chickens from "../assets/chicken sandwich.jpg";
 import fishtacos from "../assets/fishTacos.jpg";
-import { useParams } from 'react-router-dom';
+
 
 const Recipe: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Get the recipe ID from the URL
     const [recipe, setRecipe] = useState<any>(null);
-    const {id} = useParams();
+    
     console.log(id)
     useEffect(() => {
         if (!id) return;

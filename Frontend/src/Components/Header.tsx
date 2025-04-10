@@ -4,7 +4,6 @@ import LoginRegisterPopup from './LoginRegisterPopup';
 import { Link } from "react-router-dom";
 import { AuthContext } from './Contexts';
 import DisplayRecipe from '../Components/Homepage/DisplayRecipes'; // Import your DisplayRecipe component
-import MealTypeSelect from './Homepage/MealTypeSelect';
 import CuisineSelect from './Homepage/CuisineSelect';
 
 const Header: React.FC = () => {
@@ -41,7 +40,7 @@ const Header: React.FC = () => {
                                     <div className="filter-section">
                                     {/* Meal Type Tabs */}
                                     <div className="meal-type-tabs">
-                                        <MealTypeSelect />
+                                    
                                     </div>
 
                                     {/* Cuisine Checkboxes */}
