@@ -102,7 +102,7 @@ export async function updateRecipe(req, res) {
 
     try {
         // Call the updateRecipe service function with the received recipe data
-        const updatedRecipe = await model.updateRecipe(recipe);
+        const updatedRecipe = await recipeService.updateRecipe(recipe);
         if (updatedRecipe) {
             res.status(200).json({
                 success: true,
@@ -120,5 +120,17 @@ export async function updateRecipe(req, res) {
             success: false,
             message: `Error updating recipe: ${error.message}`
         });
+    }
+}
+
+export const getRecipes = async (req,res) =>{
+    const {cuisine,category} = req.query;
+
+    const recipesList = await recipeService.getRecipes(cuisine,category)
+
+    if(recipesList.success){
+        res.status(200).json({recipes:recipesList.recipes})
+    }else{
+        res.status(500).json({recipe})
     }
 }

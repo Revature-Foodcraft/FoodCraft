@@ -1,11 +1,31 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { DisplayContext } from "../Contexts";
 
+interface Cuisine{
+    strArea:string;
+}
+
 const CuisineSelect: React.FC = () => {
     const {selectedCuisine, setSelectedCuisine} = useContext(DisplayContext)
+    const [cuisines,setCuisines] = useState<Cuisine[]>([])
 
-    const cuisines: string[]=["American","British", "Indian", "French"]
+    const getCuisines = async () => {
+        try{
+            const data = await fetch("https://www.themealdb.com/api/json/v1/1/list.php?a=list",{
+                method:"GET",
+            })
+
+            setCuisines((await data.json()).meals)
+
+        }catch(err){
+            console.log(`Error: ${err}`)
+        }
+    }
+    
+    useEffect(()=>{
+        getCuisines()
+    },[])
 
     const handleSelect = (cuisineId:string) =>{
         setSelectedCuisine((prev:string)=>(prev===cuisineId?"":cuisineId))
@@ -15,9 +35,9 @@ const CuisineSelect: React.FC = () => {
         <div>
             {cuisines.map((cuisine)=>{
                 return (
-                    <div className="form-check" key={cuisine}>
-                        <input className="form-check-input" type="checkbox" id={cuisine} checked={selectedCuisine === cuisine} onChange={()=> handleSelect(cuisine)}/>
-                        <label className="form-check-label" htmlFor={cuisine}>{cuisine}</label>
+                    <div className="form-check" key={cuisine.strArea}>
+                        <input className="form-check-input" type="checkbox" id={cuisine.strArea} checked={selectedCuisine === cuisine.strArea} onChange={()=> handleSelect(cuisine.strArea)}/>
+                        <label className="form-check-label" htmlFor={cuisine.strArea}>{cuisine.strArea}</label>
                     </div>
                 )
             })}

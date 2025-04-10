@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { useState,useEffect } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
@@ -11,9 +11,20 @@ import Recipe from './pages/Recipe';
 import CreateRecipe from './pages/createRecipe';
 import Reviews from './pages/Reviews'
 import { AuthContext } from './Components/Contexts';
+import { ProtectedRoute } from './Components/ProtectedRoutes';
+
+// function ProtectedRoute( isLoggedIn:boolean, children:any ) {
+//   return isLoggedIn ? children : <Navigate to="/" />;
+// }
 
 const App: React.FC = () => {
   const [isLoggedIn,setLogInStatus] = useState(false)
+  
+  useEffect(()=>{
+    if(localStorage.getItem("token")){
+        setLogInStatus(true)
+    }
+  })
 
   return (
     <div>
@@ -25,13 +36,14 @@ const App: React.FC = () => {
         </div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path='/profile' element={<Profile/>}/>
+          <Route path='/profile' element={<ProtectedRoute isLoggedIn={isLoggedIn}><Profile/></ProtectedRoute>}/>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/recipe/:id" element={<Recipe />} />
-          <Route path="/createRecipe" element={<CreateRecipe />} />
+          <Route path="/recipes" element={<Recipe />} />
           <Route path="/recipes/reviews" element={<Reviews />}/>
+          <Route path="/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Account/></ProtectedRoute>} />
+          <Route path="/recipe/:id" element={<Recipe/>}/>
+          {/* <Route path='*' element={<Navigate to="/404"/>}/> */}
         </Routes>
       </AuthContext.Provider>
     </div>
