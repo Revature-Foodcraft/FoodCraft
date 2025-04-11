@@ -30,24 +30,40 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
     const itemsPerPage = 18
     
     const getRecipes = async () => {
-        let searchCondition = new URLSearchParams();
-        if(selectedCuisine){
-            searchCondition.append("cuisine",selectedCuisine)
+        try {
+          const dbRes = await fetch("http://localhost:5000/recipes/", {
+            method: "GET",
+          });
+          const dbRecipes = (await dbRes.json()).recipes.map((r: any) => ({
+            ...r,
+            source: "db", 
+            id: r.PK,
+          }));
+      
+          const apiRecipes: any[] = [];
+          for (let i = 0; i < 10; i++) {
+            const res = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
+            const data = await res.json();
+            const meal = data.meals?.[0];
+            if (meal) {
+              apiRecipes.push({
+                id: meal.idMeal,
+                name: meal.strMeal,
+                description: meal.strArea + " " + meal.strCategory,
+                dateCreated: meal.dateModified || "2024-01-01",
+                rating: Math.floor(Math.random() * 5) + 1, // optional: fake rating
+                source: "api",
+              });
+            }
+          }
+      
+          setRecipes([...dbRecipes, ...apiRecipes]);
+      
+        } catch (err) {
+          console.log(`Error: ${err}`);
         }
-        if(mealCategory){
-            searchCondition.append("category",mealCategory)
-        }
-        try{
-            const data = await fetch("http://localhost:5000/recipe/recipes",{
-                method:"GET",
-            })
-
-            setRecipes((await data.json()).recipes)
-            
-        }catch(err){
-            console.log(`Error: ${err}`)
-        }
-    }
+      };
+      
 
     useEffect(()=>{
         getRecipes()
@@ -91,7 +107,7 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
                             <div className="card-header">
                                 <div className="d-flex align-item-center">
                                     <div className="card-title">
-                                        <Link to={`/recipe/${recipes.PK}`}>
+                                        <Link to={`/recipe/${recipes.source}/${recipes.id}`}>
                                             <h5>{recipes.name}</h5>
                                         </Link>
                                     </div>

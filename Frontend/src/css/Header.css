@@ -79,12 +79,14 @@ header nav ul li button:hover {
 }
 
 .dropdownMenu input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  font-size: 16px;
+  border: 2px solid #ff9d00;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #fff8ec;
+  color: #333;
 }
+
 
 .dropdownMenu ul {
   list-style: none;
@@ -116,13 +118,25 @@ header nav ul li button:hover {
 
 /* Card Style */
 .dropdownMenu .card {
-  background-color: #fdfdfd;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dropdownMenu .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+.dropdownMenu .card-title {
+  font-size: 16px;
+  color: #5b3e18;
+  font-weight: bold;
+  text-align: center;
+}
+
+.dropdownMenu .card-body {
+  font-size: 14px;
+  color: #333;
 }
 
 .dropdownMenu .card-header,
@@ -133,8 +147,10 @@ header nav ul li button:hover {
 }
 
 .dropdownMenu .card-title {
-  font-size: 15px;
+  font-size: 16px;
+  color: #5b3e18;
   font-weight: bold;
+  text-align: center;
 }
 
 /* Pagination */
@@ -180,18 +196,22 @@ header nav ul li button:hover {
 
 /* Cuisine checkbox container */
 .cuisine-checkboxes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 20px;
+  align-items: center;
 }
+
+
 
 /* Checkbox styling */
 .cuisine-checkboxes .form-check {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  margin: 5px;
+  gap: 6px;
+  padding: 4px;
 }
+
 
 .cuisine-checkboxes .form-check-input {
   margin-right: 6px;
@@ -203,4 +223,7 @@ header nav ul li button:hover {
   color: #5b3e18;
   font-weight: 500;
   font-size: 14px;
+}
+.cusineButton{
+  text-align: center;
 }
