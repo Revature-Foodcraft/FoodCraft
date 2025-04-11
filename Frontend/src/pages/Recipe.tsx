@@ -12,16 +12,43 @@ import fishtacos from "../assets/fishTacos.jpg";
 const Recipe: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Get the recipe ID from the URL
     const [recipe, setRecipe] = useState<any>(null);
-    
-    console.log(id)
+    const [isApiRecipe, setIsApiRecipe] = useState(false);
+
     useEffect(() => {
         if (!id) return;
-        
-        fetch(`http://localhost:5000/recipe/recipe/${id}`) // Use dynamic ID from URL
+        if (window.location.pathname.includes("/recipe/api/")) {
+          setIsApiRecipe(true);
+          fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+            .then(res => res.json())
+            .then(data => {
+              const meal = data.meals?.[0];
+              if (meal) {
+                setRecipe({
+                  name: meal.strMeal,
+                  ingredients: Array.from({ length: 20 }, (_, i) => {
+                    const name = meal[`strIngredient${i+1}`];
+                    const amount = meal[`strMeasure${i+1}`];
+                    return name ? { name, amount, category: "Unknown" } : null;
+                  }).filter(Boolean),
+                  instructions: meal.strInstructions?.split(". ").filter(Boolean),
+                  macros: {
+                    calories: "N/A",
+                    fat: "N/A",
+                    carbs: "N/A",
+                    protein: "N/A"
+                  },
+                  pictures: { link: meal.strMealThumb },
+                  user_id: "API"
+                });
+              }
+            });
+        } else {
+          fetch(`http://localhost:5000/recipes/${id}`)
             .then(response => response.json())
             .then(data => setRecipe(data.recipe))
             .catch(error => console.error("Error fetching recipe:", error));
-    }, [id]); // Depend on `id` so fetch runs when it changes
+        }
+      }, [id]);
 
     if (!recipe) {
         return <p>Loading recipe...</p>;
