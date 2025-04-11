@@ -98,3 +98,7 @@ export const updateProfile = async (req,res) =>{
         res.status(result.code).json({message:result.message})
     }
 }
+
+export const authGoogle = (req,res) =>{
+    const user = userService.getAccount({email:req.user.email,googleId:req.user.sub,firstname:req.user.given_name,lastname:req.user.family_name,picture:req.user.picture})
+}

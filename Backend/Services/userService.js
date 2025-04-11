@@ -62,7 +62,10 @@ export async function loginUser({ username, password }) {
 
 export async function getUser(userId){
     const user = await model.getUser(userId)
-    user.picture = await getSignedImageUrl(user.picture)
+    if(user.picture){
+        user.picture = await getSignedImageUrl(user.picture)
+    }
+
     if(user){
         return {success: true, user:user}
     }else{
@@ -111,4 +114,8 @@ export async function updateProfile({username, firstname, lastname, email},{user
     }else{
         return {success:false, code:500, message:"Failed to update"}
     }
+}
+
+export async function getAccount({email,googleId,firstname,lastname,picture}) {
+    const user = model.getUserByGoogleId
 }

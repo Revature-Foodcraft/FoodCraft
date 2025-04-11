@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/login-background.mp4';
 import { AuthContext } from '../Components/Contexts';
-
+import { GoogleLogin } from '@react-oauth/google';
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +32,14 @@ const Login: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleSuccess =  (credentialResponse:any) => {
+    console.log("Login Success:",credentialResponse);
+  };
+
+  const handleError = () => {
+    console.error("Login Failed");
   };
 
   return (
@@ -73,10 +81,17 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="button-container">
-          <button type="submit" className="auth-button">Login</button>
+            <button type="submit" className="auth-button">Login</button>
             <Link to="/register" className="auth-button-link">
               <button type="button" className="auth-button register-button">Register</button>
             </Link>
+            
+          </div>
+          <div >
+            <p className='mt-3'>or</p>
+            <div className='d-flex justify-content-center'>
+              <GoogleLogin onSuccess={handleSuccess} onError={handleError}/>
+            </div>
           </div>
         </form>
       </div>

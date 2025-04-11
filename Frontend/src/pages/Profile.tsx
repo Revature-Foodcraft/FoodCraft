@@ -54,7 +54,7 @@ const Profile: React.FC = () => {
       <div className="card-body">
         <div className="d-flex justify-content-center">
           
-          <img className="rounded mt-3" src={profileInfo ? profileInfo.picture: "/src/assets/boy.png"} style={{ width: "30%", height: "auto", objectFit:"contain" }}/>
+          <img className="rounded mt-3" src={profileInfo.picture ? profileInfo.picture: "/src/assets/boy.png"} style={{ width: "30%", height: "auto", objectFit:"contain" }}/>
         </div>
         <div className="container">
           <ul className="list-group">
