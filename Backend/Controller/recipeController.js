@@ -1,6 +1,5 @@
 import Joi from "joi";
 import * as recipeService from "../Services/recipeService.js";
-import * as model from "../Models/model.js";
 
 export const getRecipe = async (req, res) => {
     const { recipeId } = req.params;
@@ -133,5 +132,20 @@ export const getRecipes = async (req, res) => {
         res.status(200).json({ recipes: recipesList.recipes })
     } else {
         res.status(500).json({ recipe })
+    }
+}
+
+export const getAllRecipes = async (req, res) => {
+    try {
+        const recipes = await recipeService.getAllRecipes();
+
+        if (recipes.success) {
+            return res.status(200).json({ success: true, recipes: recipes.recipes });
+        } else {
+            return res.status(404).json({ success: false, message: recipes.message });
+        }
+    } catch (error) {
+        console.error("Error fetching all recipes:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }

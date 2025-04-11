@@ -1,7 +1,6 @@
-import { hashPassword } from "../util/bcrypt.js"
+import { hashPassword, comparePassword } from "../util/bcrypt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
-import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { uploadImage, getSignedImageUrl, deleteImage } from "../util/s3.js";

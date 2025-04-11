@@ -831,81 +831,6 @@ async function getAllRecipes() {
  *   }
  * ]
  */
-async function getAllRecipes() {
-    const command = new ScanCommand({
-        TableName: tableName,
-        IndexName: "SK-index",
-        KeyConditionExpression: "SK = :SK",
-        ExpressionAttributeValues: {
-            ":SK": "RECIPE"
-        }
-    });
-
-    try {
-        const response = await documentClient.send(command);
-        if (response.Items && response.Items.length > 0) {
-            logger.info(`Retrieved all recipes: ${JSON.stringify(response.Items)}`);
-            return response.Items;
-        } else {
-            logger.warn("No recipes found in the database");
-            return [];
-        }
-    } catch (error) {
-        logger.error(`Error while retrieving all recipes: ${error.message}`);
-        return [];
-    }
-}
-
-/**
- * Retrieves all recipes from the database depending on cuisine and category.
- *
- * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
- * or an empty array if no recipes are present.
- *
- * @async
- * @function
- * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
- *                              Returns an empty array if no recipes are found.
- * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
- *
- * Example response:
- * [
- *   {
- *     recipe_id: "RECIPE#001",
- *     name: "Spaghetti Bolognese",
- *     review_id: "REVIEW#001",
- *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
- *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
- *     pictures: [
- *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
- *     ],
- *     rating: 4.5,
- *     macros: {
- *       calories: 600,
- *       protein: 25,
- *       carbs: 75,
- *       fat: 20
- *     }
- *   },
- *   {
- *     recipe_id: "RECIPE#002",
- *     name: "Chicken Salad",
- *     review_id: "REVIEW#002",
- *     ingredients: ["Chicken Breast", "Lettuce", "Tomatoes", "Cucumber", "Dressing"],
- *     instructions: ["Grill chicken", "Chop vegetables", "Mix together"],
- *     pictures: [
- *       { name: "chickensalad.jpg", link: "https://example.com/chickensalad.jpg" }
- *     ],
- *     rating: 4.8,
- *     macros: {
- *       calories: 350,
- *       protein: 30,
- *       carbs: 10,
- *       fat: 15
- *     }
- *   }
- * ]
- */
 async function getRecipesByParameters(cuisine, category) {
     const filterExpression = []
     const expressionAttributeValue = {
@@ -943,34 +868,6 @@ async function getRecipesByParameters(cuisine, category) {
     }
 }
 
-//TODO write methods for more precice recipe fetching
-
-async function getRecipe(recipeId) {
-    const command = new GetCommand({
-        TableName: tableName,
-        IndexName: "SK-index",
-        KeyConditionExpression: "SK = :sk",
-        FilterExpression: "cuisine = :cuisine",
-        ExpressionAttributeValues: {
-            ":sk": "RECIPE",
-            ":cuisine": cuisine,
-        },
-    });
-
-    try {
-        const response = await documentClient.send(command);
-        if (response.Items && response.Items.length > 0) {
-            logger.info(`Retrieved recipes by cuisine ${cuisine}: ${JSON.stringify(response.Items)}`);
-            return response.Items;
-        } else {
-            logger.warn(`No recipes found for cuisine ${cuisine}`);
-            return [];
-        }
-    } catch (error) {
-        logger.error(`Error while retrieving recipes by cuisine ${cuisine}: ${error.message}`);
-        return null;
-    }
-}
 
 /* 
 ========================
