@@ -3,9 +3,8 @@ import * as fridgeService from "../Services/fridgeService.js";
 
 export const addIngredientToFridge = async (req, res) => {
   const ingredientSchema = Joi.object({
-    name: Joi.string().required(),
-    amount: Joi.string().required(),
-    category: Joi.string().required(),
+    id: Joi.string().required(),
+    amount: Joi.number().required(),
   });
 
 
@@ -95,12 +94,11 @@ export const updateIngredientFromFridge = async (req, res) => {
   }
 
   try {
-    // Call your service to update the ingredient.
     const result = await fridgeService.updateIngredientInFridge(userId, value);
     if (result.success) {
       return res
         .status(200)
-        .json({ message: "Ingredient updated successfully", ingredient: result.ingredient });
+        .json({ message: "Ingredient updated successfully", ingredient: result.ingredients });
     } else {
       return res.status(result.code).json({ message: result.message });
     }
