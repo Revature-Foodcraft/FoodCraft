@@ -35,6 +35,7 @@ const App: React.FC = () => {
           </div>
         </div>
         <Routes>
+          <Route path="/recipe/:source/:id" element={<Recipe />} />
           <Route path="/" element={<Home />} />
           <Route path='/profile' element={<ProtectedRoute isLoggedIn={isLoggedIn}><Profile/></ProtectedRoute>}/>
           <Route path="/login" element={<Login />} />

@@ -60,24 +60,24 @@ export const login = async (req, res) => {
     }
 }
 
-export const getProfile = async (req,res) => {
+export const getProfile = async (req, res) => {
     const userInfo = await userService.getUser(req.user?.userId)
 
-    if(userInfo.success){
-        res.status(200).json({username:userInfo.user.username,account:userInfo.user.account, picture:userInfo.user?.picture})
-    } else{
-        res.status(500).json({message:userInfo.message})
+    if (userInfo.success) {
+        res.status(200).json({ username: userInfo.user.username, account: userInfo.user.account, picture: userInfo.user?.picture })
+    } else {
+        res.status(500).json({ message: userInfo.message })
     }
 }
 
-export const updateProfile = async (req,res) =>{
+export const updateProfile = async (req, res) => {
     const updateSchema = Joi.object({
-        username: Joi.string().optional(),
         firstname: Joi.string().optional(),
         lastname: Joi.string().optional(),
         email: Joi.string().email().optional(),
+
     })
-    
+
     const { error, value } = updateSchema.validate(req.body)
 
     if (error) {
@@ -90,11 +90,11 @@ export const updateProfile = async (req,res) =>{
         return res.status(400).json({ message: messages })
     }
 
-    const result = await userService.updateProfile(value,{userId:req.user.userId,picture:req.file})
-    
-    if(result.success){
-        res.status(200).json({message:"Update Successful"})
-    }else{
-        res.status(result.code).json({message:result.message})
+    const updatedUser = await userService.updateUser(req.user?.userId, value);
+
+    if (updatedUser.success) {
+        return res.status(200).json({ message: "Profile updated successfully", user: updatedUser.user });
+    } else {
+        return res.status(500).json({ message: updatedUser.message });
     }
 }

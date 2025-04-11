@@ -14,7 +14,10 @@ fridgeRoutes.use(authenticateToken)
  * @swagger
  * /fridge:
  *   post:
- *     summary: Create a new ingredient and store in the database.
+ *     summary: Add a new ingredient to the user's fridge.
+ *     description: Adds a new ingredient to the user's fridge. If the ingredient already exists, its amount will be updated.
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -22,19 +25,15 @@ fridgeRoutes.use(authenticateToken)
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               id:
  *                 type: string
- *                 description: Required name for the ingredient.
+ *                 description: The unique ID of the ingredient. Required.
  *               amount:
- *                 type: string
- *                 description: Amount of certain ingredient.
- *               category:
- *                 type: string
- *                 description: Category the ingredient belongs to.
- *   
+ *                 type: number
+ *                 description: The amount of the ingredient. Required.
  *     responses:
  *       200:
- *         description: Ingredient added successfully.
+ *         description: Ingredient added or updated successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -45,7 +44,7 @@ fridgeRoutes.use(authenticateToken)
  *                   example: Ingredient added successfully
  *                 ingredient:
  *                   type: object
- *                   example: {"name":"beef", "amount": "1kg", "category": "meat", "id":"knn124kjn124j"}
+ *                   example: {"id": "123", "name": "beef", "amount": 1, "category": "meat"}
  *       400:
  *         description: Bad request due to invalid input.
  *         content:
@@ -54,10 +53,12 @@ fridgeRoutes.use(authenticateToken)
  *               type: object
  *               properties:
  *                 message:
- *                   type: string
- *                   example: Error message
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["id is required", "amount must be a number"]
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized. Missing or invalid token.
  *         content:
  *           application/json:
  *             schema:
@@ -65,7 +66,7 @@ fridgeRoutes.use(authenticateToken)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Error message
+ *                   example: Unauthorized
  *       500:
  *         description: Internal server error occurred.
  *         content:
@@ -79,20 +80,24 @@ fridgeRoutes.use(authenticateToken)
  */
 fridgeRoutes.post("/", addIngredientToFridge);
 
-//TODO change doc it's now taking id in body
 /**
  * @swagger
  * /fridge:
  *   delete:
  *     summary: Remove an ingredient from the user's fridge.
- *     description: Removes an ingredient from the fridge by its name.
- *     parameters:
- *       - in: query
- *         name: name
- *         required: true
- *         schema:
- *           type: string
- *         description: The name of the ingredient to remove.
+ *     description: Removes an ingredient from the user's fridge by its ID.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 description: The ID of the ingredient to remove. Required.
  *     responses:
  *       200:
  *         description: Ingredient removed successfully.
@@ -108,7 +113,7 @@ fridgeRoutes.post("/", addIngredientToFridge);
  *                   type: array
  *                   items:
  *                     type: object
- *                     example: {"name": "beef", "amount": "1kg", "category": "meat"}
+ *                     example: {"id": "123", "name": "beef", "amount": 1, "category": "meat"}
  *       400:
  *         description: Bad request due to invalid input.
  *         content:
@@ -117,10 +122,12 @@ fridgeRoutes.post("/", addIngredientToFridge);
  *               type: object
  *               properties:
  *                 message:
- *                   type: string
- *                   example: Error message
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["id is required"]
  *       401:
- *         description: Unauthorized.
+ *         description: Unauthorized. Missing or invalid token.
  *         content:
  *           application/json:
  *             schema:
@@ -147,6 +154,9 @@ fridgeRoutes.delete("/", removeIngredientFromFridge);
  * /fridge:
  *   get:
  *     summary: Retrieve all ingredients from the user's fridge.
+ *     description: Fetches a list of all ingredients currently stored in the user's fridge.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of ingredients from the fridge.
@@ -159,9 +169,9 @@ fridgeRoutes.delete("/", removeIngredientFromFridge);
  *                   type: array
  *                   items:
  *                     type: object
- *                     example: {"name": "beef", "amount": "1kg", "category": "meat", "id":"kj134bjk124j"}
+ *                     example: {"id": "123", "name": "beef", "amount": 1, "category": "meat"}
  *       401:
- *         description: Unauthorized.
+ *         description: Unauthorized. Missing or invalid token.
  *         content:
  *           application/json:
  *             schema:
@@ -188,7 +198,9 @@ fridgeRoutes.get("/", getAllIngredientsFromFridge);
  * /fridge:
  *   put:
  *     summary: Update an ingredient in the user's fridge.
- *     description: Updates the amount and category of an ingredient by its name.
+ *     description: Updates the amount of an ingredient by its ID.
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -198,13 +210,10 @@ fridgeRoutes.get("/", getAllIngredientsFromFridge);
  *             properties:
  *               id:
  *                 type: string
- *                 description: The id of the ingredient to update.
+ *                 description: The ID of the ingredient to update. Required.
  *               amount:
- *                 type: string
- *                 description: The new amount for the ingredient.
- *               category:
- *                 type: string
- *                 description: The new category for the ingredient.
+ *                 type: number
+ *                 description: The new amount for the ingredient. Required.
  *     responses:
  *       200:
  *         description: Ingredient updated successfully.
@@ -218,7 +227,7 @@ fridgeRoutes.get("/", getAllIngredientsFromFridge);
  *                   example: Ingredient updated successfully
  *                 ingredient:
  *                   type: object
- *                   example: {"name": "beef", "amount": "500g", "category": "meat"}
+ *                   example: {"id": "123", "name": "beef", "amount": 2, "category": "meat"}
  *       400:
  *         description: Bad request due to invalid input.
  *         content:
@@ -227,10 +236,12 @@ fridgeRoutes.get("/", getAllIngredientsFromFridge);
  *               type: object
  *               properties:
  *                 message:
- *                   type: string
- *                   example: Error message
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["id is required", "amount must be a number"]
  *       401:
- *         description: Unauthorized.
+ *         description: Unauthorized. Missing or invalid token.
  *         content:
  *           application/json:
  *             schema:
