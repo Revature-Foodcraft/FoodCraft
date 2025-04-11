@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { useParams } from 'react-router-dom'; // Import useParams
 import '../css/Recipe.css';
 import lasagna from "../assets/lasagna.jpg";
 import orangec from "../assets/orange-chicken.jpg";
@@ -7,18 +7,21 @@ import salad from "../assets/salad.jpg";
 import pizza from "../assets/pizza.jpg";
 import chickens from "../assets/chicken sandwich.jpg";
 import fishtacos from "../assets/fishTacos.jpg";
-import { useParams } from 'react-router-dom';
+
 
 const Recipe: React.FC = () => {
+    const { id } = useParams<{ id: string }>(); // Get the recipe ID from the URL
     const [recipe, setRecipe] = useState<any>(null);
-    const {id} = useParams();
+    
     console.log(id)
     useEffect(() => {
-        fetch('http://localhost:5000/recipe/recipe/2') // Replace with actual API URL
+        if (!id) return;
+        
+        fetch(`http://localhost:5000/recipe/recipe/${id}`) // Use dynamic ID from URL
             .then(response => response.json())
             .then(data => setRecipe(data.recipe))
             .catch(error => console.error("Error fetching recipe:", error));
-    }, []);
+    }, [id]); // Depend on `id` so fetch runs when it changes
 
     if (!recipe) {
         return <p>Loading recipe...</p>;
@@ -36,10 +39,13 @@ const Recipe: React.FC = () => {
                     </div>
                     <h4>Ingredients</h4>
                     <ul className="ingredients-list">
-                        {recipe.ingredients.map((ingredient: string, index: number) => (
-                            <li key={index}>{ingredient}</li>
+                    {recipe.ingredients.map((ingredient: any, index: number) => (
+                        <li key={index}>
+                            {ingredient.amount} {ingredient.name} ({ingredient.category})
+                        </li>
                         ))}
                     </ul>
+
                     <h4>Instructions</h4>
                     <ol className="instructions-list">
                         {recipe.instructions.map((step: string, index: number) => (
@@ -67,7 +73,7 @@ const Recipe: React.FC = () => {
                     <div className="middle-bottom">Middle Bottom</div>
                 </div>
                 <div className="food-image">
-                <img src={recipe.pictures?.link} alt={recipe.name || "Recipe Image"} />
+                    <img src={recipe.pictures?.link} alt={recipe.name || "Recipe Image"} />
                 </div>
             </div>
             <div className="recipeSuggestions">

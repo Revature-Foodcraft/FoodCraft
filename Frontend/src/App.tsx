@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Header from './Components/Header';
 import Profile from './pages/Profile';
 import Recipe from './pages/Recipe';
+import CreateRecipe from './pages/createRecipe';
 import Reviews from './pages/Reviews'
 import { AuthContext } from './Components/Contexts';
 import { ProtectedRoute } from './Components/ProtectedRoutes';
