@@ -24,11 +24,19 @@ export const getRecipe = async (req, res) => {
 };
 
 export const createRecipe = async (req, res) => {
+    //FIXME
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
-        description: Joi.string.optional(),
+        description: Joi.string().optional(),
         review_id: Joi.string().optional(),
-        ingredients: Joi.array().items(Joi.string()).optional(),
+        ingredients: Joi.array().items(
+            Joi.object({
+                category: Joi.string().required(),
+                name: Joi.string().required(),
+                amount: Joi.string().required()
+            })
+        ).optional(),
+
         instructions: Joi.array().items(Joi.string()).optional(),
         pictures: Joi.array().items(
             Joi.object({
@@ -91,7 +99,7 @@ export const getSavedRecipes = async (req, res) => {
 };
 
 export async function updateRecipe(req, res) {
-    const { recipe } = req.body; // Assuming the recipe data is sent in the body of the request
+    const { recipe } = req.body;
 
     try {
         // Call the updateRecipe service function with the received recipe data
@@ -116,14 +124,14 @@ export async function updateRecipe(req, res) {
     }
 }
 
-export const getRecipes = async (req,res) =>{
-    const {cuisine,category} = req.query;
+export const getRecipes = async (req, res) => {
+    const { cuisine, category } = req.query;
 
-    const recipesList = await recipeService.getRecipes(cuisine,category)
+    const recipesList = await recipeService.getRecipes(cuisine, category)
 
-    if(recipesList.success){
-        res.status(200).json({recipes:recipesList.recipes})
-    }else{
-        res.status(500).json({recipe})
+    if (recipesList.success) {
+        res.status(200).json({ recipes: recipesList.recipes })
+    } else {
+        res.status(500).json({ recipe })
     }
 }
