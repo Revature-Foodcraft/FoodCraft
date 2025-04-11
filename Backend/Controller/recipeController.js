@@ -27,9 +27,16 @@ export const createRecipe = async (req, res) => {
     //FIXME
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
-        description: Joi.string.optional(),
+        description: Joi.string().optional(),
         review_id: Joi.string().optional(),
-        ingredients: Joi.array().items(Joi.string()).optional(),
+        ingredients: Joi.array().items(
+            Joi.object({
+                category: Joi.string().required(),
+                name: Joi.string().required(),
+                amount: Joi.string().required()
+            })
+        ).optional(),
+
         instructions: Joi.array().items(Joi.string()).optional(),
         pictures: Joi.array().items(
             Joi.object({
@@ -95,7 +102,8 @@ export async function updateRecipe(req, res) {
     const { recipe } = req.body;
 
     try {
-        const updatedRecipe = await model.updateRecipe(recipe);
+        // Call the updateRecipe service function with the received recipe data
+        const updatedRecipe = await recipeService.updateRecipe(recipe);
         if (updatedRecipe) {
             res.status(200).json({
                 success: true,
@@ -116,44 +124,14 @@ export async function updateRecipe(req, res) {
     }
 }
 
-export const getRecipesByCuisine = async (req, res) => {
-    const { cuisine } = req.params;
+export const getRecipes = async (req, res) => {
+    const { cuisine, category } = req.query;
 
-    if (!cuisine) {
-        return res.status(400).json({ message: "Cuisine is required" });
+    const recipesList = await recipeService.getRecipes(cuisine, category)
+
+    if (recipesList.success) {
+        res.status(200).json({ recipes: recipesList.recipes })
+    } else {
+        res.status(500).json({ recipe })
     }
-
-    try {
-        const recipes = await model.getRecipesByCuisine(cuisine);
-
-        if (recipes && recipes.length > 0) {
-            return res.status(200).json({ success: true, recipes });
-        } else {
-            return res.status(404).json({ success: false, message: "No recipes found for the specified cuisine" });
-        }
-    } catch (error) {
-        console.error("Error fetching recipes by cuisine:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
-
-export const getRecipesByCategory = async (req, res) => {
-    const { category } = req.params;
-
-    if (!category) {
-        return res.status(400).json({ message: "Category is required" });
-    }
-
-    try {
-        const recipes = await model.getRecipesByCategory(category);
-
-        if (recipes && recipes.length > 0) {
-            return res.status(200).json({ success: true, recipes });
-        } else {
-            return res.status(404).json({ success: false, message: "No recipes found for the specified category" });
-        }
-    } catch (error) {
-        console.error("Error fetching recipes by category:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
+}

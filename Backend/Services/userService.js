@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
-import { uploadImage, getSignedImageUrl } from "../util/s3.js";
+import { uploadImage, getSignedImageUrl, deleteImage } from "../util/s3.js";
 
 dotenv.config({ override: true })
 
@@ -83,7 +83,15 @@ export async function updateProfile({ userId, firstname, lastname, email, pictur
         PK: userDB.PK
     }
 
+    if (username) {
+        const exist = model.getUserByUsername(username)
+        if (!exist) {
+            updateUser.username = username;
+        } else {
+            return { success: false, message: "username in use" }
+        }
 
+    }
     if (firstname) {
         updateUser.account.firstname = firstname;
     }
@@ -94,6 +102,11 @@ export async function updateProfile({ userId, firstname, lastname, email, pictur
         updateUser.account.email = email;
     }
     if (picture) {
+        const hasPicture = await model.getUser(userId)
+
+        if (hasPicture.picture) {
+            await deleteImage(hasPicture.picture)
+        }
         const filename = `${userId}/${Date.now()}_${picture.originalname}`;
         try {
             await uploadImage(filename, picture.buffer, picture.mimeType);
@@ -103,7 +116,8 @@ export async function updateProfile({ userId, firstname, lastname, email, pictur
         }
     }
 
-    const user = await model.updateUser(updateUser);
+
+    const user = await model.updateUser(updateUser)
 
     if (user) {
         return { success: true, message: "Profile updated successfully", user };

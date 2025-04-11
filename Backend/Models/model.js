@@ -722,24 +722,30 @@ async function deleteRecipe(recipeId) {
     }
 }
 
+
 /**
+ * Retrieves all recipes from the database.
+ *
+ * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
+ * or an empty array if no recipes are present.
+ *
  * @async
- * @function getAllRecipes
- * @description Retrieves all recipes from the database.
- * @returns {Promise<Array|null>} - A promise that resolves to an array of recipe objects or null if an error occurs.
- * @example
+ * @function
+ * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
+ *                              Returns an empty array if no recipes are found.
+ * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
+ *
+ * Example response:
  * [
  *   {
- *     PK: "recipe-123",
- *     SK: "RECIPE",
- *     name: "Pasta",
- *     ingredients: [
- *       { id: "31", amount: 2 },
- *       { id: "12", amount: 5 }
+ *     recipe_id: "RECIPE#001",
+ *     name: "Spaghetti Bolognese",
+ *     review_id: "REVIEW#001",
+ *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
+ *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
+ *     pictures: [
+ *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
  *     ],
- *     description: "A delicious pasta recipe",
- *     instructions: ["Boil water", "Cook pasta", "Serve"],
- *     pictures: [],
  *     rating: 4.5,
  *     reviews: [],
  *     user_id: "kj124kb1231231jbjk",
@@ -775,97 +781,172 @@ async function getAllRecipes() {
     }
 }
 
-async function upsertRecipeFromExternalDB(APIResponse) {
-    //TODO
-}
-
-
 /**
+ * Retrieves all recipes from the database depending on cuisine and category.
+ *
+ * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
+ * or an empty array if no recipes are present.
+ *
  * @async
- * @function getRecipesByCategory
- * @description Retrieves all recipes belonging to a specific category.
- * @param {string} category - The category of recipes to retrieve.
- * @returns {Promise<Array|null>} - An array of recipes in the specified category or null if an error occurs.
- * @example
+ * @function
+ * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
+ *                              Returns an empty array if no recipes are found.
+ * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
+ *
+ * Example response:
  * [
  *   {
- *     PK: "recipe-123",
- *     SK: "RECIPE",
- *     name: "Pasta",
- *     ingredients: [
- *       { id: "31", amount: 2 },
- *       { id: "12", amount: 5 }
+ *     recipe_id: "RECIPE#001",
+ *     name: "Spaghetti Bolognese",
+ *     review_id: "REVIEW#001",
+ *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
+ *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
+ *     pictures: [
+ *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
  *     ],
- *     description: "A delicious pasta recipe",
- *     instructions: ["Boil water", "Cook pasta", "Serve"],
- *     pictures: [],
  *     rating: 4.5,
- *     reviews: [],
- *     user_id: "kj124kb1231231jbjk",
- *     macros: { calories: 500, fats: 20, carbs: 60, protein: 15 },
- *     dateCreated: "2025-04-07T14:10:00.000Z",
- *     category: "Pasta",
- *     cuisine: "Italian"
+ *     macros: {
+ *       calories: 600,
+ *       protein: 25,
+ *       carbs: 75,
+ *       fat: 20
+ *     }
+ *   },
+ *   {
+ *     recipe_id: "RECIPE#002",
+ *     name: "Chicken Salad",
+ *     review_id: "REVIEW#002",
+ *     ingredients: ["Chicken Breast", "Lettuce", "Tomatoes", "Cucumber", "Dressing"],
+ *     instructions: ["Grill chicken", "Chop vegetables", "Mix together"],
+ *     pictures: [
+ *       { name: "chickensalad.jpg", link: "https://example.com/chickensalad.jpg" }
+ *     ],
+ *     rating: 4.8,
+ *     macros: {
+ *       calories: 350,
+ *       protein: 30,
+ *       carbs: 10,
+ *       fat: 15
+ *     }
  *   }
  * ]
  */
-async function getRecipesByCategory(category) {
-    const command = new QueryCommand({
+async function getAllRecipes() {
+    const command = new ScanCommand({
         TableName: tableName,
         IndexName: "SK-index",
-        KeyConditionExpression: "SK = :sk",
-        FilterExpression: "category = :category",
+        KeyConditionExpression: "SK = :SK",
         ExpressionAttributeValues: {
-            ":sk": "RECIPE",
-            ":category": category,
-        },
+            ":SK": "RECIPE"
+        }
     });
 
     try {
         const response = await documentClient.send(command);
         if (response.Items && response.Items.length > 0) {
-            logger.info(`Retrieved recipes by category ${category}: ${JSON.stringify(response.Items)}`);
+            logger.info(`Retrieved all recipes: ${JSON.stringify(response.Items)}`);
             return response.Items;
         } else {
-            logger.warn(`No recipes found for category ${category}`);
+            logger.warn("No recipes found in the database");
             return [];
         }
     } catch (error) {
-        logger.error(`Error while retrieving recipes by category ${category}: ${error.message}`);
-        return null;
+        logger.error(`Error while retrieving all recipes: ${error.message}`);
+        return [];
     }
 }
+
 /**
+ * Retrieves all recipes from the database depending on cuisine and category.
+ *
+ * This function query the database table for items that has RECIPES for the GSI. It returns an array of recipe items if found,
+ * or an empty array if no recipes are present.
+ *
  * @async
- * @function getRecipesByCuisine
- * @description Retrieves all recipes belonging to a specific cuisine.
- * @param {string} cuisine - The cuisine of recipes to retrieve.
- * @returns {Promise<Array|null>} - An array of recipes in the specified cuisine or null if an error occurs.
- * @example
+ * @function
+ * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
+ *                              Returns an empty array if no recipes are found.
+ * @throws {Error} Logs and returns an empty array if an error occurs during the database scan.
+ *
+ * Example response:
  * [
  *   {
- *     PK: "recipe-123",
- *     SK: "RECIPE",
- *     name: "Pasta",
- *     ingredients: [
- *       { id: "31", amount: 2 },
- *       { id: "12", amount: 5 }
+ *     recipe_id: "RECIPE#001",
+ *     name: "Spaghetti Bolognese",
+ *     review_id: "REVIEW#001",
+ *     ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Onion", "Garlic"],
+ *     instructions: ["Boil spaghetti", "Cook beef", "Mix with sauce"],
+ *     pictures: [
+ *       { name: "spaghetti.jpg", link: "https://example.com/spaghetti.jpg" }
  *     ],
- *     description: "A delicious pasta recipe",
- *     instructions: ["Boil water", "Cook pasta", "Serve"],
- *     pictures: [],
  *     rating: 4.5,
- *     reviews: [],
- *     user_id: "kj124kb1231231jbjk",
- *     macros: { calories: 500, fats: 20, carbs: 60, protein: 15 },
- *     dateCreated: "2025-04-07T14:10:00.000Z",
- *     category: "Pasta",
- *     cuisine: "Italian"
+ *     macros: {
+ *       calories: 600,
+ *       protein: 25,
+ *       carbs: 75,
+ *       fat: 20
+ *     }
+ *   },
+ *   {
+ *     recipe_id: "RECIPE#002",
+ *     name: "Chicken Salad",
+ *     review_id: "REVIEW#002",
+ *     ingredients: ["Chicken Breast", "Lettuce", "Tomatoes", "Cucumber", "Dressing"],
+ *     instructions: ["Grill chicken", "Chop vegetables", "Mix together"],
+ *     pictures: [
+ *       { name: "chickensalad.jpg", link: "https://example.com/chickensalad.jpg" }
+ *     ],
+ *     rating: 4.8,
+ *     macros: {
+ *       calories: 350,
+ *       protein: 30,
+ *       carbs: 10,
+ *       fat: 15
+ *     }
  *   }
  * ]
  */
-async function getRecipesByCuisine(cuisine) {
+async function getRecipesByParameters(cuisine, category) {
+    const filterExpression = []
+    const expressionAttributeValue = {
+        ":SK": "RECIPE"
+    }
+
+    if (cuisine) {
+        filterExpression.push("cuisine = :cuisine")
+        expressionAttributeValue[":cuisine"] = cuisine
+    }
+    if (category) {
+        filterExpression.push("category = :category")
+        expressionAttributeValue[":category"] = category
+    }
     const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :SK",
+        FilterExpression: filterExpression.join("AND"),
+        ExpressionAttributeValues: expressionAttributeValue
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved all recipes: ${JSON.stringify(response.Items)}`);
+            return response.Items;
+        } else {
+            logger.warn("No recipes found in the database");
+            return [];
+        }
+    } catch (error) {
+        logger.error(`Error while retrieving all recipes: ${error.message}`);
+        return [];
+    }
+}
+
+//TODO write methods for more precice recipe fetching
+
+async function getRecipe(recipeId) {
+    const command = new GetCommand({
         TableName: tableName,
         IndexName: "SK-index",
         KeyConditionExpression: "SK = :sk",
@@ -1171,8 +1252,7 @@ export {
     updateRecipe,
     deleteRecipe,
     getAllRecipes,
-    getRecipesByCategory,
-    getRecipesByCuisine,
+    getRecipesByParameters,
 
     // Review-related functions
     createReview,

@@ -1,57 +1,66 @@
-import React, { useState } from "react";
-import Sidebar from "../Components/Homepage/Sidebar";
-import Dropdown from "../Components/Homepage/SortByDropdown";
-import DisplayRecipe from "../Components/Homepage/DisplayRecipes";
-import "../assets/search.svg"
-import { DisplayContext } from "../Components/Contexts";
+import React, { useState, useEffect } from "react";
+import pictureOne from "../assets/slideshow1.jpg";
+import pictureTwo from "../assets/slideshow2.jpg";
+import pictureThree from "../assets/slideshow3.jpg";
+import pictureFour from "../assets/slideshow4.jpg";
+import "../css/Homepage.css"; // Custom styles
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Home: React.FC = () => {
-  const [searchQuery,setSearchQuery] = useState<null|string>(null)
+  const images = [pictureOne, pictureTwo, pictureThree, pictureFour];
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [sortBy, setSortBy] = useState<string>("Recently Added");
-  const [invert, setInvert] = useState<boolean>(false);
-  const [selectedCuisine, setSelectedCuisine] = useState<string>("");
-  const [mealType, setMealTypeSelect] = useState<string>("");
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
-  const handleSearchEvent = (event:React.KeyboardEvent<HTMLInputElement>) =>{
-    if(event.key === "Enter"){
-      setSearchQuery(event.currentTarget.value)
-    }
-  }
+  return (
+    <div className="mainSection container text-center">
+      <h1 className="title mb-4">Welcome to FoodCraft</h1>
+      
+      <div className="slideshow-container mb-5 mx-auto">
+        {images.map((img, index) => (
+          <img
+            key={index}
+            src={img}
+            alt={`Slideshow picture ${index + 1}`}
+            className={`slide-image ${index === currentIndex ? "active" : ""}`}
+          />
+        ))}
+      </div>
 
-  const handleSearchButtonClick = () =>{
-    let input = document.querySelector<HTMLInputElement>(".form-control")
-    if(input){
-      setSearchQuery(input.value)
-    }
-  }
-  
-    return (
-        <DisplayContext.Provider value={{sortBy,setSortBy,invert,setInvert,selectedCuisine,setSelectedCuisine,mealType,setMealTypeSelect}}>
-          <div className="row">
-            <div className=" d-flex col-2 flex-grow-1" style={{ height: "calc(100vh - 5rem)" }}>
-              <Sidebar/>
-            </div>
-            <div className="col-10 d-flex" >
-              <div className="card d-flex m-2 rounded flex-grow-1 flex-column" style={{ height: "calc(100vh - 6rem)" }}>
-                <div className="row mw-100 ms-3 me-3 mt-4">
-                  <div className="col-6 ">
-                    <div className="input-group">
-                      <input type="text" className="form-control" placeholder="What recipe are you searching for?" id="searchInputBar" onKeyDown={handleSearchEvent}/>
-                        <button className="btn btn-outline-secondary" type="button" onClick={handleSearchButtonClick}><img src="./src/assets/search.svg" alt="Search Icon" /></button>
-                    </div>
-                  </div>
-                  <div className=" col-6 d-flex justify-content-end">
-                    <Dropdown/>
-                  </div>
-                </div>
-                <hr className="my-2"/>
-                <DisplayRecipe searchQuery={searchQuery}/>
+      <section className="featuredRecipies">
+        <h2 className="mb-4">Featured Recipes</h2>
+        <div className="row justify-content-center">
+          {[...Array(8)].map((_, index) => (
+            <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" key={index}>
+              <div className="recipe-card h-100">
+                <div className="recipe-image-placeholder">Image</div>
+                <p className="recipe-title">Recipe Title {index + 1}</p>
               </div>
             </div>
-          </div>
-        </DisplayContext.Provider>
-    );
-  };
+          ))}
+        </div>
+      </section>
 
-export default Home
+      <section className="bestRecipes mt-5">
+        <h2 className="mb-4">Best Recipes by Rating</h2>
+        <div className="row justify-content-center">
+          {[...Array(8)].map((_, index) => (
+            <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" key={index}>
+              <div className="recipe-card h-100">
+                <div className="recipe-image-placeholder">Image</div>
+                <p className="recipe-title">Recipe Title {index + 1}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;

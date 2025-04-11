@@ -101,46 +101,24 @@ export async function getAllRecipes() {
     }
 }
 
-export async function getRecipesByCategory(category) {
-    if (!category) {
-        return { success: false, code: 400, message: "Category is required" };
-    }
+export async function updateRecipe(recipe) {
+    const updatedRecipe = await recipeService.updateRecipe(recipe);
 
-    try {
-        const recipes = await model.getRecipesByCategory(category);
-
-        if (!recipes || recipes.length === 0) {
-            logger.warn(`No recipes found for category: ${category}`);
-            return { success: false, code: 404, message: "No recipes found for the specified category" };
-        }
-
-        logger.info(`Fetched ${recipes.length} recipes for category: ${category}`);
-        return { success: true, recipes };
-
-    } catch (error) {
-        console.error("Error fetching recipes by category:", error);
-        return { success: false, code: 500, message: "Internal server error" };
-    }
+    return updatedRecipe;
 }
 
-export async function getRecipesByCuisine(cuisine) {
-    if (!cuisine) {
-        return { success: false, code: 400, message: "Cuisine is required" };
+export async function getRecipes(cuisine, category) {
+
+    let recipes;
+    if (cuisine || category) {
+        recipes = await model.getRecipesByParameters(cuisine, category)
+    } else {
+        recipes = await model.getAllRecipes()
     }
 
-    try {
-        const recipes = await model.getRecipesByCuisine(cuisine);
-
-        if (!recipes || recipes.length === 0) {
-            logger.warn(`No recipes found for cuisine: ${cuisine}`);
-            return { success: false, code: 404, message: "No recipes found for the specified cuisine" };
-        }
-
-        logger.info(`Fetched ${recipes.length} recipes for cuisine: ${cuisine}`);
-        return { success: true, recipes };
-
-    } catch (error) {
-        console.error("Error fetching recipes by cuisine:", error);
-        return { success: false, code: 500, message: "Internal server error" };
+    if (recipes) {
+        return { success: true, recipes: recipes }
+    } else {
+        return { success: false, message: "Failed to Retrieve All Recipes" }
     }
 }

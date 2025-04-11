@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 
-const UpdatePopup:React.FC = ()=>{
+const UpdatePopup:React.FC<{onUpdate:()=>void}> = ({onUpdate})=>{
     const [showPopup, setShowPopup] = useState(false)
     const [editFirstname,setEditFirstname] = useState("")
     const [editLastname, setEditLastName] = useState("")
@@ -39,8 +39,12 @@ const UpdatePopup:React.FC = ()=>{
                 headers:{"Authorization": `Bearer ${localStorage.getItem('token')}`},
                 body:formData
             })
-
-            console.log(response)
+            
+            if(response.status == 200){
+                localStorage.removeItem("userInfo")
+                onUpdate()
+            }
+            
         }catch(err){
             console.log(err)
         }
@@ -56,7 +60,7 @@ const UpdatePopup:React.FC = ()=>{
                         <h5>Edit Profile</h5>
                     </div>
                     <div className="modal-body">
-                        <form onSubmit={handleUpdateProfile}>
+                        <form onSubmit={(e)=>{e.preventDefault(); handleUpdateProfile(e); togglePopup()}}>
                             <div>
                                 <label className="form-label" htmlFor="editFirstname">First Name</label>
                                 <input className="form-control" type="text" id="editFirstname" value={editFirstname} onChange={(e) => setEditFirstname(e.target.value)}/>
@@ -78,7 +82,7 @@ const UpdatePopup:React.FC = ()=>{
                                 <input className="form-control" type="file" id="editPicture" onChange={(e) => setEditPicture(e.target.files?.[0])}/>
                             </div>
                             <div className="d-flex justify-content-around align-content-center mt-4">
-                                <button className="btn btn-primary col-5" type="submit" onClick={()=>{togglePopup}}>Save</button>
+                                <button className="btn btn-primary col-5" type="submit">Save</button>
                                 <button className="btn btn-danger col-5" type="reset" onClick={togglePopup}>Cancel</button>
                             </div>
                             
