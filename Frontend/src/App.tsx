@@ -1,6 +1,6 @@
 
 import React, { useState,useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes} from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
