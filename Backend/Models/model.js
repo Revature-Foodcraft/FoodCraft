@@ -849,7 +849,7 @@ async function getRecipesByParameters(cuisine, category) {
         TableName: tableName,
         IndexName: "SK-index",
         KeyConditionExpression: "SK = :SK",
-        FilterExpression: filterExpression.join("AND"),
+        FilterExpression: filterExpression.join(" AND "),
         ExpressionAttributeValues: expressionAttributeValue
     });
 

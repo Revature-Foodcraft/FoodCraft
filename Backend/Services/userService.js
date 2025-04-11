@@ -75,7 +75,7 @@ export async function getUser(userId) {
     }
 }
 
-export async function updateProfile({ userId, firstname, lastname, email, picture }) {
+export async function updateProfile({ userId, username, firstname, lastname, email, picture }) {
 
     const userDB = await model.getUser(userId);
     const updateUser = {

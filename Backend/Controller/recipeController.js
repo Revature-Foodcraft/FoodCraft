@@ -131,7 +131,7 @@ export const getRecipes = async (req, res) => {
     if (recipesList.success) {
         res.status(200).json({ recipes: recipesList.recipes })
     } else {
-        res.status(500).json({ recipe })
+        res.status(500).json({ message: "Failed to fetch recipes" })
     }
 }
 
