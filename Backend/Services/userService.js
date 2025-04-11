@@ -1,4 +1,4 @@
-import { hashPassword,comparePassword } from "../util/bcrypt.js"
+import { hashPassword, comparePassword } from "../util/bcrypt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
 import jwt from "jsonwebtoken"
@@ -75,7 +75,7 @@ export async function getUser(userId) {
     }
 }
 
-export async function updateProfile({ userId, firstname, lastname, email, picture }) {
+export async function updateProfile({ userId, username, firstname, lastname, email, picture }) {
 
     const userDB = await model.getUser(userId);
     const updateUser = {

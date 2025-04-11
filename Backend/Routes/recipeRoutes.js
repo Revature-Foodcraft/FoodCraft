@@ -1,5 +1,5 @@
 import express from 'express';
-import { getRecipe, createRecipe, updateRecipe, getRecipes } from '../Controller/recipeController.js';
+import { getRecipe, createRecipe, updateRecipe, getAllRecipes } from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 
 /**
@@ -352,6 +352,7 @@ import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 
 const recipeRouter = express.Router();
 recipeRouter.post('/addRecipe', authenticateToken, createRecipe)
-recipeRouter.get('/recipe/:recipeId', getRecipe);
-recipeRouter.put("/update/info/:recipeID", authenticateToken, updateRecipe)
+recipeRouter.get('/:recipeId', getRecipe);
+recipeRouter.get('/', getAllRecipes);
+recipeRouter.put("/update/:recipeID", authenticateToken, updateRecipe)
 export default recipeRouter;
