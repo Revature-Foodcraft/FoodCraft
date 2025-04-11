@@ -1,10 +1,10 @@
-import { hashPassword } from "../util/bcyrpt.js"
+import { hashPassword } from "../util/bcrypt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
-import { uploadImage,getSignedImageUrl, deleteImage } from "../util/s3.js";
+import { uploadImage, getSignedImageUrl, deleteImage } from "../util/s3.js";
 
 dotenv.config({ override: true })
 
@@ -45,46 +45,53 @@ export async function createUser({ username, password, email = "", firstname = "
 export async function loginUser({ username, password }) {
     const user = await model.getUserByUsername(username)
 
-    if (user && await comparePassword(password, user.password)) {
-        const token = jwt.sign({
-            userId: user.PK
-        },
-            process.env.SECRET_KEY,
-            {
-                expiresIn: '1h'
-            })
+    try {
+        if (user && await comparePassword(password, user.password)) {
+            const token = jwt.sign({
+                userId: user.PK
+            },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: '1h'
+                })
 
-        return { success: true, message: "Login Successful", token: token }
-    } else {
-        return { success: false, message: "Login Failed: Incorrect Username or Password" }
+            return { success: true, message: "Login Successful", token: token }
+        } else {
+            return { success: false, message: "Login Failed: Incorrect Username or Password" }
+        }
+    } catch (error) {
+        return { success: false, message: "An error occurred during login", error: error.message }
     }
 }
 
-export async function getUser(userId){
+export async function getUser(userId) {
     const user = await model.getUser(userId)
-    user.picture = await getSignedImageUrl(user.picture)
-    if(user){
-        return {success: true, user:user}
-    }else{
-        return {success: false, message:"Failed to get user"}
+
+    const pictureUrl = await getSignedImageUrl(user.picture || "default-avatar-icon.jpg");
+    user.picture = pictureUrl;
+    if (user) {
+        return { success: true, user: user }
+    } else {
+        return { success: false, message: "Failed to get user" }
     }
 }
 
-export async function updateProfile({username, firstname, lastname, email},{userId, picture}){
-    const filename = `${Date.now()}-${picture.originalname}`;
+export async function updateProfile({ userId, firstname, lastname, email, picture }) {
+
+    const userDB = await model.getUser(userId);
     const updateUser = {
-        PK:userId
+        PK: userDB.PK
     }
 
     if (username) {
         const exist = model.getUserByUsername(username)
-        if (!exist){
+        if (!exist) {
             updateUser.username = username;
-        }else{
-            return {success:false, code:400, message:"Username in use"}
+        } else {
+            return { success: false, message: "username in use" }
         }
-    }
 
+    }
     if (firstname) {
         updateUser.account.firstname = firstname;
     }
@@ -94,21 +101,27 @@ export async function updateProfile({username, firstname, lastname, email},{user
     if (email) {
         updateUser.account.email = email;
     }
-    if (picture){
+    if (picture) {
         const hasPicture = await model.getUser(userId)
 
-        if(hasPicture.picture){
+        if (hasPicture.picture) {
             await deleteImage(hasPicture.picture)
         }
-        await uploadImage(filename,picture.buffer,picture.mimeType)
-        updateUser.picture = filename
+        const filename = `${userId}/${Date.now()}_${picture.originalname}`;
+        try {
+            await uploadImage(filename, picture.buffer, picture.mimeType);
+            updateUser.picture = filename;
+        } catch (error) {
+            return { success: false, message: "Failed to upload picture", error: error.message };
+        }
     }
+
 
     const user = await model.updateUser(updateUser)
 
-    if(user){
-        return {success:true}
-    }else{
-        return {success:false, code:500, message:"Failed to update"}
+    if (user) {
+        return { success: true, message: "Profile updated successfully", user };
+    } else {
+        return { success: false, message: "Failed to update profile" };
     }
 }
