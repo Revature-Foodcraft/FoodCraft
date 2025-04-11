@@ -321,6 +321,60 @@ async function getSavedRecipes(userId) {
 
 /**
  * @async
+ * @function getUserByGoogleId
+ * @param {int} googleId - The username of the requested user
+ * @returns {Promise<Object|null>} - object that contains user from db or 'null' if user not exist or an error occurs
+ * @example {
+ *
+ * PK: {string},
+ * SK: "PROFILE",
+ * account:{
+ *
+ *      first_name: {string},
+ *      last_name: {string},
+ *      email: {string}
+ * },
+ * fridge:[] - list of objects that contais id of ingredients and amount stored,
+ * password:{string},
+ * recipes:[] - list of recipe ids,
+ * username:{string}
+ *
+ * }
+ *
+ * @throws {Error} - Logs an error if there is an issue with the database operation.
+ */
+async function getUserByGoogleId(googleId) {
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :SK",
+        FilterExpression: 'googleId = :googleId',
+        ExpressionAttributeValues: {
+            ":SK": "PROFILE",
+            ":googleId":googleId
+        },
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved user: ${JSON.stringify(response.Items[0])}`);
+            return response.Items[0];
+        } else {
+            logger.warn(`No user found with googleId ${googleId}`);
+            return null;
+        }
+    } catch (error) {
+        logger.error(
+            `Error while getting user with googleId ${googleId}`,
+            error.message
+        );
+        return null;
+    }
+}
+
+/**
+ * @async
  * @function addIngredientToFridge
  * @description Adds an ingredient to the user's fridge if not there. if ingredient already in the fridge add amount to it
  * @param {string} userId - The ID of the user.
@@ -1245,6 +1299,7 @@ export {
     getUserByUsername,
     updateUser,
     getSavedRecipes,
+    getUserByGoogleId,
 
     // Recipe-related functions
     createRecipe,

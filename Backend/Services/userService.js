@@ -1,7 +1,6 @@
-import { hashPassword } from "../util/bcrypt.js"
+import { hashPassword,comparePassword } from "../util/bcrypt.js"
 import * as model from "../Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
-import { comparePassword } from "../util/bcyrpt.js";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { uploadImage, getSignedImageUrl, deleteImage } from "../util/s3.js";
@@ -127,9 +126,49 @@ export async function updateProfile({ userId, firstname, lastname, email, pictur
 }
 
 export async function getAccount({email,googleId,firstname,lastname,picture}) {
-    const user = model.getUserByGoogleId
-}
+    const user = await model.getUserByGoogleId(googleId)
 
-export async function getAccount({email,googleId,firstname,lastname,picture}) {
-    const user = model.getUserByGoogleId
+    if(user){
+        const token = jwt.sign({
+            userId: user.PK
+        },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: '1h'
+            })
+        
+        return {success:true, message:"User Found", token:token}
+    }else{
+        const userObj = {
+            PK: uuidv4(),
+            SK: "PROFILE",
+            username:email,
+            googleId,
+            account: {
+                firstname,
+                lastname,
+                email,
+            },
+            picture,
+            fridge: [],
+            recipes: [],
+            daily_macros: {}
+        }
+        
+        const newUser = await model.createUser(userObj)
+
+        if(newUser){
+            const token = jwt.sign({
+                userId: user.PK
+            },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: '1h'
+                })
+
+            return {success:true, message:"Account Created",token:token}
+        }else{
+            return {success:false, message:"Failed to Create Account"}
+        }
+    }
 }

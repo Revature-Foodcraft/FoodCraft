@@ -1,6 +1,6 @@
 import {OAuth2Client} from "google-auth-library";
 import dotenv from "dotenv"
-import { logger } from "../util/logger";
+import { logger } from "../util/logger.js";
 
 dotenv.config({override:true})
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
