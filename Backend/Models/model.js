@@ -193,11 +193,22 @@ async function updateUser(updatedUser) {
 
     Object.keys(updatedUser).forEach((key, index) => {
         if (key !== "user_id" && key !== "PK" && key !== "SK") {
-            const attributeKey = `#key${index}`;
-            const attributeValue = `:value${index}`;
-            updateExpression += `${attributeKey} = ${attributeValue}, `;
-            ExpressionAttributeNames[attributeKey] = key;
-            ExpressionAttributeValues[attributeValue] = updatedUser[key];
+            if(key == "account"){
+                Object.keys(updatedUser.account).forEach((key,index)=>{
+                    const attributeKey = `#acc${index}`;
+                    const attributeValue = `:acc${key}`;
+                    updateExpression+= `account.${attributeKey} = ${attributeValue}, `;
+                    ExpressionAttributeNames[attributeKey] = key
+                    ExpressionAttributeValues[attributeValue] = updatedUser.account[key]
+                })
+            }else{
+                console.log("here")
+                const attributeKey = `#key${index}`;
+                const attributeValue = `:value${index}`;
+                updateExpression += `${attributeKey} = ${attributeValue}, `;
+                ExpressionAttributeNames[attributeKey] = key;
+                ExpressionAttributeValues[attributeValue] = updatedUser[key];
+            }
         }
     });
 

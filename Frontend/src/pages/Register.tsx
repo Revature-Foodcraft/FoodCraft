@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/Register.module.css';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/backroundRegister.mp4';
+import { AuthContext } from '../Components/Contexts';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,8 @@ const Register: React.FC = () => {
   const [lastname, setLastname] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+  const {setLogInStatus} = useContext(AuthContext)
+  const nav = useNavigate()
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -32,9 +34,22 @@ const Register: React.FC = () => {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Registration failed');
+      try{
+        const response = await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
 
-      setSuccess('Registration successful! Please log in.');
-      
+        localStorage.setItem('token', (await response.json()).token)
+        setLogInStatus(true)
+        nav('/')
+        
+      } catch(err:any){
+        setError(err)
+      }
     } catch (err: any) {
       setError(err.message);
     }
@@ -55,7 +70,7 @@ const Register: React.FC = () => {
         <h2 id="loginWords">Register to FoodCraft</h2>
 
         {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
+        {/* {success && <p className="success">{success}</p>} */}
 
         <form onSubmit={handleRegister}>
           <div>
