@@ -2,8 +2,9 @@ import React from 'react';
 import SavedRecipes from '../Components/SavedRecipes';
 import SmartFridge from '../Components/SmartFridge/SmartFridge';
 import Header from '../Components/Header';
+import MacroTracker from '../Components/MacroTracker/MacroTracker';
 
-const styles: { [key: string]: React.CSSProperties } = {
+const styles: { [key: string]: React.CSSProperties; } = {
     container: {
         display: 'flex',
         flexDirection: 'column',
@@ -30,19 +31,22 @@ const styles: { [key: string]: React.CSSProperties } = {
 const Account: React.FC = () => {
     return (
         <div style={styles.container}>
-           
+
             {/* Main Content */}
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}
                 <section style={styles.smartFridgeSection}>
+                    <MacroTracker />
                     <SmartFridge />
                 </section>
 
                 {/* SavedRecipes Section */}
                 <section style={styles.savedRecipesSection}>
                     <SavedRecipes />
+
                 </section>
             </div>
+
         </div>
     );
 };

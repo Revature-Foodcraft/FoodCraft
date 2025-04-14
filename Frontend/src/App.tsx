@@ -1,6 +1,6 @@
 
 import React, { useState,useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes} from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
@@ -35,6 +35,7 @@ const App: React.FC = () => {
           </div>
         </div>
         <Routes>
+          <Route path="/recipe/:source/:id" element={<Recipe />} />
           <Route path="/" element={<Home />} />
           <Route path='/profile' element={<ProtectedRoute isLoggedIn={isLoggedIn}><Profile/></ProtectedRoute>}/>
           <Route path="/login" element={<Login />} />

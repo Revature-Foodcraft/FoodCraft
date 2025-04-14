@@ -1,0 +1,156 @@
+/* Container for the whole macro tracker */
+.macro-tracker {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-height: 370px; 
+  }
+  
+  /* Container for the circles */
+  .macro-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .macro-controls-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem
+
+  }
+
+  .macro-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Optional label styling within the macro controls */
+.macro-controls label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Style for the buttons */
+.macro-controls button {
+  background-color: #f39c12; /* A vibrant orange */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Hover effect for the buttons */
+.macro-controls button:hover {
+  background-color: #d35400; /* A slightly darker orange */
+}
+
+/* Active state for the buttons */
+.macro-controls button:active {
+  transform: scale(0.95);
+}
+
+  
+  /* Each macro circle item */
+  .macro-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  /* Macro circle size */
+  .macro-circle {
+    width: 150px;
+    height: 150px;
+    position: relative;
+  }
+  
+  /* SVG container */
+  svg.macro-svg {
+    width: 150px;
+    height: 150px;
+    overflow: visible; /* Allow flame to be visible even if outside viewBox */
+  }
+  
+  /* Background circle style (thicker stroke) */
+  .bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 6;
+  }
+  
+  /* Progress circle style with transition for smooth updates */
+  .progress {
+    fill: none;
+    stroke: #f39c12;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease-out;
+  }
+  
+  /* Center percentage text styling */
+  .percentage {
+    fill: #333;
+    font-size: 0.8rem;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  
+  /* Flame icon styling and animation */
+  .flame {
+    font-size: 0.9rem;
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: flameFlicker 1.2s infinite ease-in-out;
+  }
+  
+  @keyframes flameFlicker {
+    0% {
+      transform: scale(1);
+      filter: brightness(100%);
+    }
+    50% {
+      transform: scale(1.1);
+      filter: brightness(130%);
+    }
+    100% {
+      transform: scale(1);
+      filter: brightness(100%);
+    }
+  }
+  
+  /* Controls for adjusting macros */
+  .macro-controls {
+    margin-top: 0.5rem;
+  }
+  
+  .macro-controls button {
+    margin: 0 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  /* Label under each macro circle */
+  .label {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+  .labelGoal {
+    margin-bottom: 1.5rem;
+  }
+ 
