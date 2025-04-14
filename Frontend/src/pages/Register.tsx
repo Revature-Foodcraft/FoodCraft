@@ -34,7 +34,7 @@ const Register: React.FC = () => {
       if (!response.ok) throw new Error(data.message || 'Registration failed');
 
       setSuccess('Registration successful! Please log in.');
-
+      
     } catch (err: any) {
       setError(err.message);
     }

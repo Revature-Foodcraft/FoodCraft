@@ -99,7 +99,6 @@ const Login: React.FC = () => {
             <Link to="/register" className="auth-button-link">
               <button type="button" className="auth-button register-button">Register</button>
             </Link>
-            
           </div>
           <div >
             <p className='mt-3'>or</p>
