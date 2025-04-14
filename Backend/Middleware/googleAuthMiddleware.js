@@ -16,7 +16,7 @@ export async function authenticateGoogleToken(req,res,next) {
 
         logger.info(`Decoded token: ${JSON.stringify(verifiedToken)}`);
         if(verifiedToken){
-            req.user = tokenDetail;
+            req.local = verifiedToken;
             next()
         }else{
             res.status(403).json({ message: "Forbidden Access: Invalid Token" })
@@ -31,7 +31,7 @@ async function verifyToken(token) {
             audience: process.env.GOOGLE_CLIENT_ID
         })
         
-        return ticket.getPayLoad();
+        return ticket.getPayload()
     }catch(err){
         logger.error(err)
         return null

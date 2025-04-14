@@ -75,34 +75,35 @@ export async function getUser(userId) {
     }
 }
 
-export async function updateProfile({ userId, username, firstname, lastname, email, picture }) {
-
+export async function updateProfile(userId,{ username, firstname, lastname, email },picture) {
     const userDB = await model.getUser(userId);
     const updateUser = {
         PK: userDB.PK
     }
 
     if (username) {
-        const exist = model.getUserByUsername(username)
+        const exist = await model.getUserByUsername(username)
         if (!exist) {
             updateUser.username = username;
         } else {
             return { success: false, message: "username in use" }
         }
-
     }
-    if (firstname) {
+    if(firstname || lastname || email){
+        updateUser.account = {}
+        if (firstname) {
         updateUser.account.firstname = firstname;
+        }
+        if (lastname) {
+            updateUser.account.lastname = lastname;
+        }
+        if (email) {
+            updateUser.account.email = email;
+        }
     }
-    if (lastname) {
-        updateUser.account.lastname = lastname;
-    }
-    if (email) {
-        updateUser.account.email = email;
-    }
+    
     if (picture) {
         const hasPicture = await model.getUser(userId)
-
         if (hasPicture.picture) {
             await deleteImage(hasPicture.picture)
         }
@@ -115,7 +116,6 @@ export async function updateProfile({ userId, username, firstname, lastname, ema
         }
     }
 
-
     const user = await model.updateUser(updateUser)
 
     if (user) {
@@ -125,7 +125,7 @@ export async function updateProfile({ userId, username, firstname, lastname, ema
     }
 }
 
-export async function getAccount({email,googleId,firstname,lastname,picture}) {
+export async function getAccount({email,googleId,firstname,lastname}) {
     const user = await model.getUserByGoogleId(googleId)
 
     if(user){
@@ -149,7 +149,7 @@ export async function getAccount({email,googleId,firstname,lastname,picture}) {
                 lastname,
                 email,
             },
-            picture,
+            picture:"",
             fridge: [],
             recipes: [],
             daily_macros: {}
@@ -159,7 +159,7 @@ export async function getAccount({email,googleId,firstname,lastname,picture}) {
 
         if(newUser){
             const token = jwt.sign({
-                userId: user.PK
+                userId: userObj.PK
             },
                 process.env.SECRET_KEY,
                 {

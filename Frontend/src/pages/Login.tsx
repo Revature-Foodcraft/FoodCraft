@@ -5,6 +5,7 @@ import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/login-background.mp4';
 import { AuthContext } from '../Components/Contexts';
 import { GoogleLogin } from '@react-oauth/google';
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +35,20 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSuccess =  (credentialResponse:any) => {
+  const handleSuccess =  async (credentialResponse:any) => {
+    try{
+      const response = await fetch('http://localhost:5000/auth/google',{
+        method: 'POST',
+        headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
+      })
+      const data = await response.json()
+      localStorage.setItem('token', data.token);
+      
+      setLogInStatus(true)
+      nav('/')
+    }catch(error:any){
+      setError(error.message)
+    }
     console.log("Login Success:",credentialResponse);
   };
 

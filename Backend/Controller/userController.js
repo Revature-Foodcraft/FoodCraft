@@ -1,6 +1,5 @@
 import Joi from "joi";
 import * as userService from "../Services/userService.js";
-import multer from "multer"
 
 export const register = async (req, res) => {
     const accountSchema = Joi.object({
@@ -75,7 +74,7 @@ export const updateProfile = async (req, res) => {
         firstname: Joi.string().optional(),
         lastname: Joi.string().optional(),
         email: Joi.string().email().optional(),
-
+        username: Joi.string().optional()
     })
 
     const { error, value } = updateSchema.validate(req.body)
@@ -89,8 +88,7 @@ export const updateProfile = async (req, res) => {
         })
         return res.status(400).json({ message: messages })
     }
-
-    const updatedUser = await userService.updateUser(req.user?.userId, value);
+    const updatedUser = await userService.updateProfile(req.user?.userId, value, req.file);
 
     if (updatedUser.success) {
         return res.status(200).json({ message: "Profile updated successfully", user: updatedUser.user });
@@ -99,6 +97,12 @@ export const updateProfile = async (req, res) => {
     }
 }
 
-export const authGoogle = (req,res) =>{
-    const user = userService.getAccount({email:req.user.email,googleId:req.user.sub,firstname:req.user.given_name,lastname:req.user.family_name,picture:req.user.picture})
+export const authGoogle = async (req,res) =>{
+    const user = await userService.getAccount({email:req.local.email,googleId:req.local.sub,firstname:req.local.given_name,lastname:req.local.family_name})
+    
+    if(user.success){
+        res.status(200).json({message:user.message,token:user.token})
+    }else{
+        res.status(500).json({message:user.message})
+    }
 }

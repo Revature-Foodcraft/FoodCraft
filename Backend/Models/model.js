@@ -186,7 +186,7 @@ async function updateUser(updatedUser) {
         logger.error("The 'updatedUser' object must contain a 'PK' field.");
         return null;
     }
-
+    
     let updateExpression = "SET ";
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
@@ -220,7 +220,7 @@ async function updateUser(updatedUser) {
         logger.info(`Successfully updated user: ${updatedUser.PK}`);
         return response.Attributes;
     } catch (error) {
-        logger.error(`Error updating user: ${updatedUser.PK}`, error.message);
+        logger.error(`Error updating user: ${updatedUser.PK}`, error);
         return null;
     }
 }
