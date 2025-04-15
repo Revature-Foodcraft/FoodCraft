@@ -1,3 +1,33 @@
+.fridge-container {
+  border-radius: 8px;
+}
+
+.fridge-header {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center; /* Centers the button horizontally */
+  align-items: center; /* Centers the button vertically, if needed */
+}
+
+.btn-add {
+  background-color: #edd3a1; /* Sets the button's background color */
+  border: none; /* Removes the border */
+  color: #000; /* Ensures text color is readable */
+  padding: 10px 20px; /* Adds padding for better button size */
+  border-radius: 5px; /* Optional: adds rounded corners */
+  font-size: 16px; /* Makes text more prominent */
+  cursor: pointer; /* Adds a hover effect */
+}
+
+.btn-add:hover {
+  background-color: #e0c290; /* Optional: slightly darkens color on hover */
+}
+
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
@@ -22,72 +52,6 @@
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
-/* card adjustments if needed */
-.card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-/* Ensure the container is positioned relative to anchor the suggestions dropdown */
-
-.form-group {
-  position: relative; /* Anchor suggestions list */
-}
-
-.input-field:first-of-type {
-  margin-bottom: 0 !important;
-}
-/* Suggestions list aligned directly under the input field */
-.suggestions-list {
-  position: absolute;
-  top: 100%; /* Adjust the dropdown to overlap slightly */
-  left: 0;
-  width: 95%;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  max-height: 120px; /* Limit dropdown height */
-  overflow-y: auto;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  margin: 0; /* Ensure no margin is causing the gap */
-  padding: 0; /* Reset padding inside the dropdown */
-  list-style: none;
-}
-
-/* Eliminate padding or margin within suggestion items */
-.suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.suggestion-item:hover {
-  background-color: #f0f0f0;
-}
-
-/* Fine-tune scroll wheel styling for WebKit browsers */
-.suggestions-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.suggestions-list::-webkit-scrollbar-thumb {
-  background-color: #edd3a1;
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-}
-
-.suggestions-loading {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  border-radius: 4px;
-  z-index: 1000;
-  text-align: center;
-  font-size: 0.9em;
-}
 .modal-actions {
   display: flex;
   justify-content: space-between; /* Cancel on left, Save on right inside the container */
@@ -98,16 +62,14 @@
   padding-top: 1rem;
 }
 
-/* Push the first button to the left */
 .modal-actions .btn:first-child {
   margin-right: auto;
 }
 
-/* Optional: Customize button padding and colors */
 .modal-actions .btn {
   padding: 0.5rem 1rem;
 }
-/* Optional: Overriding the Cancel button style */
+
 .modal-actions .btn.btn-secondary {
   background-color: #b4ada2;
   color: #000;
@@ -120,7 +82,6 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Optional: Overriding the Save button style */
 .modal-actions .btn.btn-primary {
   background-color: #edd2a8;
   color: #000;
@@ -132,6 +93,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
 .modal-header {
   position: relative; /* Acts as the container for absolute positioning */
   padding-right: 40px; /* Add extra space to avoid overlapping text if needed */

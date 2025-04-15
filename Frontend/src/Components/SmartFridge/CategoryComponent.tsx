@@ -22,11 +22,16 @@ function CategoryComponent({ category, items, onRemove, onUpdate }: CategoryProp
       <div className="row">
         {items.map(({ ingredient }) => (
           <div key={ingredient.id} className="col-md-4 mb-3">
-            <IngredientComponent ingredient={ingredient} onRemove={onRemove} onUpdate={onUpdate} />
+            <IngredientComponent
+              ingredient={ingredient}
+              onRemove={onRemove}
+              onUpdate={onUpdate}
+            />
           </div>
         ))}
       </div>
     </div>
+
   );
 }
 

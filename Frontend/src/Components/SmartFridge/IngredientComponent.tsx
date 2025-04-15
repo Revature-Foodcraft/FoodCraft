@@ -18,44 +18,44 @@ function IngredientComponent({ ingredient, onRemove, onUpdate }: IngredientProps
     setIsEditing(false);
   };
 
-  return (
-    <div className="ingredient-card">
-      <div className="ingredient-body">
-        <h5 className="ingredient-title">{ingredient.name}</h5>
-        <p className="ingredient-text">
-          Amount:&nbsp;
-          {isEditing ? (
-            <>
-              <input
-                type="text"
-                className="input-field inline-input"
-                value={editedAmount}
-                onChange={(e) => setEditedAmount(e.target.value)}
-              />
-              <button
-                className="btn btn-success btn-sm inline-btn"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </>
-          ) : (
-            <span
-              className="editable-text"
-              onClick={() => setIsEditing(true)}
+  return (<div className="ingredient-card">
+    <div className="ingredient-body">
+      <h5 className="ingredient-title">{ingredient.name}</h5>
+      <p className="ingredient-text">
+        Amount:&nbsp;
+        {isEditing ? (
+          <>
+            <input
+              type="text"
+              className="input-field inline-input"
+              value={editedAmount}
+              onChange={(e) => setEditedAmount(e.target.value)}
+            />
+            <button
+              className="btn btn-success btn-sm inline-btn"
+              onClick={handleSave}
             >
-              {ingredient.amount}
-            </span>
-          )}
-        </p>
-        <button
-          className="btn btn-danger btn-sm ingredient-delete"
-          onClick={() => onRemove(ingredient.id)}
-        >
-          Delete
-        </button>
-      </div>
+              Save
+            </button>
+          </>
+        ) : (
+          <span
+            className="editable-text"
+            onClick={() => setIsEditing(true)}
+          >
+            {ingredient.amount}
+          </span>
+        )}
+      </p>
+      <button
+        className="btn ingredient-delete btn-sm"
+        onClick={() => onRemove(ingredient.id)}
+      >
+        Delete
+      </button>
     </div>
+  </div>
+
   );
 }
 

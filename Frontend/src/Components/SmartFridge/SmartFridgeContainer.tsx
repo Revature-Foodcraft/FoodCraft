@@ -36,26 +36,27 @@ const SmartFridgeContainer: React.FC = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="fridge-container">
-      <header className="fridge-header">
-        <h3 className="fridge-title">Smart Fridge</h3>
+    <div className="fridge-container container">
+      <header className="text-center fridge-header">
+        <h3 className=" fridge-title">Smart Fridge</h3>
       </header>
 
       {/* Control for opening the Add Ingredient Modal */}
-      {!showModal && (
-        <div className="btn-container">
-          <button className="btn fridge-btn add-btn" onClick={() => setShowModal(true)}>
-            Add Ingredient
-          </button>
-        </div>
+      {!showModal && (<div className="btn-container">
+        <button className="btn btn-add m-2 " onClick={() => setShowModal(true)}>
+          Add Ingredient
+        </button>
+      </div>
       )}
 
       {/* Modal for Adding Ingredient */}
       {showModal && (
         <AddIngredientModal
           onCancel={() => setShowModal(false)}
-          onSubmit={async ({ id, amount }) => {
-            await addIngredient({ id, amount });
+          onSubmit={async ({ id, amount, category, name }) => {
+            console.log("Adding Ingredient:", { id, amount, category, name });
+
+            await addIngredient({ id, amount, category, name });
             setShowModal(false);
           }}
         />

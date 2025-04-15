@@ -38,7 +38,7 @@ const useIngredients = (token: string | null) => {
     fetchIngredients();
   }, [fetchIngredients]);
 
-  const addIngredient = async ({ id, amount }: { id: string; amount: string }) => {
+  const addIngredient = async ({ id, amount, category, name }: { id: string; amount: string, category:string, name:string}) => {
     try {
       const response = await fetch("http://localhost:5000/fridge/", {
         method: "POST",
@@ -46,7 +46,7 @@ const useIngredients = (token: string | null) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ id, amount }),
+        body: JSON.stringify({ id, amount, category, name }),
       });
       if (!response.ok) {
         let errorMessage = response.statusText;

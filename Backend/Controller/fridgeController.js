@@ -4,8 +4,9 @@ import * as fridgeService from "../Services/fridgeService.js";
 export const addIngredientToFridge = async (req, res) => {
   const ingredientSchema = Joi.object({
     id: Joi.string().required(),
-    amount: Joi.number().required(),
-    category: Joi.string().required,
+    amount: Joi.string().required(),
+    category: Joi.string().required(),
+    name: Joi.string().required(),
   });
 
 

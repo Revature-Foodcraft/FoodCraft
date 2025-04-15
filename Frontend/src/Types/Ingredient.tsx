@@ -5,7 +5,9 @@ export enum IngredientCategory {
   Dairy = 'Dairy',
   Fruits = 'Fruits',
   Sauses = "Sauses",
-  Spices = "Spices"
+  Spices = "Spices",
+  Cerials = "Cerials",
+  Other = "Other"
   // add additional categories as needed
 }
 

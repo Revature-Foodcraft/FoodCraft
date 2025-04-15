@@ -7,6 +7,8 @@ interface AddIngredientModalProps {
     onSubmit: (newIngredient: {
         id: string;
         amount: string;
+        category: string;
+        name: string;
     }) => void;
     onCancel: () => void;
 }
@@ -86,13 +88,21 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
 
     const handleFormSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!formData.id || !formData.amount) {
+
+        if (!formData.id || !formData.amount || !formData.name) {
             console.error(
                 "Please select a suggested ingredient and fill all required fields."
             );
             return;
         }
-        onSubmit({ id: formData.id, amount: formData.amount });
+
+
+        onSubmit({
+            id: formData.id,
+            amount: formData.amount,
+            category: formData.category || "Other",
+            name: formData.name,
+        });
     };
 
     return (
