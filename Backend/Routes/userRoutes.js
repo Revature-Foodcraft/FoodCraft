@@ -1,9 +1,11 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros } from '../Controller/userController.js';
 import { getSavedRecipes } from '../Services/recipeService.js';
-import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
+import { authenticateToken } from '../Middleware/authTokenMiddleware.js';
 import { upload } from '../util/multer.js';
+
 const userRouter = express.Router();
+
 /**
  * @swagger
  * /users:
@@ -66,13 +68,13 @@ const userRouter = express.Router();
  *                   type: string
  *                   example: Failed to create user
  */
-
 userRouter.post('/users', register);
+
 /**
  * @swagger
  * /login:
  *   post:
- *     summary: Create a new user and store in the database.
+ *     summary: Login for an existing user.
  *     requestBody:
  *       required: true
  *       content:
@@ -88,7 +90,7 @@ userRouter.post('/users', register);
  *                 description: Must be at least 8 characters, include 1 capital letter, and 1 special character. Required.
  *     responses:
  *       201:
- *         description: Successful successfully.
+ *         description: Logged in successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -96,7 +98,7 @@ userRouter.post('/users', register);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: User Created
+ *                   example: User logged in successfully
  *                 token:
  *                   type: string
  *                   example: jwt_token_here
@@ -116,22 +118,24 @@ userRouter.post('/login', login);
 /**
  * @swagger
  * /user/profile:
- *   post:
- *     summary: fetch users username, and account info
+ *   get:
+ *     summary: Fetch user’s username and account info.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
- *       201:
- *         description: User Found.
+ *       200:
+ *         description: User found.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 user:
- *                   username: string
- *                   firstname: string
- *                   lastname: string
- *                   email: string
- *                   picture: string
+ *                 username:
+ *                   type: string
+ *                 account:
+ *                   type: object
+ *                 picture:
+ *                   type: string
  *       403:
  *         description: Missing token.
  *         content:
@@ -143,7 +147,7 @@ userRouter.post('/login', login);
  *                   type: string
  *                   example: Error message
  */
-userRouter.get('/user/profile', authenticateToken, getProfile)
+userRouter.get('/user/profile', authenticateToken, getProfile);
 
 /**
  * @swagger
@@ -236,7 +240,7 @@ userRouter.get('/user/profile', authenticateToken, getProfile)
  *                   type: string
  *                   example: Failed to update profile
  */
-userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture"), updateProfile)
+userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture"), updateProfile);
 
 /**
  * @swagger
@@ -324,9 +328,167 @@ userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture
  *                   type: string
  *                   example: Internal server error
  */
-userRouter.get('/user/recipes', authenticateToken, getSavedRecipes)
+userRouter.get('/user/recipes', authenticateToken, getSavedRecipes);
 
-userRouter.get('/macros', authenticateToken ,getDailyMacros)
-userRouter.put('/macros', authenticateToken ,updateMacros)
+/**
+ * @swagger
+ * /macros:
+ *   get:
+ *     summary: Retrieve daily macros for the authenticated user.
+ *     description: Retrieves the user's daily macros. If the stored date is not today's date, it resets protein, fats, and carbs to 0 and updates the date.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Daily macros retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 daily_macros:
+ *                   type: object
+ *                   properties:
+ *                     date:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-14T00:00:00.000Z
+ *                     protein:
+ *                       type: number
+ *                       example: 80
+ *                     fats:
+ *                       type: number
+ *                       example: 60
+ *                     carbs:
+ *                       type: number
+ *                       example: 160
+ *                     proteinGoal:
+ *                       type: number
+ *                       example: 120
+ *                     fatsGoal:
+ *                       type: number
+ *                       example: 70
+ *                     carbsGoal:
+ *                       type: number
+ *                       example: 200
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error occurred.
+ */
+userRouter.get('/macros', authenticateToken, getDailyMacros);
+
+/**
+ * @swagger
+ * /macros:
+ *   put:
+ *     summary: Update daily macros for the authenticated user.
+ *     description: Updates the user's daily macros by adding the provided values to the current values.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               protein:
+ *                 type: number
+ *                 example: 80
+ *               fats:
+ *                 type: number
+ *                 example: 60
+ *               carbs:
+ *                 type: number
+ *                 example: 160
+ *             required:
+ *               - protein
+ *               - fats
+ *               - carbs
+ *     responses:
+ *       200:
+ *         description: Daily macros updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Macros updated successfully
+ *                 daily_macros:
+ *                   type: object
+ *                   properties:
+ *                     date:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-14T00:00:00.000Z
+ *                     protein:
+ *                       type: number
+ *                       example: 80
+ *                     fats:
+ *                       type: number
+ *                       example: 60
+ *                     carbs:
+ *                       type: number
+ *                       example: 160
+ *                     proteinGoal:
+ *                       type: number
+ *                       example: 120
+ *                     fatsGoal:
+ *                       type: number
+ *                       example: 70
+ *                     carbsGoal:
+ *                       type: number
+ *                       example: 200
+ *       400:
+ *         description: Bad request due to invalid input.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input provided
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error occurred.
+ */
+userRouter.put('/macros', authenticateToken, updateMacros);
 
 export default userRouter;
