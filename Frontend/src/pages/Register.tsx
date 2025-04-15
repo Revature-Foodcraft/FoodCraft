@@ -15,6 +15,7 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const {setLogInStatus} = useContext(AuthContext)
   const nav = useNavigate()
+  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -43,9 +44,13 @@ const Register: React.FC = () => {
           body: JSON.stringify({ username, password }),
         });
 
-        localStorage.setItem('token', (await response.json()).token)
-        setLogInStatus(true)
-        nav('/')
+        if(response.status == 200){
+          localStorage.setItem('token', (await response.json()).token)
+          setLogInStatus(true)
+          nav('/')
+        }else{
+          setError("Failed to register and login to account")
+        }
         
       } catch(err:any){
         setError(err)
@@ -61,16 +66,18 @@ const Register: React.FC = () => {
         method: 'POST',
         headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
       })
-      const data = await response.json()
-      console.log(data)
-      localStorage.setItem('token', data.token);
       
-      setLogInStatus(true)
-      nav('/')
+      if(response.status == 200){
+        const data = await response.json()
+        localStorage.setItem('token', data.token);
+        setLogInStatus(true)
+        nav('/')
+      }else{
+        setError("Failed to Login")
+      }
     }catch(error:any){
       setError(error.message)
     }
-    console.log("Login Success:",credentialResponse);
   };
 
   const handleError = () => {
@@ -92,7 +99,6 @@ const Register: React.FC = () => {
         <h2 id="loginWords">Register to FoodCraft</h2>
 
         {error && <p className="error">{error}</p>}
-        {/* {success && <p className="success">{success}</p>} */}
 
         <form onSubmit={handleRegister}>
           <div>

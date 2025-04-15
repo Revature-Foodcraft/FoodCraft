@@ -41,11 +41,13 @@ const Login: React.FC = () => {
         method: 'POST',
         headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
       })
-      const data = await response.json()
-      localStorage.setItem('token', data.token);
       
-      setLogInStatus(true)
-      nav('/')
+      if(response.status == 200){
+        const data = await response.json()
+        localStorage.setItem('token', data.token);
+        setLogInStatus(true)
+        nav('/')
+      }
     }catch(error:any){
       setError(error.message)
     }
