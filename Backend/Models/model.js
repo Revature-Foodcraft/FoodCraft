@@ -897,18 +897,18 @@ async function getAllRecipes() {
  * ]
  */
 async function getRecipesByParameters(cuisine, category) {
-    const filterExpression = []
+    const filterExpression = [];
     const expressionAttributeValue = {
         ":SK": "RECIPE"
-    }
+    };
 
     if (cuisine) {
-        filterExpression.push("cuisine = :cuisine")
-        expressionAttributeValue[":cuisine"] = cuisine
+        filterExpression.push("cuisine = :cuisine");
+        expressionAttributeValue[":cuisine"] = cuisine;
     }
     if (category) {
-        filterExpression.push("category = :category")
-        expressionAttributeValue[":category"] = category
+        filterExpression.push("category = :category");
+        expressionAttributeValue[":category"] = category;
     }
     const command = new QueryCommand({
         TableName: tableName,
@@ -1200,6 +1200,82 @@ async function getAllIngredients() {
         return null;
     }
 }
+
+/**
+ * Updates the daily_macros for a user.
+ * @param {string} userId - The unique identifier for the user.
+ * @param {object} newDailyMacros - The updated daily macros object.
+ *        Example:
+ *        {
+ *          date: "2025-04-14T00:00:00.000Z",
+ *          protein: 0,
+ *          fats: 0,
+ *          carbs: 0,
+ *          proteinGoal: 120,
+ *          fatsGoal: 70,
+ *          carbsGoal: 200
+ *        }
+ * @returns {Promise<object|null>} - Returns the updated user attributes if successful or null if not.
+ */
+async function updateMacros(userId, newDailyMacros) {
+    const command = new UpdateCommand({
+      TableName: tableName,
+      Key: {
+        PK: userId,
+        SK: "PROFILE",
+      },
+      UpdateExpression: "set daily_macros = :macros",
+      ExpressionAttributeValues: {
+        ":macros": newDailyMacros,
+      },
+      ReturnValues: "ALL_NEW",
+    });
+  
+    try {
+      const response = await documentClient.send(command);
+      if (response.Attributes) {
+        logger.info(`Updated daily_macros for user ${userId}: ${JSON.stringify(response.Attributes)}`);
+        return response.Attributes;
+      } else {
+        logger.warn(`No Attributes returned after updating macros for user ${userId}`);
+        return null;
+      }
+    } catch (error) {
+      logger.error(`Error updating macros for user ${userId}: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+ * Retrieves the daily_macros for the current user.
+ * @param {string} userId - The unique identifier for the user.
+ * @returns {Promise<object|null>} - The daily_macros object if found; otherwise, null.
+ */
+async function getDailyMacros(userId) {
+    const command = new GetCommand({
+      TableName: tableName,
+      Key: {
+        PK: userId,
+        SK: "PROFILE",
+      },
+    });
+  
+    try {
+      const response = await documentClient.send(command);
+      if (response.Item && response.Item.daily_macros) {
+        logger.info(`Retrieved daily_macros for user ${userId}: ${JSON.stringify(response.Item.daily_macros)}`);
+        return response.Item.daily_macros;
+      } else {
+        logger.warn(`User ${userId} or daily_macros not found`);
+        return null;
+      }
+    } catch (error) {
+      logger.error(`Error retrieving daily_macros for user ${userId}: ${error.message}`);
+      return null;
+    }
+  }
+  
+
 export {
     // User-related functions
     createUser,
@@ -1231,6 +1307,10 @@ export {
     removeIngredientFromFridge,
     updateIngredientFromFridge,
     getAllIngredientsFromFridge,
+
+    //Macro Functions
+    updateMacros,
+    getDailyMacros
 };
 
 
