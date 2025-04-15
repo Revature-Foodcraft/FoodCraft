@@ -85,34 +85,35 @@ export async function getUser(userId) {
     }
 }
 
-export async function updateProfile({ userId, username, firstname, lastname, email, picture }) {
-
+export async function updateProfile(userId,{ username, firstname, lastname, email },picture) {
     const userDB = await model.getUser(userId);
     const updateUser = {
         PK: userDB.PK
     }
 
     if (username) {
-        const exist = model.getUserByUsername(username)
+        const exist = await model.getUserByUsername(username)
         if (!exist) {
             updateUser.username = username;
         } else {
             return { success: false, message: "username in use" }
         }
-
     }
-    if (firstname) {
+    if(firstname || lastname || email){
+        updateUser.account = {}
+        if (firstname) {
         updateUser.account.firstname = firstname;
+        }
+        if (lastname) {
+            updateUser.account.lastname = lastname;
+        }
+        if (email) {
+            updateUser.account.email = email;
+        }
     }
-    if (lastname) {
-        updateUser.account.lastname = lastname;
-    }
-    if (email) {
-        updateUser.account.email = email;
-    }
+    
     if (picture) {
         const hasPicture = await model.getUser(userId)
-
         if (hasPicture.picture) {
             await deleteImage(hasPicture.picture)
         }
@@ -125,6 +126,71 @@ export async function updateProfile({ userId, username, firstname, lastname, ema
         }
     }
 
+    const user = await model.updateUser(updateUser)
+
+    if (user) {
+        return { success: true, message: "Profile updated successfully", user };
+    } else {
+        return { success: false, message: "Failed to update profile" };
+    }
+}
+
+export async function getAccount({email,googleId,firstname ='',lastname =''}) {
+    const user = await model.getUserByGoogleId(googleId)
+
+    if(user){
+        const token = jwt.sign({
+            userId: user.PK
+        },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: '1h'
+            })
+        
+        return {success:true, message:"User Found", token:token}
+    }else{
+        const userObj = {
+            PK: uuidv4(),
+            SK: "PROFILE",
+            username:email,
+            googleId,
+            account: {
+                firstname,
+                lastname,
+                email,
+            },
+            picture:"",
+            fridge: [],
+            recipes: [],
+            daily_macros: {}
+        }
+
+        const newUser = await model.createUser(userObj)
+
+        if(newUser){
+            const token = jwt.sign({
+                userId: userObj.PK
+            },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: '1h'
+                })
+
+            return {success:true, message:"Account Created",token:token}
+        }else{
+            return {success:false, message:"Failed to Create Account"}
+        }
+    }
+}
+
+export async function linkAccount(userId,googleId,email) {
+    const updateUser = {
+        PK: userId,
+        googleId: googleId,
+        account:{
+            email
+        }
+    }
 
     const user = await model.updateUser(updateUser)
 
