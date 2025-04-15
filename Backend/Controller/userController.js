@@ -63,7 +63,7 @@ export const getProfile = async (req, res) => {
     const userInfo = await userService.getUser(req.user?.userId)
 
     if (userInfo.success) {
-        res.status(200).json({ username: userInfo.user.username, account: userInfo.user.account, picture: userInfo.user?.picture })
+        res.status(200).json({ username: userInfo.user.username, account: userInfo.user.account, picture: userInfo.user?.picture, googleId:userInfo.user?.googleId })
     } else {
         res.status(500).json({ message: userInfo.message })
     }
@@ -102,6 +102,16 @@ export const authGoogle = async (req,res) =>{
     
     if(user.success){
         res.status(200).json({message:user.message,token:user.token})
+    }else{
+        res.status(500).json({message:user.message})
+    }
+}
+
+export const linkGoogle = async (req,res) =>{
+    const user = await userService.linkAccount(req.user?.userId, req.local.sub, req.local.email)
+
+    if(user.success){
+        res.status(200).json({message:user.message})
     }else{
         res.status(500).json({message:user.message})
     }

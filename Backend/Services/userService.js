@@ -125,7 +125,7 @@ export async function updateProfile(userId,{ username, firstname, lastname, emai
     }
 }
 
-export async function getAccount({email,googleId,firstname,lastname}) {
+export async function getAccount({email,googleId,firstname ='',lastname =''}) {
     const user = await model.getUserByGoogleId(googleId)
 
     if(user){
@@ -154,7 +154,7 @@ export async function getAccount({email,googleId,firstname,lastname}) {
             recipes: [],
             daily_macros: {}
         }
-        
+
         const newUser = await model.createUser(userObj)
 
         if(newUser){
@@ -170,5 +170,23 @@ export async function getAccount({email,googleId,firstname,lastname}) {
         }else{
             return {success:false, message:"Failed to Create Account"}
         }
+    }
+}
+
+export async function linkAccount(userId,googleId,email) {
+    const updateUser = {
+        PK: userId,
+        googleId: googleId,
+        account:{
+            email
+        }
+    }
+
+    const user = await model.updateUser(updateUser)
+
+    if (user) {
+        return { success: true, message: "Profile updated successfully", user };
+    } else {
+        return { success: false, message: "Failed to update profile" };
     }
 }

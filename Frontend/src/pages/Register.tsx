@@ -4,6 +4,7 @@ import '../css/Register.module.css';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/backroundRegister.mp4';
 import { AuthContext } from '../Components/Contexts';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,6 @@ const Register: React.FC = () => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const {setLogInStatus} = useContext(AuthContext)
   const nav = useNavigate()
   const handleRegister = async (e: React.FormEvent) => {
@@ -53,6 +53,28 @@ const Register: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleSuccess =  async (credentialResponse:any) => {
+    try{
+      const response = await fetch('http://localhost:5000/auth/google',{
+        method: 'POST',
+        headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
+      })
+      const data = await response.json()
+      console.log(data)
+      localStorage.setItem('token', data.token);
+      
+      setLogInStatus(true)
+      nav('/')
+    }catch(error:any){
+      setError(error.message)
+    }
+    console.log("Login Success:",credentialResponse);
+  };
+
+  const handleError = () => {
+    console.error("Login Failed");
   };
 
   return (
@@ -140,6 +162,12 @@ const Register: React.FC = () => {
             </Link>
           </div>
         </form>
+          <div >
+            <p className='mt-3'>or</p>
+            <div className='d-flex justify-content-center'>
+              <GoogleLogin text="signup_with" onSuccess={handleSuccess} onError={handleError}/>
+            </div>
+          </div>
       </div>
     </div>
   );

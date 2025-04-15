@@ -49,7 +49,6 @@ const Login: React.FC = () => {
     }catch(error:any){
       setError(error.message)
     }
-    console.log("Login Success:",credentialResponse);
   };
 
   const handleError = () => {
