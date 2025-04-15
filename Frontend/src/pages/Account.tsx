@@ -3,6 +3,8 @@ import SavedRecipes from '../Components/SavedRecipes';
 import SmartFridge from '../Components/SmartFridge/SmartFridge';
 import Header from '../Components/Header';
 import MacroTracker from '../Components/MacroTracker/MacroTracker';
+import { Outlet } from 'react-router-dom';
+
 
 const styles: { [key: string]: React.CSSProperties; } = {
     container: {
@@ -43,7 +45,7 @@ const Account: React.FC = () => {
                 {/* SavedRecipes Section */}
                 <section style={styles.savedRecipesSection}>
                     <SavedRecipes />
-
+                    <Outlet />
                 </section>
             </div>
 

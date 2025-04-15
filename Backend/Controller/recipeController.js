@@ -30,7 +30,7 @@ export const createRecipe = async (req, res) => {
         review_id: Joi.string().optional(),
         ingredients: Joi.array().items(
             Joi.object({
-                category: Joi.string().required(),
+                category: Joi.string().optional(),
                 name: Joi.string().required(),
                 amount: Joi.string().required()
             })
