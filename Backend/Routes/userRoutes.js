@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile } from '../Controller/userController.js';
-import { getSavedRecipes } from '../Services/recipeService.js';
+import { getSavedRecipes, deleteSavedRecipe } from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
 const userRouter = express.Router();
@@ -325,5 +325,8 @@ userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture
  *                   example: Internal server error
  */
 userRouter.get('/user/recipes', authenticateToken, getSavedRecipes)
+
+
+userRouter.delete("/user/recipes/:recipeId", authenticateToken, deleteSavedRecipe)
 
 export default userRouter;

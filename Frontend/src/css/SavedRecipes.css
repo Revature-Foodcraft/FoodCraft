@@ -1,12 +1,9 @@
 #card-container {
   max-height: 430px;
-  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-y: auto;
   overflow-x: hidden;
-  display: block; /* Stack cards vertically */
-
-  padding: 10px; /* Inner spacing around the wrapper */
-  gap: 0; /* Remove unnecessary horizontal spacing */
-  margin: 0 auto; /* Center the wrapper horizontally */
+  padding: 15px; /* A bit more spacing inside */
+  margin: 0 auto;
 }
 
 #card-container::-webkit-scrollbar {
@@ -14,52 +11,52 @@
 }
 
 #card-container::-webkit-scrollbar-thumb {
-  background-color: #edd3a1; /* Match the card colors */
+  background-color: #edd3a1;
   border-radius: 4px;
 }
 
 .container {
-  padding: 20px; /* Add inner spacing around the container */
-  margin: 0 auto; /* Center the container horizontally */
-  padding: 20px; /* Add padding around the container */
-  background-color: #f9f9f9; /* Light gray background for contrast */
-  border-radius: 10px; /* Rounded corners for a soft look */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 20px;
+  margin: 20px auto;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .row {
-  margin-bottom: 15px; /* Add spacing between rows */
+  margin-bottom: 15px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .row:first-child {
-  margin-bottom: 20px; /* Space below the header */
-  text-align: center; /* Center-align the title */
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .row:first-child h3 {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
-  color: #333; /* Darker text for contrast */
+  color: #333;
 }
 
 .btn-custom {
-  background-color: #edd2a8; /* Warm orange shade for emphasis */
-  color: #000000; /* White text for contrast */
-  border: none; /* Remove border */
-  border-radius: 20px; /* Rounded, pill-like shape */
-  padding: 10px 20px; /* Larger padding for aesthetics */
+  background-color: #edd2a8;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 30px;
   font-size: 16px;
   font-weight: bold;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .btn-custom:hover {
-  background-color: #e6a902; /* Slightly darker shade on hover */
-  transform: translateY(-2px); /* Lift effect on hover */
+  background-color: #e6a902;
+  transform: translateY(-2px);
 }
 
 .btn-custom:active {
-  transform: translateY(0); /* Reset lift on click */
-  background-color: #d79902; /* Even darker shade */
+  transform: translateY(0);
+  background-color: #d79902;
 }

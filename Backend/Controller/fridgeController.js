@@ -5,6 +5,7 @@ export const addIngredientToFridge = async (req, res) => {
   const ingredientSchema = Joi.object({
     id: Joi.string().required(),
     amount: Joi.number().required(),
+    category: Joi.string().optional,
   });
 
 
