@@ -104,3 +104,24 @@ export async function getRecipes(cuisine, category) {
         return { success: false, message: "Failed to Retrieve All Recipes" }
     }
 }
+
+export async function deleteSavedRecipe(userId, recipeId) {
+    if (!userId || !recipeId) {
+        return { success: false, code: 400, message: "User ID and Recipe ID are required" };
+    }
+
+    try {
+        const result = await model.deleteSavedRecipe(userId, recipeId);
+
+        if (result) {
+            logger.info(`Deleted saved recipe with ID: ${recipeId} for user: ${userId}`);
+            return { success: true, message: "Saved recipe deleted successfully" };
+        } else {
+            logger.warn(`Failed to delete saved recipe with ID: ${recipeId} for user: ${userId}`);
+            return { success: false, code: 404, message: "Saved recipe not found" };
+        }
+    } catch (error) {
+        console.error("Error deleting saved recipe:", error);
+        return { success: false, code: 500, message: "Internal server error" };
+    }
+}

@@ -1,28 +1,25 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge//SmartFridge.css";
+import "../../css/SmartFridge/SmartFridge.css";
 import { Ingredient } from "../../Types/Ingredient";
 
 interface IngredientProps {
   ingredient: Ingredient;
-  onRemove: (id: string) => void; // onRemove receives the id.
-    onUpdate: (id: string, newAmount: string) => void;
+  onRemove: (id: string) => void;
+  onUpdate: (id: string, newAmount: string) => void;
 }
 
-const IngredientComponent: React.FC<IngredientProps> = ({ ingredient, onRemove, onUpdate }) => {
-
+function IngredientComponent({ ingredient, onRemove, onUpdate }: IngredientProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedAmount, setEditedAmount] = useState(ingredient.amount);
 
-  
   const handleSave = () => {
-    // Call the parent's update function with the new amount.
     onUpdate(ingredient.id, editedAmount);
     setIsEditing(false);
   };
 
   return (
-      <div className="ingredient-card">
+    <div className="ingredient-card">
       <div className="ingredient-body">
         <h5 className="ingredient-title">{ingredient.name}</h5>
         <p className="ingredient-text">
@@ -59,8 +56,7 @@ const IngredientComponent: React.FC<IngredientProps> = ({ ingredient, onRemove, 
         </button>
       </div>
     </div>
-
   );
-};
+}
 
 export default IngredientComponent;

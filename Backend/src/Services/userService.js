@@ -61,7 +61,7 @@ export async function loginUser({ username, password }) {
             },
                 process.env.SECRET_KEY,
                 {
-                    expiresIn: '1h'
+                    expiresIn: '5h'
                 })
 
             return { success: true, message: "Login Successful", token: token }

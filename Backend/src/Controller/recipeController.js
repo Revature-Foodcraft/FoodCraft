@@ -82,8 +82,7 @@ export const createRecipe = async (req, res) => {
 
 export const getSavedRecipes = async (req, res) => {
     try {
-        const { userId } = req.locals.tokenDetail;
-        console.log(userId);
+        const { userId } = req.user;
         const responses = await recipeService.getSavedRecipes(userId);
 
         if (responses.success) {
@@ -149,3 +148,25 @@ export const getAllRecipes = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
+
+export const deleteSavedRecipe = async (req, res) => {
+    const { recipeId } = req.params;
+    const { userId } = req.user;
+
+    if (!recipeId) {
+        return res.status(400).json({ success: false, message: "Recipe ID is required" });
+    }
+
+    try {
+        const result = await recipeService.deleteSavedRecipe(userId, recipeId);
+
+        if (result.success) {
+            return res.status(200).json({ success: true, message: "Recipe deleted successfully" });
+        } else {
+            return res.status(404).json({ success: false, message: result.message });
+        }
+    } catch (error) {
+        console.error("Error deleting saved recipe:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
