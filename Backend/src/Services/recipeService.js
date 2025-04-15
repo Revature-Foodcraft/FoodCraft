@@ -83,24 +83,6 @@ export async function getSavedRecipes(userId) {
     }
 }
 
-export async function getAllRecipes() {
-    try {
-        const recipes = await model.getAllRecipes();
-
-        if (!recipes || recipes.length === 0) {
-            logger.warn("No recipes found in the database");
-            return { success: false, code: 404, message: "No recipes found" };
-        }
-
-        logger.info(`Fetched ${recipes.length} recipes from the database`);
-        return { success: true, recipes };
-
-    } catch (error) {
-        console.error("Error fetching all recipes:", error);
-        return { success: false, code: 500, message: "Internal server error" };
-    }
-}
-
 export async function updateRecipe(recipe) {
     const updatedRecipe = await recipeService.updateRecipe(recipe);
 
@@ -108,8 +90,8 @@ export async function updateRecipe(recipe) {
 }
 
 export async function getRecipes(cuisine, category) {
-
     let recipes;
+    
     if (cuisine || category) {
         recipes = await model.getRecipesByParameters(cuisine, category)
     } else {
