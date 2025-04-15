@@ -1,8 +1,9 @@
 import express from 'express';
-import { login, register, getProfile, updateProfile } from '../Controller/userController.js';
-import { getSavedRecipes, deleteSavedRecipe } from '../Controller/recipeController.js';
+import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros , authGoogle, linkGoogle} from '../Controller/userController.js';
+import { getSavedRecipes, deleteSavedRecipe } from '../Services/recipeService.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
+import { authenticateGoogleToken } from '../Middleware/googleAuthMiddleware.js';
 const userRouter = express.Router();
 /**
  * @swagger
@@ -112,6 +113,92 @@ userRouter.post('/users', register);
  *                   example: Error message
  */
 userRouter.post('/login', login);
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Decode Google JWT token and create/login user.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         description: Bearer token received from Google.
+ *         schema:
+ *           type: string
+ *           example: Bearer <google-jwt-token>
+ *     responses:
+ *       200:
+ *         description: User successfully authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User Logged In Successfully
+ *                 token:
+ *                   type: string
+ *                   example: jwt_token_here
+ *       401:
+ *         description: Unauthorized due to missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid token or unauthorized access.
+ */
+userRouter.post('/auth/google',authenticateGoogleToken, authGoogle);
+
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Decode Google JWT token and link googleId and email to account
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         description: Bearer token received from API.
+ *         schema:
+ *           type: string
+ *           example: Bearer <jwt-token>
+ *       - in: header
+ *         name: GoogleToken
+ *         required: true
+ *         description: Bearer token received from Google.
+ *         schema:
+ *           type: string
+ *           example: Bearer <google-jwt-token>
+ *     responses:
+ *       200:
+ *         description: User successfully authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User Logged In Successfully
+ *                 token:
+ *                   type: string
+ *                   example: jwt_token_here
+ *       401:
+ *         description: Unauthorized due to missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid token or unauthorized access.
+ */
+userRouter.put('/auth/google',authenticateToken,authenticateGoogleToken, linkGoogle);
 
 /**
  * @swagger
@@ -328,5 +415,8 @@ userRouter.get('/user/recipes', authenticateToken, getSavedRecipes)
 
 
 userRouter.delete("/user/recipes/:recipeId", authenticateToken, deleteSavedRecipe)
+
+userRouter.get('/macros', authenticateToken ,getDailyMacros)
+userRouter.put('/macros', authenticateToken ,updateMacros)
 
 export default userRouter;

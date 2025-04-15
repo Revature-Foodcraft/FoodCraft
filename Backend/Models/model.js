@@ -186,18 +186,29 @@ async function updateUser(updatedUser) {
         logger.error("The 'updatedUser' object must contain a 'PK' field.");
         return null;
     }
-
+    
     let updateExpression = "SET ";
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
 
     Object.keys(updatedUser).forEach((key, index) => {
         if (key !== "user_id" && key !== "PK" && key !== "SK") {
-            const attributeKey = `#key${index}`;
-            const attributeValue = `:value${index}`;
-            updateExpression += `${attributeKey} = ${attributeValue}, `;
-            ExpressionAttributeNames[attributeKey] = key;
-            ExpressionAttributeValues[attributeValue] = updatedUser[key];
+            if(key == "account"){
+                Object.keys(updatedUser.account).forEach((key,index)=>{
+                    const attributeKey = `#acc${index}`;
+                    const attributeValue = `:acc${key}`;
+                    updateExpression+= `account.${attributeKey} = ${attributeValue}, `;
+                    ExpressionAttributeNames[attributeKey] = key
+                    ExpressionAttributeValues[attributeValue] = updatedUser.account[key]
+                })
+            }else{
+                console.log("here")
+                const attributeKey = `#key${index}`;
+                const attributeValue = `:value${index}`;
+                updateExpression += `${attributeKey} = ${attributeValue}, `;
+                ExpressionAttributeNames[attributeKey] = key;
+                ExpressionAttributeValues[attributeValue] = updatedUser[key];
+            }
         }
     });
 
@@ -220,7 +231,7 @@ async function updateUser(updatedUser) {
         logger.info(`Successfully updated user: ${updatedUser.PK}`);
         return response.Attributes;
     } catch (error) {
-        logger.error(`Error updating user: ${updatedUser.PK}`, error.message);
+        logger.error(`Error updating user: ${updatedUser.PK}`, error);
         return null;
     }
 }
@@ -362,6 +373,60 @@ async function deleteSavedRecipe(userId, recipeId) {
 }
 
 
+
+/**
+ * @async
+ * @function getUserByGoogleId
+ * @param {int} googleId - The username of the requested user
+ * @returns {Promise<Object|null>} - object that contains user from db or 'null' if user not exist or an error occurs
+ * @example {
+ *
+ * PK: {string},
+ * SK: "PROFILE",
+ * account:{
+ *
+ *      first_name: {string},
+ *      last_name: {string},
+ *      email: {string}
+ * },
+ * fridge:[] - list of objects that contais id of ingredients and amount stored,
+ * password:{string},
+ * recipes:[] - list of recipe ids,
+ * username:{string}
+ *
+ * }
+ *
+ * @throws {Error} - Logs an error if there is an issue with the database operation.
+ */
+async function getUserByGoogleId(googleId) {
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "SK-index",
+        KeyConditionExpression: "SK = :SK",
+        FilterExpression: 'googleId = :googleId',
+        ExpressionAttributeValues: {
+            ":SK": "PROFILE",
+            ":googleId":googleId
+        },
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Items && response.Items.length > 0) {
+            logger.info(`Retrieved user: ${JSON.stringify(response.Items[0])}`);
+            return response.Items[0];
+        } else {
+            logger.warn(`No user found with googleId ${googleId}`);
+            return null;
+        }
+    } catch (error) {
+        logger.error(
+            `Error while getting user with googleId ${googleId}`,
+            error.message
+        );
+        return null;
+    }
+}
 
 /**
  * @async
@@ -876,18 +941,18 @@ async function getAllRecipes() {
  * ]
  */
 async function getRecipesByParameters(cuisine, category) {
-    const filterExpression = []
+    const filterExpression = [];
     const expressionAttributeValue = {
         ":SK": "RECIPE"
-    }
+    };
 
     if (cuisine) {
-        filterExpression.push("cuisine = :cuisine")
-        expressionAttributeValue[":cuisine"] = cuisine
+        filterExpression.push("cuisine = :cuisine");
+        expressionAttributeValue[":cuisine"] = cuisine;
     }
     if (category) {
-        filterExpression.push("category = :category")
-        expressionAttributeValue[":category"] = category
+        filterExpression.push("category = :category");
+        expressionAttributeValue[":category"] = category;
     }
     const command = new QueryCommand({
         TableName: tableName,
@@ -1179,6 +1244,82 @@ async function getAllIngredients() {
         return null;
     }
 }
+
+/**
+ * Updates the daily_macros for a user.
+ * @param {string} userId - The unique identifier for the user.
+ * @param {object} newDailyMacros - The updated daily macros object.
+ *        Example:
+ *        {
+ *          date: "2025-04-14T00:00:00.000Z",
+ *          protein: 0,
+ *          fats: 0,
+ *          carbs: 0,
+ *          proteinGoal: 120,
+ *          fatsGoal: 70,
+ *          carbsGoal: 200
+ *        }
+ * @returns {Promise<object|null>} - Returns the updated user attributes if successful or null if not.
+ */
+async function updateMacros(userId, newDailyMacros) {
+    const command = new UpdateCommand({
+      TableName: tableName,
+      Key: {
+        PK: userId,
+        SK: "PROFILE",
+      },
+      UpdateExpression: "set daily_macros = :macros",
+      ExpressionAttributeValues: {
+        ":macros": newDailyMacros,
+      },
+      ReturnValues: "ALL_NEW",
+    });
+  
+    try {
+      const response = await documentClient.send(command);
+      if (response.Attributes) {
+        logger.info(`Updated daily_macros for user ${userId}: ${JSON.stringify(response.Attributes)}`);
+        return response.Attributes;
+      } else {
+        logger.warn(`No Attributes returned after updating macros for user ${userId}`);
+        return null;
+      }
+    } catch (error) {
+      logger.error(`Error updating macros for user ${userId}: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+ * Retrieves the daily_macros for the current user.
+ * @param {string} userId - The unique identifier for the user.
+ * @returns {Promise<object|null>} - The daily_macros object if found; otherwise, null.
+ */
+async function getDailyMacros(userId) {
+    const command = new GetCommand({
+      TableName: tableName,
+      Key: {
+        PK: userId,
+        SK: "PROFILE",
+      },
+    });
+  
+    try {
+      const response = await documentClient.send(command);
+      if (response.Item && response.Item.daily_macros) {
+        logger.info(`Retrieved daily_macros for user ${userId}: ${JSON.stringify(response.Item.daily_macros)}`);
+        return response.Item.daily_macros;
+      } else {
+        logger.warn(`User ${userId} or daily_macros not found`);
+        return null;
+      }
+    } catch (error) {
+      logger.error(`Error retrieving daily_macros for user ${userId}: ${error.message}`);
+      return null;
+    }
+  }
+  
+
 export {
     // User-related functions
     createUser,
@@ -1187,6 +1328,8 @@ export {
     updateUser,
     getSavedRecipes,
     deleteSavedRecipe,
+    getUserByGoogleId,
+
 
     // Recipe-related functions
     createRecipe,
@@ -1210,6 +1353,10 @@ export {
     removeIngredientFromFridge,
     updateIngredientFromFridge,
     getAllIngredientsFromFridge,
+
+    //Macro Functions
+    updateMacros,
+    getDailyMacros
 };
 
 
