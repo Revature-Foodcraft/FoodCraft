@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/login-background.mp4';
 import { AuthContext } from '../Components/Contexts';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -32,6 +33,28 @@ const Login: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleSuccess =  async (credentialResponse:any) => {
+    try{
+      const response = await fetch('http://localhost:5000/auth/google',{
+        method: 'POST',
+        headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
+      })
+      
+      if(response.status == 200){
+        const data = await response.json()
+        localStorage.setItem('token', data.token);
+        setLogInStatus(true)
+        nav('/')
+      }
+    }catch(error:any){
+      setError(error.message)
+    }
+  };
+
+  const handleError = () => {
+    console.error("Login Failed");
   };
 
   return (
@@ -73,10 +96,16 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="button-container">
-          <button type="submit" className="auth-button">Login</button>
+            <button type="submit" className="auth-button">Login</button>
             <Link to="/register" className="auth-button-link">
               <button type="button" className="auth-button register-button">Register</button>
             </Link>
+          </div>
+          <div >
+            <p className='mt-3'>or</p>
+            <div className='d-flex justify-content-center'>
+              <GoogleLogin onSuccess={handleSuccess} onError={handleError}/>
+            </div>
           </div>
         </form>
       </div>

@@ -1,7 +1,6 @@
 import React from 'react';
-import SavedRecipes from '../Components/SavedRecipes';
-import SmartFridge from '../Components/SmartFridge/SmartFridge';
-import Header from '../Components/Header';
+import SavedRecipes from '../Components/SavedRecipes/SavedRecipes';
+import SmartFridge from '../Components/SmartFridge/SmartFridgeContainer';
 import MacroTracker from '../Components/MacroTracker/MacroTracker';
 
 const styles: { [key: string]: React.CSSProperties; } = {
@@ -36,7 +35,7 @@ const Account: React.FC = () => {
             <div style={styles.mainContent}>
                 {/* SmartFridge Section */}
                 <section style={styles.smartFridgeSection}>
-                    <MacroTracker />
+                    {/* <MacroTracker /> */}
                     <SmartFridge />
                 </section>
 

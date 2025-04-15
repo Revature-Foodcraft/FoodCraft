@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/Register.module.css';
 import foodCraftLogo from '../assets/FoodCraft-Logo.png';
 import backgroundVideo from '../assets/backroundRegister.mp4';
+import { AuthContext } from '../Components/Contexts';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -11,8 +13,9 @@ const Register: React.FC = () => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
+  const {setLogInStatus} = useContext(AuthContext)
+  const nav = useNavigate()
+  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -32,12 +35,53 @@ const Register: React.FC = () => {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Registration failed');
+      try{
+        const response = await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
 
-      setSuccess('Registration successful! Please log in.');
-
+        if(response.status == 200){
+          localStorage.setItem('token', (await response.json()).token)
+          setLogInStatus(true)
+          nav('/')
+        }else{
+          setError("Failed to register and login to account")
+        }
+        
+      } catch(err:any){
+        setError(err)
+      }
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleSuccess =  async (credentialResponse:any) => {
+    try{
+      const response = await fetch('http://localhost:5000/auth/google',{
+        method: 'POST',
+        headers:{"Authorization": `Bearer ${credentialResponse.credential}`}
+      })
+      
+      if(response.status == 200){
+        const data = await response.json()
+        localStorage.setItem('token', data.token);
+        setLogInStatus(true)
+        nav('/')
+      }else{
+        setError("Failed to Login")
+      }
+    }catch(error:any){
+      setError(error.message)
+    }
+  };
+
+  const handleError = () => {
+    console.error("Login Failed");
   };
 
   return (
@@ -55,7 +99,6 @@ const Register: React.FC = () => {
         <h2 id="loginWords">Register to FoodCraft</h2>
 
         {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
 
         <form onSubmit={handleRegister}>
           <div>
@@ -125,6 +168,12 @@ const Register: React.FC = () => {
             </Link>
           </div>
         </form>
+          <div >
+            <p className='mt-3'>or</p>
+            <div className='d-flex justify-content-center'>
+              <GoogleLogin text="signup_with" onSuccess={handleSuccess} onError={handleError}/>
+            </div>
+          </div>
       </div>
     </div>
   );
