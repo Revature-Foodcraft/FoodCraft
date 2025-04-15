@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register, getProfile, updateProfile } from '../Controller/userController.js';
+import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros } from '../Controller/userController.js';
 import { getSavedRecipes } from '../Services/recipeService.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
@@ -325,5 +325,8 @@ userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture
  *                   example: Internal server error
  */
 userRouter.get('/user/recipes', authenticateToken, getSavedRecipes)
+
+userRouter.get('/macros', authenticateToken ,getDailyMacros)
+userRouter.put('/macros', authenticateToken ,updateMacros)
 
 export default userRouter;

@@ -11,7 +11,12 @@ import recipeRoutes from "./Routes/recipeRoutes.js"
 const app = express();
 const PORT = 5000;
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173", // Specify your front-end origin
+  credentials: true, // Allow credentials (cookies, headers, etc.)
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/", userRouter);
 app.use("/fridge", fridgeRoutes);

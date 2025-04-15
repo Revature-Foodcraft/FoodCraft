@@ -98,3 +98,63 @@ export const updateProfile = async (req, res) => {
         return res.status(500).json({ message: updatedUser.message });
     }
 }
+
+
+export const getDailyMacros = async (req, res) => {
+    try {
+      const dailyMacros = await userService.getDailyMacros(req.user?.userId);
+      if (dailyMacros) {
+        return res.status(200).json({ daily_macros: dailyMacros });
+      } else {
+        return res.status(404).json({ message: "Daily macros not found" });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  };
+  
+ 
+  export const updateMacros = async (req, res) => {
+    const macrosSchema = Joi.object({
+      protein: Joi.number().required(),
+      fats: Joi.number().required(),
+      carbs: Joi.number().required(),
+    });
+  
+    const { error, value } = macrosSchema.validate(req.body);
+  
+    if (error) {
+      const messages = [];
+      error.details.forEach(detail => {
+        messages.push(detail.message.replace(/"/g, ""));
+      });
+      return res.status(400).json({ message: messages });
+    }
+  
+    try {
+      const currentDailyMacros = await userService.getDailyMacros(req.user?.userId);
+      if (!currentDailyMacros) {
+        return res.status(404).json({ message: "Daily macros not found" });
+      }
+  
+      const updatedMacros = {
+        ...currentDailyMacros,
+        protein: value.protein,
+        fats: value.fats,
+        carbs: value.carbs,
+      };
+  
+      const result = await userService.updateMacros(req.user?.userId, updatedMacros);
+  
+      if (result.success) {
+        return res
+          .status(200)
+          .json({ message: "Macros updated", daily_macros: result.daily_macros });
+      } else {
+        return res.status(result.code || 500).json({ message: result.message });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  };
+
