@@ -25,3 +25,6 @@ dist-ssr
 
 # important info
 .env
+
+#code coverage
+coverage/
