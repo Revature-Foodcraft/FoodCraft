@@ -1,6 +1,6 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge/SmartFridge.css";
+import "../../css/SmartFridge/Category.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
 import IngredientComponent from "./IngredientComponent";
 
@@ -19,18 +19,18 @@ function CategoryComponent({ category, items, onRemove, onUpdate }: CategoryProp
   return (
     <div className="mb-4">
       <h4 className="mb-3 text-uppercase">{category}</h4>
-      <div className="row">
+      <ul className="ingredient-list"> {/* Replace grid with list */}
         {items.map(({ ingredient }) => (
-          <div key={ingredient.id} className="col-md-4 mb-3">
-            <IngredientComponent
-              ingredient={ingredient}
-              onRemove={onRemove}
-              onUpdate={onUpdate}
-            />
-          </div>
+          <IngredientComponent
+            key={ingredient.id}
+            ingredient={ingredient}
+            onRemove={onRemove}
+            onUpdate={onUpdate}
+          />
         ))}
-      </div>
+      </ul>
     </div>
+
 
   );
 }

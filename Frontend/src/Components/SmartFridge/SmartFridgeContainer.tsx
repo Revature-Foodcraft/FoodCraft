@@ -26,9 +26,6 @@ const SmartFridgeContainer: React.FC = () => {
   const { ingredients, loading, error, addIngredient, updateIngredient, removeIngredient } = useIngredients(token);
   const [showModal, setShowModal] = useState(false);
 
-
-
-
   // Group ingredients by category
   const groupedIngredients = useMemo(() => groupIngredientsByCategory(ingredients), [ingredients]);
 
@@ -42,11 +39,12 @@ const SmartFridgeContainer: React.FC = () => {
       </header>
 
       {/* Control for opening the Add Ingredient Modal */}
-      {!showModal && (<div className="btn-container">
-        <button className="btn btn-add m-2 " onClick={() => setShowModal(true)}>
-          Add Ingredient
-        </button>
-      </div>
+      {!showModal && (
+        <div className="btn-container" style={{ marginTop: '20px' }}>
+          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={() => setShowModal(true)}>
+            Add Ingredient
+          </button>
+        </div>
       )}
 
       {/* Modal for Adding Ingredient */}
@@ -62,16 +60,18 @@ const SmartFridgeContainer: React.FC = () => {
         />
       )}
 
-      {/* Render Grouped Ingredients */}
-      {Object.keys(groupedIngredients).map((catKey) => (
-        <CategoryComponent
-          key={catKey}
-          category={catKey as IngredientCategory}
-          items={groupedIngredients[catKey as IngredientCategory]}
-          onRemove={removeIngredient}
-          onUpdate={updateIngredient}
-        />
-      ))}
+      {/* Wrap grouped ingredients in a scrollable container */}
+      <div className="fridge-content">
+        {Object.keys(groupedIngredients).map((catKey) => (
+          <CategoryComponent
+            key={catKey}
+            category={catKey as IngredientCategory}
+            items={groupedIngredients[catKey as IngredientCategory]}
+            onRemove={removeIngredient}
+            onUpdate={updateIngredient}
+          />
+        ))}
+      </div>
     </div>
   );
 };

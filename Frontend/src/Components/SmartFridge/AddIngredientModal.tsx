@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge/SmartFridge.css";
+import "../../css/SmartFridge/AddIngredientModal.css";
 import { IngredientCategory } from "../../Types/Ingredient";
 
 interface AddIngredientModalProps {

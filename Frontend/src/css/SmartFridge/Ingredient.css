@@ -6,14 +6,12 @@
   align-items: center;
   padding: 10px;
   background-color: #fdf5e6;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  transition: transform 0.2s ease;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.2s ease;
 }
 
 .ingredient-item:hover {
-  transform: translateY(-2px);
+  background-color: #f7e8d5;
 }
 
 .ingredient-info {
@@ -25,18 +23,26 @@
   font-size: 16px;
   font-weight: bold;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .ingredient-text {
   font-size: 14px;
   color: #666;
-  margin-top: 4px;
 }
 
 .editable-text {
   cursor: pointer;
   padding: 2px 4px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.editable-text:hover {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
 }
 
 .input-field {
@@ -46,16 +52,24 @@
 }
 
 .btn-success {
-  padding: 2px 8px;
-  font-size: 12px;
+  background-color: #3182ce; /* Match color of 'add ingredient' button */
+  color: #fff;
+  border: none;
+  border-radius: 5px; /* Revert to original roundness */
+  padding: 5px 10px; /* Revert to original size */
+  font-size: 14px; /* Revert to original font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.inline-btn {
-  font-size: 12px;
-  margin-left: 5px;
+.btn-success:hover {
+  background-color: #2b6cb0; /* Slightly darker blue on hover */
 }
 
 .ingredient-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #e53e3e;
   color: #fff;
   border: none;
@@ -63,24 +77,12 @@
   padding: 5px 10px;
   font-size: 14px;
   cursor: pointer;
-  margin-top: 10px;
 }
 
 .ingredient-delete:hover {
   background-color: #c53030;
 }
 
-/* Added styles related to ingredients */
-
-.ingredient-card {
-  background-color: #fdf5e6; /* Light pastel background for distinction */
-  border: 1px solid #ddd; /* Subtle border for structure */
-  border-radius: 8px; /* Add rounded corners */
-  padding: 15px; /* Add padding for breathing space */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a soft shadow for depth */
-  transition: transform 0.2s ease-in-out; /* Smooth hover effect */
-}
-
-.ingredient-card:hover {
-  transform: translateY(-3px); /* Hover effect: lift card slightly */
+.ingredient-delete svg {
+  font-size: 16px;
 }
