@@ -4,7 +4,6 @@ import CuisineSelect from "../Homepage/CuisineSelect";
 
 const SearchDropdownTabs: React.FC = () => {
     const [activeTab, setActiveTab] = useState<"meal" | "cuisine">("meal");
-
     return (
         <div className="dropdownMenu">
             <div className="row">
@@ -32,8 +31,10 @@ const SearchDropdownTabs: React.FC = () => {
 
                 {/* Dynamic Content Area */}
                 <div className="col-9">
-                    {activeTab === "meal" && <MealCategorySelect />}
-                    {activeTab === "cuisine" && <CuisineSelect />}
+                    
+                        {activeTab === "meal" && <MealCategorySelect />}
+                        {activeTab === "cuisine" && <CuisineSelect />}
+                    
                 </div>
             </div>
         </div>

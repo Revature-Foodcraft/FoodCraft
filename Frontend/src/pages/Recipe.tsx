@@ -80,10 +80,10 @@ const Recipe: React.FC = () => {
                         ))}
                     </ol>
                     <div className="time-fields">
-                        <p><strong>Calories:</strong> {recipe.macros.calories} kcal</p>
-                        <p><strong>Fat:</strong> {recipe.macros.fat} g</p>
-                        <p><strong>Carbs:</strong> {recipe.macros.carbs} g</p>
-                        <p><strong>Protein:</strong> {recipe.macros.protein} g</p>
+                        <p><strong>Calories:</strong> {recipe.macros?.calories} kcal</p>
+                        <p><strong>Fat:</strong> {recipe.macros?.fat} g</p>
+                        <p><strong>Carbs:</strong> {recipe.macros?.carbs} g</p>
+                        <p><strong>Protein:</strong> {recipe.macros?.protein} g</p>
                     </div>
                 </div>
                 <div className="middle-section">

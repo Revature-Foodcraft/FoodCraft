@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import '../css/Header.css';
 import LoginRegisterPopup from './LoginRegisterPopup';
 import { Link } from "react-router-dom";
-import { AuthContext } from './Contexts';
+import { AuthContext, DisplayContext } from './Contexts';
 import DisplayRecipe from '../Components/Homepage/DisplayRecipes'; // Import your DisplayRecipe component
 import CuisineSelect from './Homepage/CuisineSelect';
 import MealCategorySelect from './Homepage/MealCategorySelect';
@@ -15,6 +15,11 @@ const Header: React.FC = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string | null>(null);
     const [showCuisineTab, setShowCuisineTab] = useState(false);
+    
+    const [mealCategory,setMealCategorySelect] = useState("")
+    const [selectedCuisine,setSelectedCuisine] = useState("")
+    const [invert,setInvert] = useState(false)
+    const [sortBy,setSortBy] = useState("Recently Added")
 
     const toggleDropdown = () => {
         setIsDropdownOpen(prevState => !prevState); // Toggle dropdown visibility
@@ -46,6 +51,7 @@ const Header: React.FC = () => {
                             <button onClick={toggleDropdown}>Search</button>
                             {isDropdownOpen && (
                             <div className="dropdownMenu">
+                                <DisplayContext.Provider value={{mealCategory,setMealCategorySelect,selectedCuisine,setSelectedCuisine,invert,setInvert, sortBy,setSortBy}}>
                                 <button className="cuisineButton btn btn-warning mb-3" onClick={toggleCuisineTab}>
                                      Cuisine Filter
                                 </button>
@@ -58,7 +64,7 @@ const Header: React.FC = () => {
                                     onChange={handleSearchChange}
                                 />
                                 <DisplayRecipe searchQuery={searchQuery} />
-                                
+                                </DisplayContext.Provider>
                             </div>
                         )}     
                         </li>

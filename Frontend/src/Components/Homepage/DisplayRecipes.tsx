@@ -5,17 +5,6 @@ import { DisplayContext } from "../Contexts";
 import { Link } from "react-router-dom";
 import StarRating from "../StarRating";
 import { CiSaveDown2 } from "react-icons/ci";
-// interface Recipes{
-//     PK:string,
-//     SK:string,
-//     name:string,
-//     description:string,
-    
-//     macros:{},
-//     pictures:[],
-//     dateCreated:string,
-//     rating:number
-// }
 
 interface SearchProp{
     searchQuery:string|null;
@@ -31,50 +20,68 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
     
     const getRecipes = async () => {
         try {
-          const dbRes = await fetch("http://localhost:5000/recipes/", {
-            method: "GET",
-          });
-          const dbRecipes = (await dbRes.json()).recipes.map((r: any) => ({
-            ...r,
-            source: "db", 
-            id: r.PK,
-          }));
-      
-          const apiRecipes: any[] = [];
-          for (let i = 0; i < 10; i++) {
-            const res = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
-            const data = await res.json();
-            const meal = data.meals?.[0];
-            if (meal) {
-              apiRecipes.push({
-                id: meal.idMeal,
-                name: meal.strMeal,
-                description: meal.strArea + " " + meal.strCategory,
-                dateCreated: meal.dateModified || "2024-01-01",
-                rating: Math.floor(Math.random() * 5) + 1, // optional: fake rating
-                source: "api",
-              });
+            const searchParam = new URLSearchParams()
+            if(selectedCuisine){
+                searchParam.append("cuisine",selectedCuisine)
             }
-          }
-      
-          setRecipes([...dbRecipes, ...apiRecipes]);
-      
-        } catch (err) {
-          console.log(`Error: ${err}`);
-        }
-      };
-      
+            if(mealCategory){
+                searchParam.append("category",mealCategory)
+            }
 
+            const dbRes = await fetch(`http://localhost:5000/recipes?${searchParam.toString()}`, {
+                method: "GET",
+            });
+
+            const dbRecipes = await dbRes.json()
+            console.log(dbRecipes.recipes)
+            if(dbRecipes.recipes.length <= 0){
+                console.log("here")
+                getRecipesFromAPI()
+            }else{
+                setRecipes(dbRecipes.recipes);
+            }
+
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    };
+
+    const getRecipesFromAPI = async () => {
+        const searchParam = new URLSearchParams
+        if(selectedCuisine){
+            searchParam.append("a",selectedCuisine)
+        }
+        if(mealCategory){
+            searchParam.append("c",mealCategory)
+        }
+        try{
+            const data = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?${searchParam.toString()}`,{
+            method:"GET"
+            })
+
+            const response = await data.json()
+
+            const apiRecipes:any = []
+
+            response.meals.forEach( (meal:any)  => {
+                apiRecipes.push({
+                    PK: meal.idMeal,
+                    name: meal.strMeal,
+                    dateCreated: meal.dateModified || "2024-01-01",
+                    rating: 3,
+                    source: "api",
+                });
+            });
+
+            setRecipes(apiRecipes)
+        }catch (err){
+            console.log(err)
+        }
+
+    }
     useEffect(()=>{
         getRecipes()
-        
-    },[])
-    // useEffect(() => {
-    //     console.log(`SortBy changed to: ${selectedCuisine}`);
-    // }, [selectedCuisine]);
-    // useEffect(() => {
-    //     console.log(`SortBy changed to: ${mealCategory}`)
-    // }, [mealCategory]);
+    },[selectedCuisine,mealCategory])
 
     const fuseOptions = {
         keys:['name'],
@@ -94,28 +101,31 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
     if(invert){
         currentRecipes.reverse()
     }
+
     const handlePageChange = (page:number)=>{
         setCurrentPage(page)
     }
 
     return(
         <div style={{ position: "relative", height: "100%" }} >
-            <div className=" d-flex flex-wrap p-3" style={{background: "inherit"}}>
+            <div className="p-3" style={{background: "inherit"}}>
                 {currentRecipes.map((recipes)=>{
                     return(
-                        <div className="card m-2" style={{maxWidth:"24%",flex: "1 1 calc(25% - 1rem)"}} key={recipes.id}>
-                            <div className="card-header">
+                        <div className="card m-2"  key={recipes.id}>
+                            <div className="card-header m-2 p-0">
                                 <div className="d-flex align-item-center">
-                                    <div className="card-title">
-                                        <Link to={`/recipe/${recipes.source}/${recipes.id}`}>
+                                    <div className="card-title m-0">
+                                        <Link to={`/recipe/${recipes?.source ? recipes.source : "db"}/${recipes.PK}`}>
                                             <h5>{recipes.name}</h5>
                                         </Link>
                                     </div>
-                                    <button className="btn btn-primary-outline ms-auto"><img src="/src/assets/floppy.svg" alt="" /></button>
+                                    <div className="ms-auto">
+                                        
+                                    <StarRating rating={recipes.rating} outOf={5}/></div>
                                 </div>
                             </div>
                             <div className="card-body">
-                                {recipes.description}<br></br>{recipes.dateCreated}<br></br><StarRating rating={recipes.rating} outOf={5}/>
+                                {recipes.dateCreated}<br></br>
                             </div>
                         </div>
                     )
