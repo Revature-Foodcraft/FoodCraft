@@ -9,6 +9,7 @@ interface AddIngredientModalProps {
         amount: string;
         category: string;
         name: string;
+        unit: string;
     }) => void;
     onCancel: () => void;
 }
@@ -18,7 +19,8 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
         id: "",
         name: "",
         category: IngredientCategory.Meat,
-        amount: "",
+        amount: 0, // Changed to number
+        unit: "g",
     });
     const [suggestions, setSuggestions] = useState<
         Array<{ id: string; name: string }>
@@ -89,19 +91,19 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
     const handleFormSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (!formData.id || !formData.amount || !formData.name) {
+        if (!formData.id || formData.amount <= 0 || !formData.name) { // Validate amount as a positive number
             console.error(
                 "Please select a suggested ingredient and fill all required fields."
             );
             return;
         }
 
-
         onSubmit({
             id: formData.id,
-            amount: formData.amount,
+            amount: formData.amount, // Ensure amount is passed as a number
             category: formData.category || "Other",
             name: formData.name,
+            unit: formData.unit,
         });
     };
 
@@ -183,6 +185,25 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                                 title=""
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label>Unit:</label>
+                            <select
+                                name="unit"
+                                value={formData.unit}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, unit: e.target.value }))
+                                }
+                                className="input-field"
+                            >
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                                <option value="ml">ml</option>
+                                <option value="l">l</option>
+                                <option value="qt">qt</option>
+                            </select>
                         </div>
                         <div className="modal-actions">
                             <button

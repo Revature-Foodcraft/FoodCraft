@@ -38,7 +38,7 @@ const useIngredients = (token: string | null) => {
     fetchIngredients();
   }, [fetchIngredients]);
 
-  const addIngredient = async ({ id, amount, category, name }: { id: string; amount: string, category:string, name:string}) => {
+  const addIngredient = async ({ id, amount, category, name, unit }: { id: string; amount: number; category: string; name: string; unit: string }) => {
     try {
       const response = await fetch("http://localhost:5000/fridge/", {
         method: "POST",
@@ -46,7 +46,7 @@ const useIngredients = (token: string | null) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ id, amount, category, name }),
+        body: JSON.stringify({ id, amount, category, name, unit }), // Ensure unit is included
       });
       if (!response.ok) {
         let errorMessage = response.statusText;
@@ -64,7 +64,7 @@ const useIngredients = (token: string | null) => {
     }
   };
 
-  const updateIngredient = async (id: string, newAmount: string) => {
+  const updateIngredient = async (id: string, newAmount: number, newUnit: string) => {
     try {
       const response = await fetch("http://localhost:5000/fridge/", {
         method: "PUT",
@@ -72,7 +72,7 @@ const useIngredients = (token: string | null) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ id, amount: newAmount }),
+        body: JSON.stringify({ id, amount: newAmount, unit: newUnit }), // Include unit
       });
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
       await fetchIngredients();

@@ -51,10 +51,10 @@ const SmartFridgeContainer: React.FC = () => {
       {showModal && (
         <AddIngredientModal
           onCancel={() => setShowModal(false)}
-          onSubmit={async ({ id, amount, category, name }) => {
-            console.log("Adding Ingredient:", { id, amount, category, name });
+          onSubmit={async ({ id, amount, category, name, unit }) => {
+            console.log("Adding Ingredient:", { id, amount, category, name, unit });
 
-            await addIngredient({ id, amount, category, name });
+            await addIngredient({ id, amount, category, name, unit });
             setShowModal(false);
           }}
         />

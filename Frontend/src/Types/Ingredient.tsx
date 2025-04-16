@@ -1,4 +1,3 @@
-
 export enum IngredientCategory {
   Meat = 'Meat',
   Vegetables = 'Vegetables',
@@ -15,7 +14,8 @@ export interface Ingredient {
   id: string;
   name: string;
   category: IngredientCategory;
-  amount: string;
+  amount: number; // Changed from string to number
+  unit: string; // Added unit explicitly
 }
 
 
