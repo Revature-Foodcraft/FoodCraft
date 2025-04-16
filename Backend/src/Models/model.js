@@ -40,7 +40,20 @@ PROFILE methods
 async function createUser(user) {
     const command = new PutCommand({
         TableName: tableName,
-        Item: user,
+        Item: {
+            ...user,
+            daily_macros: {
+                date: new Date().toISOString(),
+                protein: 0,
+                fats: 0,
+                carbs: 0,
+                calories: 0, // Ensure calories field is initialized
+                proteinGoal: 120,
+                fatsGoal: 70,
+                carbsGoal: 200,
+                caloriesGoal: 2000, // Set default value for caloriesGoal
+            },
+        },
         ReturnValues: "NONE",
     });
 
@@ -1317,6 +1330,46 @@ async function getDailyMacros(userId) {
     }
 }
 
+/**
+ * Updates the macro goals for a user.
+ * @param {string} userId - The unique identifier for the user.
+ * @param {object} newGoals - The updated macro goals object.
+ *        Example:
+ *        {
+ *          proteinGoal: 120,
+ *          fatsGoal: 70,
+ *          carbsGoal: 200
+ *        }
+ * @returns {Promise<object>} - Returns an object with success status and updated goals or error message.
+ */
+const updateGoals = async (userId, newGoals) => {
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: 'PROFILE',
+        },
+        UpdateExpression: 'set daily_macros.proteinGoal = :proteinGoal, daily_macros.fatsGoal = :fatsGoal, daily_macros.carbsGoal = :carbsGoal, daily_macros.caloriesGoal = :caloriesGoal',
+        ExpressionAttributeValues: {
+            ':proteinGoal': newGoals.proteinGoal,
+            ':fatsGoal': newGoals.fatsGoal,
+            ':carbsGoal': newGoals.carbsGoal,
+            ':caloriesGoal': newGoals.caloriesGoal, // Add caloriesGoal to update
+        },
+        ReturnValues: 'ALL_NEW',
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        if (response.Attributes) {
+            return { success: true, updatedGoals: response.Attributes.daily_macros };
+        } else {
+            return { success: false, message: 'Failed to update goals' };
+        }
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+};
 
 export {
     // User-related functions
@@ -1353,5 +1406,6 @@ export {
 
     // Macro Functions
     updateMacros,
-    getDailyMacros
+    getDailyMacros,
+    updateGoals
 };

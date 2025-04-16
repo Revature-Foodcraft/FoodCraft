@@ -10,7 +10,7 @@ export interface MacroData {
 
 const MacroCircle: React.FC<MacroData> = ({ label, amount, goal }) => {
     // Calculate progress percentage, clamped to 100%
-    const percent = Math.min((amount / goal) * 100, 100);
+    const percent = isNaN(amount / goal) ? 0 : Math.min((amount / goal) * 100, 100);
 
     // Coordinates and radius in viewBox coordinates (with viewBox "0 0 36 36")
     const cx = 18;
@@ -19,12 +19,12 @@ const MacroCircle: React.FC<MacroData> = ({ label, amount, goal }) => {
 
     // Compute the angle for the progress (starting at 12 o'clock) by subtracting 90 degrees.
     const angle = (percent / 100) * 360 - 90;
-    const rad = (angle * Math.PI) / 180;
+    const rad = isNaN(angle) ? 0 : (angle * Math.PI) / 180;
 
     // Add an offset so that the flame sits just outside the arc.
     const offset = 3;
-    const flameX = cx + (r + offset) * Math.cos(rad);
-    const flameY = cy + (r + offset) * Math.sin(rad);
+    const flameX = isNaN(cx + (r + offset) * Math.cos(rad)) ? cx : cx + (r + offset) * Math.cos(rad);
+    const flameY = isNaN(cy + (r + offset) * Math.sin(rad)) ? cy : cy + (r + offset) * Math.sin(rad);
 
     return (
         <div className="macro-circle">

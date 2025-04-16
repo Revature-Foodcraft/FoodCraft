@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros , authGoogle, linkGoogle} from '../Controller/userController.js';
+import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, updateGoals, authGoogle, linkGoogle } from '../Controller/userController.js';
 import { getSavedRecipes, deleteSavedRecipe } from '../Services/recipeService.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
@@ -152,7 +152,7 @@ userRouter.post('/login', login);
  *                   type: string
  *                   example: Invalid token or unauthorized access.
  */
-userRouter.post('/auth/google',authenticateGoogleToken, authGoogle);
+userRouter.post('/auth/google', authenticateGoogleToken, authGoogle);
 
 /**
  * @swagger
@@ -199,7 +199,7 @@ userRouter.post('/auth/google',authenticateGoogleToken, authGoogle);
  *                   type: string
  *                   example: Invalid token or unauthorized access.
  */
-userRouter.put('/auth/google',authenticateToken,authenticateGoogleToken, linkGoogle);
+userRouter.put('/auth/google', authenticateToken, authenticateGoogleToken, linkGoogle);
 
 /**
  * @swagger
@@ -576,5 +576,89 @@ userRouter.get('/macros', authenticateToken, getDailyMacros);
  *                   example: Internal server error occurred.
  */
 userRouter.put('/macros', authenticateToken, updateMacros);
+
+/**
+ * @swagger
+ * /macros/goals:
+ *   put:
+ *     summary: Update macro goals for the authenticated user.
+ *     description: Updates the user's macro goals for protein, fats, and carbs.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               proteinGoal:
+ *                 type: number
+ *                 example: 120
+ *               fatsGoal:
+ *                 type: number
+ *                 example: 70
+ *               carbsGoal:
+ *                 type: number
+ *                 example: 200
+ *             required:
+ *               - proteinGoal
+ *               - fatsGoal
+ *               - carbsGoal
+ *     responses:
+ *       200:
+ *         description: Macro goals updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Macro goals updated successfully
+ *                 macro_goals:
+ *                   type: object
+ *                   properties:
+ *                     proteinGoal:
+ *                       type: number
+ *                       example: 120
+ *                     fatsGoal:
+ *                       type: number
+ *                       example: 70
+ *                     carbsGoal:
+ *                       type: number
+ *                       example: 200
+ *       400:
+ *         description: Bad request due to invalid input.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input provided
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error occurred.
+ */
+userRouter.put('/macros/goals', authenticateToken, updateGoals);
 
 export default userRouter;

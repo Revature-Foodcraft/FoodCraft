@@ -9,6 +9,8 @@ interface DailyMacros {
   proteinGoal: number;
   fatsGoal: number;
   carbsGoal: number;
+  calories: number;
+  caloriesGoal: number;
   date: string;
 }
 
@@ -22,10 +24,11 @@ interface UseMacrosReturn {
   setShowInputs: React.Dispatch<React.SetStateAction<boolean>>;
   fetchMacros: () => Promise<void>;
   updateMacros: () => Promise<void>;
+  goals: Record<string, number>;
+  updateGoals: (newGoals: Record<string, number>) => Promise<void>;
 }
 
 export const useMacros = (): UseMacrosReturn => {
-  // Retrieve token from local storage
   const token = localStorage.getItem('token');
 
   const [macros, setMacros] = useState<MacroData[]>([]);
@@ -37,15 +40,20 @@ export const useMacros = (): UseMacrosReturn => {
     Carbs: 0,
   });
   const [showInputs, setShowInputs] = useState<boolean>(false);
+  const [goals, setGoals] = useState<Record<string, number>>({
+    Protein: 120,
+    Fats: 70,
+    Carbs: 200,
+    Calories: 2000,
+  });
 
-  // Transforms the backend daily_macros object into an array used by UI.
   const transformDailyMacros = (daily: DailyMacros): MacroData[] => [
     { label: 'Protein', amount: daily.protein, goal: daily.proteinGoal },
     { label: 'Fats', amount: daily.fats, goal: daily.fatsGoal },
     { label: 'Carbs', amount: daily.carbs, goal: daily.carbsGoal },
+    { label: 'Calories', amount: daily.calories, goal: daily.caloriesGoal },
   ];
 
-  // Fetch macros from the backend.
   const fetchMacros = async () => {
     setLoading(true);
     setError('');
@@ -53,7 +61,7 @@ export const useMacros = (): UseMacrosReturn => {
       const res = await fetch('http://localhost:5000/macros', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -63,6 +71,12 @@ export const useMacros = (): UseMacrosReturn => {
       const data = await res.json();
       if (data.daily_macros) {
         setMacros(transformDailyMacros(data.daily_macros));
+        setGoals({
+          Protein: data.daily_macros.proteinGoal,
+          Fats: data.daily_macros.fatsGoal,
+          Carbs: data.daily_macros.carbsGoal,
+          Calories: data.daily_macros.caloriesGoal,
+        });
       }
     } catch (err: any) {
       setError(err.message);
@@ -71,30 +85,41 @@ export const useMacros = (): UseMacrosReturn => {
     }
   };
 
-  // Update macros by adding new input values to current values.
   const updateMacros = async () => {
     setError('');
-    // Get current macro values (default to 0 if not present)
+
+    // Check if at least one field has been modified
+    const hasChanges = Object.keys(inputValues).some(
+      key => inputValues[key] !== 0
+    );
+
+    if (!hasChanges) {
+      setError('Please modify at least one field before submitting.');
+      return;
+    }
+
     const currentProtein = macros.find(m => m.label === 'Protein')?.amount || 0;
     const currentFats = macros.find(m => m.label === 'Fats')?.amount || 0;
     const currentCarbs = macros.find(m => m.label === 'Carbs')?.amount || 0;
+    const currentCalories = macros.find(m => m.label === 'Calories')?.amount || 0;
 
-    // Sum up current values with new inputs.
     const newProtein = currentProtein + inputValues.Protein;
     const newFats = currentFats + inputValues.Fats;
     const newCarbs = currentCarbs + inputValues.Carbs;
+    const newCalories = currentCalories + inputValues.Calories;
 
     try {
       const res = await fetch('http://localhost:5000/macros', {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           protein: newProtein,
           fats: newFats,
           carbs: newCarbs,
+          calories: newCalories,
         }),
       });
       if (!res.ok) {
@@ -104,18 +129,46 @@ export const useMacros = (): UseMacrosReturn => {
       if (data.daily_macros) {
         setMacros(transformDailyMacros(data.daily_macros));
       }
-      // Reset inputs and hide input fields.
-      setInputValues({ Protein: 0, Fats: 0, Carbs: 0 });
+      setInputValues({ Protein: 0, Fats: 0, Carbs: 0, Calories: 0 });
       setShowInputs(false);
+    } catch (err: any) {
+      console.error("Error updating macros:", err);
+      setError(err.message);
+    }
+  };
+
+  const updateGoals = async (newGoals: Record<string, number>) => {
+    setError('');
+    try {
+      // Transform keys to match backend schema
+      const transformedGoals = {
+        proteinGoal: newGoals.Protein,
+        fatsGoal: newGoals.Fats,
+        carbsGoal: newGoals.Carbs,
+        caloriesGoal: newGoals.Calories, // Include caloriesGoal
+      };
+
+      const res = await fetch('http://localhost:5000/macros/goals', {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transformedGoals),
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to update goals, status: ${res.status}`);
+      }
+
+      // Fetch updated macros after successful update
+      await fetchMacros();
     } catch (err: any) {
       setError(err.message);
     }
   };
 
-  // Fetch macros on hook initialization.
   useEffect(() => {
     fetchMacros();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -128,5 +181,7 @@ export const useMacros = (): UseMacrosReturn => {
     setShowInputs,
     fetchMacros,
     updateMacros,
+    goals,
+    updateGoals,
   };
 };

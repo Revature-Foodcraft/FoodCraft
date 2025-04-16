@@ -19,6 +19,15 @@ const AddToMacros: React.FC<AddToMacrosProps> = ({
     onInputChange,
     onSubmit,
 }) => {
+    const handleSubmit = () => {
+        try {
+            onSubmit();
+        } catch (error) {
+            console.error("Error submitting macros:", error);
+            alert("Failed to add macros. Please try again.");
+        }
+    };
+
     return (
         <div className="macro-inputs">
             {macros.map(macro => (
@@ -27,7 +36,7 @@ const AddToMacros: React.FC<AddToMacrosProps> = ({
                     <input
                         id={macro.label}
                         type="number"
-                        value={inputValues[macro.label]}
+                        value={inputValues[macro.label] || 0} // Default to 0 if undefined
                         onChange={e =>
                             onInputChange(
                                 macro.label,
@@ -37,7 +46,7 @@ const AddToMacros: React.FC<AddToMacrosProps> = ({
                     />
                 </div>
             ))}
-            <button onClick={onSubmit}>Add</button>
+            <button onClick={handleSubmit}>Add</button>
         </div>
     );
 };
