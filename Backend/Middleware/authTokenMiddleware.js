@@ -12,8 +12,7 @@ export async function authenticateToken(req, res, next) {
         res.status(403).json({ message: "Message Forbidden Access: No Token" })
     } else {
         const tokenDetail = await decodeJWT(token)
-        logger.info(`Decoded token: ${JSON.stringify(tokenDetail)}`);
-        if(tokenDetail){
+        if (tokenDetail) {
             req.user = tokenDetail;
             next()
         } else {

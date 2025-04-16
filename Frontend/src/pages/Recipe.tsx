@@ -8,7 +8,6 @@ import pizza from "../assets/pizza.jpg";
 import chickens from "../assets/chicken sandwich.jpg";
 import fishtacos from "../assets/fishTacos.jpg";
 
-
 const Recipe: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Get the recipe ID from the URL
     const [recipe, setRecipe] = useState<any>(null);
@@ -17,42 +16,56 @@ const Recipe: React.FC = () => {
     useEffect(() => {
         if (!id) return;
         if (window.location.pathname.includes("/recipe/api/")) {
-          setIsApiRecipe(true);
-          fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
-            .then(res => res.json())
-            .then(data => {
-              const meal = data.meals?.[0];
-              if (meal) {
-                setRecipe({
-                  name: meal.strMeal,
-                  ingredients: Array.from({ length: 20 }, (_, i) => {
-                    const name = meal[`strIngredient${i+1}`];
-                    const amount = meal[`strMeasure${i+1}`];
-                    return name ? { name, amount, category: "Unknown" } : null;
-                  }).filter(Boolean),
-                  instructions: meal.strInstructions?.split(". ").filter(Boolean),
-                  macros: {
-                    calories: "N/A",
-                    fat: "N/A",
-                    carbs: "N/A",
-                    protein: "N/A"
-                  },
-                  pictures: { link: meal.strMealThumb },
-                  user_id: "API"
+            setIsApiRecipe(true);
+            fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    const meal = data.meals?.[0];
+                    if (meal) {
+                        setRecipe({
+                            name: meal.strMeal,
+                            ingredients: Array.from({ length: 20 }, (_, i) => {
+                                const name = meal[`strIngredient${i + 1}`];
+                                const amount = meal[`strMeasure${i + 1}`];
+                                return name ? { name, amount, category: "Unknown" } : null;
+                            }).filter(Boolean),
+                            instructions: meal.strInstructions?.split(". ").filter(Boolean),
+                            macros: {
+                                calories: "N/A",
+                                fat: "N/A",
+                                carbs: "N/A",
+                                protein: "N/A"
+                            },
+                            pictures: { link: meal.strMealThumb },
+                            user_id: "API"
+                        });
+                    }
                 });
-              }
-            });
         } else {
-          fetch(`http://localhost:5000/recipes/${id}`)
-            .then(response => response.json())
-            .then(data => setRecipe(data.recipe))
-            .catch(error => console.error("Error fetching recipe:", error));
+            fetch(`http://localhost:5000/recipes/${id}`)
+                .then(response => response.json())
+                .then(data => setRecipe(data.recipe))
+                .catch(error => console.error("Error fetching recipe:", error));
         }
-      }, [id]);
+    }, [id]);
 
     if (!recipe) {
         return <p>Loading recipe...</p>;
     }
+
+    // Function to handle image URLs
+    const getImageUrl = (imageLink: string) => {
+        // Check if the image link is an S3 URL (from your DynamoDB storage)
+        if (imageLink && imageLink.includes('s3.amazonaws.com')) {
+            return imageLink; // If it's an S3 URL, return it directly
+        }
+        // If not an S3 URL, check if it's from the API (MealDB)
+        if (imageLink) {
+            return imageLink; // Assuming it's a valid link (like from the API)
+        }
+        // Return a fallback image if no link is provided
+        return lasagna; // Default fallback image
+    };
 
     return (
         <div className="containerRecipe">
@@ -66,10 +79,10 @@ const Recipe: React.FC = () => {
                     </div>
                     <h4>Ingredients</h4>
                     <ul className="ingredients-list">
-                    {recipe.ingredients.map((ingredient: any, index: number) => (
-                        <li key={index}>
-                            {ingredient.amount} {ingredient.name} ({ingredient.category})
-                        </li>
+                        {recipe.ingredients.map((ingredient: any, index: number) => (
+                            <li key={index}>
+                                {ingredient.amount} {ingredient.name} ({ingredient.category})
+                            </li>
                         ))}
                     </ul>
 
@@ -80,10 +93,10 @@ const Recipe: React.FC = () => {
                         ))}
                     </ol>
                     <div className="time-fields">
-                        <p><strong>Calories:</strong> {recipe.macros.calories} kcal</p>
-                        <p><strong>Fat:</strong> {recipe.macros.fat} g</p>
-                        <p><strong>Carbs:</strong> {recipe.macros.carbs} g</p>
-                        <p><strong>Protein:</strong> {recipe.macros.protein} g</p>
+                        <p><strong>Calories:</strong> {recipe.macros?.calories} kcal</p>
+                        <p><strong>Fat:</strong> {recipe.macros?.fat} g</p>
+                        <p><strong>Carbs:</strong> {recipe.macros?.carbs} g</p>
+                        <p><strong>Protein:</strong> {recipe.macros?.protein} g</p>
                     </div>
                 </div>
                 <div className="middle-section">
@@ -100,7 +113,8 @@ const Recipe: React.FC = () => {
                     <div className="middle-bottom">Middle Bottom</div>
                 </div>
                 <div className="food-image">
-                    <img src={recipe.pictures?.link} alt={recipe.name || "Recipe Image"} />
+                    {/* Dynamically set image URL based on recipe data */}
+                    <img src={getImageUrl(recipe.pictures?.[0]?.link)} alt={recipe.name || "Recipe Image"} />
                 </div>
             </div>
             <div className="recipeSuggestions">

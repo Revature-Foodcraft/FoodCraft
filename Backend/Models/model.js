@@ -330,6 +330,50 @@ async function getSavedRecipes(userId) {
     }
 }
 
+
+
+/**
+ * @async
+ * @function deleteSavedRecipe
+ * @description Removes a recipe from the user's saved recipes list.
+ * @param {string} userId - The ID of the user.
+ * @param {string} recipeId - The ID of the recipe to remove.
+ * @returns {Promise<Array|null>} - The updated list of saved recipes or null if an error occurs.
+ */
+async function deleteSavedRecipe(userId, recipeId) {
+    const user = await getUser(userId);
+    if (!user || !user.recipes) {
+        logger.warn(`User ${userId} not found or no saved recipes.`);
+        return null;
+    }
+
+    const updatedRecipes = user.recipes.filter((id) => id !== recipeId);
+
+    const command = new UpdateCommand({
+        TableName: tableName,
+        Key: {
+            PK: `${userId}`,
+            SK: "PROFILE",
+        },
+        UpdateExpression: "SET recipes = :updatedRecipes",
+        ExpressionAttributeValues: {
+            ":updatedRecipes": updatedRecipes,
+        },
+        ReturnValues: "ALL_NEW",
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        logger.info(`Successfully removed recipe ${recipeId} from user ${userId}'s saved recipes.`);
+        return response.Attributes.recipes;
+    } catch (error) {
+        logger.error(`Error removing recipe ${recipeId} for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+
+
 /**
  * @async
  * @function getUserByGoogleId
@@ -613,7 +657,7 @@ async function createRecipe(recipe) {
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe,
-        ReturnValues: "ALL_NEW", // Ensures attributes are returned
+        ReturnValues: "NONE", // Ensures attributes are returned
     });
 
 
@@ -1283,7 +1327,9 @@ export {
     getUserByUsername,
     updateUser,
     getSavedRecipes,
+    deleteSavedRecipe,
     getUserByGoogleId,
+
 
     // Recipe-related functions
     createRecipe,

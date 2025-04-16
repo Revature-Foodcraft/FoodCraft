@@ -16,6 +16,7 @@
     "@aws-sdk/lib-dynamodb": "^3.777.0",
     "@aws-sdk/s3-request-presigner": "^3.777.0",
     "@react-oauth/google": "^0.12.1",
+    "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.11.3",

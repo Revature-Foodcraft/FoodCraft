@@ -21,7 +21,8 @@ async function uploadImage(key, fileContent, contentType) {
         Bucket: BUCKET_NAME,
         Key: key,
         Body: fileContent,
-        ContentType: contentType
+        ContentType: contentType,
+        ACL: 'public-read'
     });
     await s3Client.send(command);
     logger.info(`Image uploaded successfully to ${BUCKET_NAME}/${key}`);
@@ -48,4 +49,4 @@ async function getSignedImageUrl(key, expiresIn = 3600) {
     return signedUrl;
 }
 
-export { uploadImage, deleteImage, getSignedImageUrl };
+export { uploadImage, deleteImage, getSignedImageUrl, s3Client};

@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros , authGoogle, linkGoogle} from '../Controller/userController.js';
-import { getSavedRecipes } from '../Services/recipeService.js';
+import { getSavedRecipes, deleteSavedRecipe } from '../Services/recipeService.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
 import { authenticateGoogleToken } from '../Middleware/googleAuthMiddleware.js';
@@ -412,6 +412,9 @@ userRouter.put("/user/profile", authenticateToken, upload.single("profilePicture
  *                   example: Internal server error
  */
 userRouter.get('/user/recipes', authenticateToken, getSavedRecipes)
+
+
+userRouter.delete("/user/recipes/:recipeId", authenticateToken, deleteSavedRecipe)
 
 userRouter.get('/macros', authenticateToken ,getDailyMacros)
 userRouter.put('/macros', authenticateToken ,updateMacros)

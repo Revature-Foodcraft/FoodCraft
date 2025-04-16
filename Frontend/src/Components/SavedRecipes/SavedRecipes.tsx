@@ -1,7 +1,7 @@
 import React from 'react';
-import RecipeCard from './RecipeCard';
+import RecipeCard from './RecipeCard.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import "../css/SavedRecipes.css"
+import "../../css/SavedRecipes.css"
 import { Link } from 'react-router-dom';
 
 interface Recipe {

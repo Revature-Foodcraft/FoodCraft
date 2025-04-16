@@ -17,6 +17,7 @@ const CreateRecipe: React.FC = () => {
             try {
                 const response = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?i=list');
                 const data = await response.json();
+                
                 const names = data.meals.map((item: any) => item.strIngredient).filter(Boolean);
                 setIngredientList(names);
             } catch (error) {
@@ -26,7 +27,7 @@ const CreateRecipe: React.FC = () => {
         fetchIngredients();
     }, []);
 
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
     
@@ -35,13 +36,27 @@ const CreateRecipe: React.FC = () => {
             return;
         }
     
-        const uploadedImage = {
-            name: file.name,
-            link: URL.createObjectURL(file),
-        };
+        try {
+            // Request signed URL from backend
+            const res = await fetch(`http://localhost:5000/s3/generate-upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}`);
+            const { uploadUrl, publicUrl } = await res.json();
+            console.log("Signed upload URL:", uploadUrl);
+
+            // Upload image directly to S3
+            await fetch(uploadUrl, {
+                method: "PUT",
+                headers: { "Content-Type": file.type },
+                body: file,
+            });
     
-        setPicture(uploadedImage);
+            // Save S3 public URL for submission
+            setPicture({ name: file.name, link: publicUrl });
+        } catch (error) {
+            console.error("Upload failed:", error);
+            alert("Image upload failed");
+        }
     };
+    
     
     
 
@@ -55,17 +70,18 @@ const CreateRecipe: React.FC = () => {
 
     const handleSubmit = async () => {
         const token = localStorage.getItem("token");
-    
+        
         const recipeData = {
             name,
             description,
             ingredients,
             macros,
             instructions,
-            pictures: picture ? [picture] : [],
+            pictures: picture ? [{ link: picture.link }] : [],
         };
-    
+        console.log("Submitting recipe with picture URL:", recipeData.pictures[0]?.link);
         try {
+            
             const response = await fetch('http://localhost:5000/recipes/addRecipe', {
                 method: 'POST',
                 headers: {

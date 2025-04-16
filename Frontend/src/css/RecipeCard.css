@@ -1,22 +1,28 @@
 /* Custom card styling */
 .custom-card {
-  position: relative; /* Enable positioning for child elements */
+  position: relative;
   background-color: #fff7eb; /* Light beige background */
-  border: none; /* Remove default border */
-  border-radius: 10px; /* Soft rounded corners */
-  padding: 12px 18px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Full width */
+  border: none;
+  border-radius: 10px;
+  padding: 20px 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  width: 100%;
   box-sizing: border-box;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Title styling */
 .card-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #333333;
-  margin: 0;
+  margin: 0 0 5px;
 }
 
 /* Author text styling */
@@ -28,27 +34,40 @@
 
 /* Additional description text styling */
 .card-description {
-  font-size: 14px;
+  font-size: 15px;
   color: #666666;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 
 /* Delete button styling */
 .delete-btn {
-  position: absolute; /* Position relative to .custom-card */
-  top: 50%; /* Vertical center */
-  right: 10px; /* Position from the right edge */
-  transform: translateY(-50%); /* Adjust vertical centering */
   background: transparent;
   border: none;
-  color: #dc3545; /* Red color for emphasis */
-  font-size: 16px;
+  color: #dc3545;
+  font-size: 18px;
   cursor: pointer;
   padding: 4px;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
+.delete-btn:hover {
+  color: #a72828;
+  transform: scale(1.1);
+}
+
+/* Accordion body styling */
+/* We set the background to match the custom-card's background for visual consistency */
+.accordion-body {
+  background-color: white;
+  position: relative; /* For the delete button's absolute positioning */
+  padding: 15px 70px 15px 15px; /* Extra right padding for delete button */
+  border-top: 1px solid #ffdba5; /* Optional subtle border line */
+}
+
+/* Place the delete button inside the accordion body */
+.accordion-body .delete-btn {
+  position: absolute;
+  top: 50%; /* Vertically centered */
+  right: 20px; /* Space from the right edge */
+  transform: translateY(-50%);
 }
