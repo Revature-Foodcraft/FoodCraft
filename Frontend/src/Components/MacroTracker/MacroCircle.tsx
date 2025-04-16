@@ -26,9 +26,9 @@ const MacroCircle: React.FC<MacroData> = ({ label, amount, goal }) => {
     const flameX = isNaN(cx + (r + offset) * Math.cos(rad)) ? cx : cx + (r + offset) * Math.cos(rad);
     const flameY = isNaN(cy + (r + offset) * Math.sin(rad)) ? cy : cy + (r + offset) * Math.sin(rad);
 
+    // Removed all labels except one
     return (
         <div className="macro-circle">
-            <div className="labelGoal">{amount}/{goal}</div>
             <svg viewBox="0 0 36 36" className="macro-svg">
                 {/* Background circle */}
                 <circle className="bg" cx={cx} cy={cy} r={r} />
@@ -57,7 +57,8 @@ const MacroCircle: React.FC<MacroData> = ({ label, amount, goal }) => {
                     🔥
                 </text>
             </svg>
-            <div className="label">{label}</div>
+            <div className="macro-circle-amount">{amount}/{goal}</div>
+            <div className="macro-circle-label">{label}</div>
         </div>
     );
 };

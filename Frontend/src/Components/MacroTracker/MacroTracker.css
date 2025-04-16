@@ -26,21 +26,22 @@
   margin-top: 1rem;
 }
 
-.macro-add-button button {
-  background-color: #3498db;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+/* Added !important to Add button styles to ensure they are not overridden */
+.macro-controls-wrapper .macro-add-button button {
+  background-color: #3498db !important;
+  border: none !important;
+  border-radius: 5px !important;
+  color: #fff !important;
+  font-size: 1rem !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease, transform 0.1s ease !important;
 }
-.macro-add-button button:hover {
-  background-color: #2980b9;
+.macro-controls-wrapper .macro-add-button button:hover {
+  background-color: #2980b9 !important;
 }
-.macro-add-button button:active {
-  transform: scale(0.95);
+.macro-controls-wrapper .macro-add-button button:active {
+  transform: scale(0.95) !important;
 }
 
 .macro-inputs-wrapper {
@@ -151,4 +152,30 @@ svg.macro-svg {
 
 .labelGoal {
   margin-bottom: 0.5rem;
+}
+
+/* Styled the Save Goals button */
+.goal-input-wrapper button {
+  background-color: #3498db !important;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+.goal-input-wrapper button:hover {
+  background-color: #2980b9 !important;
+}
+.goal-input-wrapper button:active {
+  transform: scale(0.95) !important;
+}
+
+/* Added styles for the macro circle label */
+.macro-circle-label {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  text-align: center;
 }
