@@ -1,4 +1,3 @@
-import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../css/SmartFridge/Category.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
