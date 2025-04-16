@@ -1,39 +1,36 @@
-/* Container for the whole macro tracker */
+/* Updated styles for better readability and compactness */
 .macro-tracker {
-  background: white;
+  background: #fff;
   padding: 1rem;
   border-radius: 10px;
   margin: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  min-height: 370px; 
+  min-height: 350px;
 }
 
-/* Container for the circles */
 .macro-circle-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5rem;
+  gap: 3rem;
   flex-wrap: wrap;
   margin-top: 1rem;
 }
 
-/* Controls wrapper: holds the button on the left and inputs on the right */
 .macro-controls-wrapper {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-/* Add to macros button styling */
 .macro-add-button button {
   background-color: #3498db;
   border: none;
   border-radius: 5px;
-  color: white;
+  color: #fff;
   font-size: 1rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
@@ -46,7 +43,6 @@
   transform: scale(0.95);
 }
 
-/* Macro inputs wrapper with smooth appearing transition */
 .macro-inputs-wrapper {
   opacity: 0;
   transform: translateX(20px);
@@ -59,7 +55,6 @@
   pointer-events: auto;
 }
 
-/* Macro inputs styling (used inside AddToMacros component) */
 .macro-inputs {
   display: flex;
   flex-direction: row;
@@ -74,21 +69,21 @@
 }
 .macro-inputs label {
   margin-bottom: 0.25rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #333;
 }
 .macro-inputs input {
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100px;
+  width: 80px;
   text-align: center;
 }
 .macro-inputs button {
   background-color: #3498db;
   border: none;
   border-radius: 5px;
-  color: white;
+  color: #fff;
   font-size: 1rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
@@ -101,27 +96,23 @@
   transform: scale(0.95);
 }
 
-/* Macro circle styling */
 .macro-circle {
-  width: 150px;
-  height: 230px;
+  width: 120px;
+  height: 200px;
 }
 
-/* SVG container */
 svg.macro-svg {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   overflow: visible;
 }
 
-/* Background circle style */
 .bg {
   fill: none;
   stroke: #eee;
   stroke-width: 6;
 }
 
-/* Progress circle style with smooth transition */
 .progress {
   fill: none;
   stroke: #f39c12;
@@ -130,7 +121,6 @@ svg.macro-svg {
   transition: stroke-dasharray 0.5s ease-out;
 }
 
-/* Center percentage text styling */
 .percentage {
   fill: #333;
   font-size: 0.8rem;
@@ -138,7 +128,6 @@ svg.macro-svg {
   dominant-baseline: middle;
 }
 
-/* Flame icon styling and flicker animation */
 .flame {
   font-size: 0.9rem;
   transform-origin: center;

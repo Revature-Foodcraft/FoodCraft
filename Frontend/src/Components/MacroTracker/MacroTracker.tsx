@@ -3,6 +3,8 @@ import './MacroTracker.css';
 import AddToMacros from './AddToMacros';
 import MacroCircle, { MacroData } from './MacroCircle';
 import { useMacros } from './useMacros';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const MacroTracker: React.FC = () => {
   const {
@@ -16,7 +18,6 @@ const MacroTracker: React.FC = () => {
     updateMacros,
   } = useMacros();
 
-  // Updates input values from the AddToMacros component.
   const handleInputChange = (label: string, value: number) => {
     setInputValues(prev => ({
       ...prev,
@@ -27,31 +28,27 @@ const MacroTracker: React.FC = () => {
   return (
     <div className="macro-tracker">
       <h4>Today's Macros</h4>
-      {loading && <p>Loading macros...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <p>Loading...</p>}
+      {error && <p className="error-text">{error}</p>}
 
       <div className="macro-circle-container">
         {macros.map((macro: MacroData) => (
-          <div key={macro.label} className="macro-item">
-            <MacroCircle {...macro} />
-          </div>
+          <MacroCircle key={macro.label} {...macro} />
         ))}
       </div>
 
       <div className="macro-controls-wrapper">
-        <div className="macro-add-button">
-          <button onClick={() => setShowInputs(prev => !prev)}>
-            Add to macros
-          </button>
-        </div>
-        <div className={`macro-inputs-wrapper ${showInputs ? 'show' : ''}`}>
+        <button className="macro-add-button" onClick={() => setShowInputs(!showInputs)}>
+          Add Macros
+        </button>
+        {showInputs && (
           <AddToMacros
             macros={macros}
             inputValues={inputValues}
             onInputChange={handleInputChange}
             onSubmit={updateMacros}
           />
-        </div>
+        )}
       </div>
     </div>
   );

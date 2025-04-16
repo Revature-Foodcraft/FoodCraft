@@ -1,0 +1,34 @@
+.account-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.smart-fridge-section {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.saved-recipes-section {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.macro-tracker-section {
+  margin-top: 20px;
+  width: 100%;
+}
