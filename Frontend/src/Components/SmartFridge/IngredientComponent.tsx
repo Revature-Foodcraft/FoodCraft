@@ -7,7 +7,7 @@ import { FaTrash } from "react-icons/fa";
 interface IngredientProps {
   ingredient: Ingredient;
   onRemove: (id: string) => void;
-  onUpdate: (id: string, newAmount: string, newUnit: string) => void;
+  onUpdate: (id: string, newAmount: number, newUnit: string) => void;
 }
 
 function IngredientComponent({ ingredient, onRemove, onUpdate }: IngredientProps) {
@@ -16,6 +16,7 @@ function IngredientComponent({ ingredient, onRemove, onUpdate }: IngredientProps
   const [editedUnit, setEditedUnit] = useState<string>(ingredient.unit || "g");
 
   const handleSave = () => {
+    // Convert editedAmount to string before passing to onUpdate
     onUpdate(ingredient.id, editedAmount, editedUnit);
     setIsEditing(false);
   };
@@ -29,7 +30,7 @@ function IngredientComponent({ ingredient, onRemove, onUpdate }: IngredientProps
           {isEditing ? (
             <>
               <input
-                type="text"
+                type="number"
                 className="input-field"
                 value={editedAmount}
                 onChange={(e) => setEditedAmount(Number(e.target.value))}

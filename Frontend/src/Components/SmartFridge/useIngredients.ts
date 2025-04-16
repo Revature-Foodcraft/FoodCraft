@@ -72,7 +72,7 @@ const useIngredients = (token: string | null) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ id, amount: newAmount, unit: newUnit }), // Include unit
+        body: JSON.stringify({ id, amount: Number(newAmount), unit: newUnit }), // Ensure amount is sent as a number
       });
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
       await fetchIngredients();

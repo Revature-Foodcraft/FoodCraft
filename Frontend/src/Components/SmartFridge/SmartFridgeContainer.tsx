@@ -1,5 +1,5 @@
 // SmartFridgeContainer.tsx
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../css/SmartFridge/SmartFridge.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
@@ -62,13 +62,13 @@ const SmartFridgeContainer: React.FC = () => {
 
       {/* Wrap grouped ingredients in a scrollable container */}
       <div className="fridge-content">
-        {Object.keys(groupedIngredients).map((catKey) => (
+        {Object.keys(groupedIngredients).map((catKey: string) => (
           <CategoryComponent
             key={catKey}
             category={catKey as IngredientCategory}
             items={groupedIngredients[catKey as IngredientCategory]}
-            onRemove={removeIngredient}
-            onUpdate={updateIngredient}
+            onRemove={(id: string) => removeIngredient(id)}
+            onUpdate={(id: string, newAmount: number, newUnit: string) => updateIngredient(id, newAmount, newUnit)}
           />
         ))}
       </div>

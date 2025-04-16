@@ -4,7 +4,7 @@ import * as fridgeService from "../Services/fridgeService.js";
 export const addIngredientToFridge = async (req, res) => {
   const ingredientSchema = Joi.object({
     id: Joi.string().required(),
-    amount: Joi.string().required(),
+    amount: Joi.number().required(),
     category: Joi.string().required(),
     name: Joi.string().required(),
     unit: Joi.string().valid("g", "kg", "oz", "lb", "ml", "l", "qt").required(),
@@ -76,7 +76,7 @@ export const removeIngredientFromFridge = async (req, res) => {
 export const updateIngredientFromFridge = async (req, res) => {
   const updateSchema = Joi.object({
     id: Joi.string().required(),
-    amount: Joi.string().required(),
+    amount: Joi.number().required(), // Ensure amount is validated as a number
     unit: Joi.string().valid("g", "kg", "oz", "lb", "ml", "l", "qt").required(),
   });
 

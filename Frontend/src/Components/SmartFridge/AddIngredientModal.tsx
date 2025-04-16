@@ -6,7 +6,7 @@ import { IngredientCategory } from "../../Types/Ingredient";
 interface AddIngredientModalProps {
     onSubmit: (newIngredient: {
         id: string;
-        amount: string;
+        amount: number;
         category: string;
         name: string;
         unit: string;
@@ -174,11 +174,11 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                         <div className="form-group">
                             <label>Amount:</label>
                             <input
-                                type="text"
+                                type="number"
                                 name="amount"
                                 value={formData.amount}
                                 onChange={(e) =>
-                                    setFormData((prev) => ({ ...prev, amount: e.target.value }))
+                                    setFormData((prev) => ({ ...prev, amount: Number(e.target.value) })) // Ensure amount is treated as a number
                                 }
                                 className="input-field"
                                 autoComplete="off"

@@ -12,7 +12,7 @@ interface CategoryProps {
   category: IngredientCategory;
   items: CategoryItem[];
   onRemove: (id: string) => void;
-  onUpdate: (id: string, newAmount: string) => void;
+  onUpdate: (id: string, newAmount: number, newUnit: string) => Promise<void>; // Updated to handle asynchronous functions
 }
 
 function CategoryComponent({ category, items, onRemove, onUpdate }: CategoryProps) {
