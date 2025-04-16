@@ -91,7 +91,7 @@ export async function updateRecipe(recipe) {
 
 export async function getRecipes(cuisine, category) {
     let recipes;
-    
+
     if (cuisine || category) {
         recipes = await model.getRecipesByParameters(cuisine, category)
     } else {
@@ -121,7 +121,7 @@ export async function deleteSavedRecipe(userId, recipeId) {
             return { success: false, code: 404, message: "Saved recipe not found" };
         }
     } catch (error) {
-        console.error("Error deleting saved recipe:", error);
+        logger.error("Error deleting saved recipe:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
