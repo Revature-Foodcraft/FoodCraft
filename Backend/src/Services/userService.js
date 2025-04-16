@@ -76,9 +76,11 @@ export async function loginUser({ username, password }) {
 export async function getUser(userId) {
     const user = await model.getUser(userId)
 
-    const pictureUrl = await getSignedImageUrl(user.picture || "default-avatar-icon.jpg");
-    user.picture = pictureUrl;
+    
     if (user) {
+        const pictureUrl = await getSignedImageUrl(user.picture || "default-avatar-icon.jpg");
+        user.picture = pictureUrl;
+
         return { success: true, user: user }
     } else {
         return { success: false, message: "Failed to get user" }

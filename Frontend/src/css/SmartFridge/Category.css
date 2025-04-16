@@ -1,0 +1,39 @@
+/* Category.css */
+
+.category-container {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #4a5568;
+  margin-bottom: 10px;
+}
+
+.category-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 250px; /* Fixed height for the ingredients list */
+  overflow-y: auto; /* Enable scrolling if there are too many items */
+}
+
+/* Added styles related to categories */
+
+.mb-4 {
+  border-bottom: 2px solid #ddd; /* Add a subtle separator */
+  padding-bottom: 15px; /* Space out the content */
+  margin-bottom: 30px; /* Increase spacing between categories */
+}
+
+h4.text-uppercase {
+  color: #4a5568; /* Elegant dark gray for category title */
+  font-weight: bold; /* Make the category title more prominent */
+  letter-spacing: 1px; /* Add slight letter-spacing for refinement */
+}

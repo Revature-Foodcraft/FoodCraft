@@ -186,22 +186,22 @@ async function updateUser(updatedUser) {
         logger.error("The 'updatedUser' object must contain a 'PK' field.");
         return null;
     }
-    
+
     let updateExpression = "SET ";
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
 
     Object.keys(updatedUser).forEach((key, index) => {
         if (key !== "user_id" && key !== "PK" && key !== "SK") {
-            if(key == "account"){
-                Object.keys(updatedUser.account).forEach((key,index)=>{
+            if (key == "account") {
+                Object.keys(updatedUser.account).forEach((key, index) => {
                     const attributeKey = `#acc${index}`;
                     const attributeValue = `:acc${key}`;
-                    updateExpression+= `account.${attributeKey} = ${attributeValue}, `;
+                    updateExpression += `account.${attributeKey} = ${attributeValue}, `;
                     ExpressionAttributeNames[attributeKey] = key
                     ExpressionAttributeValues[attributeValue] = updatedUser.account[key]
                 })
-            }else{
+            } else {
                 console.log("here")
                 const attributeKey = `#key${index}`;
                 const attributeValue = `:value${index}`;
@@ -406,7 +406,7 @@ async function getUserByGoogleId(googleId) {
         FilterExpression: 'googleId = :googleId',
         ExpressionAttributeValues: {
             ":SK": "PROFILE",
-            ":googleId":googleId
+            ":googleId": googleId
         },
     });
 
@@ -431,13 +431,13 @@ async function getUserByGoogleId(googleId) {
 /**
  * @async
  * @function addIngredientToFridge
- * @description Adds an ingredient to the user's fridge if not there. if ingredient already in the fridge add amount to it
+ * @description Adds an ingredient to the user's fridge if not there. If the ingredient already exists, updates the amount and unit.
  * @param {string} userId - The ID of the user.
  * @param {Object} ingredient - The ingredient object to add.
  * {
- * id:"123",
- * amount:4
- *
+ *   id: "123",
+ *   amount: "4",
+ *   unit: "g"
  * }
  * @returns {Promise<Array|null>} - Updated fridge array or null if an error occurs.
  */
@@ -457,7 +457,9 @@ async function addIngredientToFridge(userId, ingredient) {
 
         const existingIndex = currentFridge.findIndex((item) => item.id === ingredient.id);
         if (existingIndex !== -1) {
-            currentFridge[existingIndex].amount += ingredient.amount;
+            currentFridge[existingIndex].amount = ingredient.amount;
+            currentFridge[existingIndex].unit = ingredient.unit; // Ensure unit is updated
+
             const updateExistingCommand = new UpdateCommand({
                 TableName: tableName,
                 Key: {
@@ -471,9 +473,7 @@ async function addIngredientToFridge(userId, ingredient) {
                 ReturnValues: "ALL_NEW",
             });
             const updateResponse = await documentClient.send(updateExistingCommand);
-            logger.info(`Updated ingredient amount in fridge for user ${userId}`);
             return updateResponse.Attributes.fridge;
-
         }
 
         const addCommand = new UpdateCommand({
@@ -490,15 +490,12 @@ async function addIngredientToFridge(userId, ingredient) {
             },
             ReturnValues: "ALL_NEW",
         });
-
         const addResponse = await documentClient.send(addCommand);
-        logger.info(`Successfully added ingredient to fridge for user ${userId}`);
         return addResponse.Attributes.fridge;
     } catch (error) {
         logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
         return null;
     }
-
 }
 
 /**
@@ -551,53 +548,54 @@ async function removeIngredientFromFridge(userId, ingredientId) {
  * @description Changes the amount of an ingredient stored in the fridge.
  * @function updateIngredientFromFridge
  * @param {string} userId - The ID of the user.
- * @param {object} ingredient - The ingredient object with updated amount.
- * @example
+ * @param {object} ingredient - The ingredient object with updated amount and unit.
  * {
  *   id: "123",
- *   amount: 5
+ *   amount: "5",
+ *   unit: "kg"
  * }
  * @returns {Promise<Array|null>} - The updated fridge array or null if an error occurs.
  */
 async function updateIngredientFromFridge(userId, ingredient) {
-    const user = await getUser(userId);
-    if (!user || !user.fridge) {
-        logger.warn(`User ${userId} not found or fridge is empty.`);
-        return null;
-    }
-
-    const fridgeCopy = [...user.fridge];
-    const index = fridgeCopy.findIndex((ing) => ing.id === ingredient.id);
-    if (index === -1) {
-        logger.warn(
-            `Ingredient ${ingredient.id} not found in fridge for user ${userId}`
-        );
-        return null;
-    }
-
-    fridgeCopy[index].amount = ingredient.amount;
-
-    const command = new UpdateCommand({
+    const getCommand = new GetCommand({
         TableName: tableName,
         Key: {
-            PK: `${userId}`,
+            PK: userId,
             SK: "PROFILE",
         },
-        UpdateExpression: "SET fridge = :updatedFridge",
-        ExpressionAttributeValues: {
-            ":updatedFridge": fridgeCopy,
-        },
-        ReturnValues: "ALL_NEW",
+        ProjectionExpression: "fridge",
     });
 
     try {
-        const response = await documentClient.send(command);
-        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
-        return response.Attributes.fridge;
+        const currentResponse = await documentClient.send(getCommand);
+        const currentFridge = (currentResponse.Item && currentResponse.Item.fridge) || [];
+
+        const index = currentFridge.findIndex((item) => item.id === ingredient.id);
+        if (index === -1) {
+            logger.warn(`Ingredient ${ingredient.id} not found in fridge for user ${userId}`);
+            return null;
+        }
+
+        currentFridge[index].amount = ingredient.amount;
+        currentFridge[index].unit = ingredient.unit;
+
+        const updateCommand = new UpdateCommand({
+            TableName: tableName,
+            Key: {
+                PK: userId,
+                SK: "PROFILE",
+            },
+            UpdateExpression: "SET fridge = :updatedFridge",
+            ExpressionAttributeValues: {
+                ":updatedFridge": currentFridge,
+            },
+            ReturnValues: "ALL_NEW",
+        });
+
+        const updateResponse = await documentClient.send(updateCommand);
+        return updateResponse.Attributes.fridge;
     } catch (error) {
-        logger.error(
-            `Error updating ingredient in fridge for user ${userId}: ${error.message}`
-        );
+        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
         return null;
     }
 }
@@ -657,7 +655,7 @@ async function createRecipe(recipe) {
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe,
-        ReturnValues: "NONE", // Ensures attributes are returned
+        ReturnValues: "ALL_NEW", // Ensures attributes are returned
     });
 
 
@@ -1263,62 +1261,62 @@ async function getAllIngredients() {
  */
 async function updateMacros(userId, newDailyMacros) {
     const command = new UpdateCommand({
-      TableName: tableName,
-      Key: {
-        PK: userId,
-        SK: "PROFILE",
-      },
-      UpdateExpression: "set daily_macros = :macros",
-      ExpressionAttributeValues: {
-        ":macros": newDailyMacros,
-      },
-      ReturnValues: "ALL_NEW",
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: "PROFILE",
+        },
+        UpdateExpression: "set daily_macros = :macros",
+        ExpressionAttributeValues: {
+            ":macros": newDailyMacros,
+        },
+        ReturnValues: "ALL_NEW",
     });
-  
-    try {
-      const response = await documentClient.send(command);
-      if (response.Attributes) {
-        logger.info(`Updated daily_macros for user ${userId}: ${JSON.stringify(response.Attributes)}`);
-        return response.Attributes;
-      } else {
-        logger.warn(`No Attributes returned after updating macros for user ${userId}`);
-        return null;
-      }
-    } catch (error) {
-      logger.error(`Error updating macros for user ${userId}: ${error.message}`);
-      return null;
-    }
-  }
 
-  /**
- * Retrieves the daily_macros for the current user.
- * @param {string} userId - The unique identifier for the user.
- * @returns {Promise<object|null>} - The daily_macros object if found; otherwise, null.
- */
+    try {
+        const response = await documentClient.send(command);
+        if (response.Attributes) {
+            logger.info(`Updated daily_macros for user ${userId}: ${JSON.stringify(response.Attributes)}`);
+            return response.Attributes;
+        } else {
+            logger.warn(`No Attributes returned after updating macros for user ${userId}`);
+            return null;
+        }
+    } catch (error) {
+        logger.error(`Error updating macros for user ${userId}: ${error.message}`);
+        return null;
+    }
+}
+
+/**
+* Retrieves the daily_macros for the current user.
+* @param {string} userId - The unique identifier for the user.
+* @returns {Promise<object|null>} - The daily_macros object if found; otherwise, null.
+*/
 async function getDailyMacros(userId) {
     const command = new GetCommand({
-      TableName: tableName,
-      Key: {
-        PK: userId,
-        SK: "PROFILE",
-      },
+        TableName: tableName,
+        Key: {
+            PK: userId,
+            SK: "PROFILE",
+        },
     });
-  
+
     try {
-      const response = await documentClient.send(command);
-      if (response.Item && response.Item.daily_macros) {
-        logger.info(`Retrieved daily_macros for user ${userId}: ${JSON.stringify(response.Item.daily_macros)}`);
-        return response.Item.daily_macros;
-      } else {
-        logger.warn(`User ${userId} or daily_macros not found`);
-        return null;
-      }
+        const response = await documentClient.send(command);
+        if (response.Item && response.Item.daily_macros) {
+            logger.info(`Retrieved daily_macros for user ${userId}: ${JSON.stringify(response.Item.daily_macros)}`);
+            return response.Item.daily_macros;
+        } else {
+            logger.warn(`User ${userId} or daily_macros not found`);
+            return null;
+        }
     } catch (error) {
-      logger.error(`Error retrieving daily_macros for user ${userId}: ${error.message}`);
-      return null;
+        logger.error(`Error retrieving daily_macros for user ${userId}: ${error.message}`);
+        return null;
     }
-  }
-  
+}
+
 
 export {
     // User-related functions
@@ -1329,7 +1327,6 @@ export {
     getSavedRecipes,
     deleteSavedRecipe,
     getUserByGoogleId,
-
 
     // Recipe-related functions
     createRecipe,
@@ -1354,9 +1351,7 @@ export {
     updateIngredientFromFridge,
     getAllIngredientsFromFridge,
 
-    //Macro Functions
+    // Macro Functions
     updateMacros,
     getDailyMacros
 };
-
-

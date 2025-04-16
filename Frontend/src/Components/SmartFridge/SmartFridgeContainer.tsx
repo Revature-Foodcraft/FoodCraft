@@ -1,5 +1,5 @@
 // SmartFridgeContainer.tsx
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../css/SmartFridge/SmartFridge.css";
 import { Ingredient, IngredientCategory } from "../../Types/Ingredient";
@@ -26,9 +26,6 @@ const SmartFridgeContainer: React.FC = () => {
   const { ingredients, loading, error, addIngredient, updateIngredient, removeIngredient } = useIngredients(token);
   const [showModal, setShowModal] = useState(false);
 
-
-
-
   // Group ingredients by category
   const groupedIngredients = useMemo(() => groupIngredientsByCategory(ingredients), [ingredients]);
 
@@ -36,15 +33,15 @@ const SmartFridgeContainer: React.FC = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="fridge-container">
-      <header className="fridge-header">
-        <h3 className="fridge-title">Smart Fridge</h3>
+    <div className="fridge-container container">
+      <header className="text-center fridge-header">
+        <h3 className=" fridge-title">Smart Fridge</h3>
       </header>
 
       {/* Control for opening the Add Ingredient Modal */}
       {!showModal && (
-        <div className="btn-container">
-          <button className="btn fridge-btn add-btn" onClick={() => setShowModal(true)}>
+        <div className="btn-container" style={{ marginTop: '20px' }}>
+          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={() => setShowModal(true)}>
             Add Ingredient
           </button>
         </div>
@@ -54,23 +51,27 @@ const SmartFridgeContainer: React.FC = () => {
       {showModal && (
         <AddIngredientModal
           onCancel={() => setShowModal(false)}
-          onSubmit={async ({ id, amount }) => {
-            await addIngredient({ id, amount });
+          onSubmit={async ({ id, amount, category, name, unit }) => {
+            console.log("Adding Ingredient:", { id, amount, category, name, unit });
+
+            await addIngredient({ id, amount, category, name, unit });
             setShowModal(false);
           }}
         />
       )}
 
-      {/* Render Grouped Ingredients */}
-      {Object.keys(groupedIngredients).map((catKey) => (
-        <CategoryComponent
-          key={catKey}
-          category={catKey as IngredientCategory}
-          items={groupedIngredients[catKey as IngredientCategory]}
-          onRemove={removeIngredient}
-          onUpdate={updateIngredient}
-        />
-      ))}
+      {/* Wrap grouped ingredients in a scrollable container */}
+      <div className="fridge-content">
+        {Object.keys(groupedIngredients).map((catKey: string) => (
+          <CategoryComponent
+            key={catKey}
+            category={catKey as IngredientCategory}
+            items={groupedIngredients[catKey as IngredientCategory]}
+            onRemove={(id: string) => removeIngredient(id)}
+            onUpdate={(id: string, newAmount: number, newUnit: string) => updateIngredient(id, newAmount, newUnit)}
+          />
+        ))}
+      </div>
     </div>
   );
 };
