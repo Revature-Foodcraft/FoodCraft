@@ -1,7 +1,10 @@
 import Joi from "joi";
 import * as userService from "../Services/userService.js";
+import { logger } from '../util/logger.js';
 
 export const register = async (req, res) => {
+  logger.info('Register request received', { username: req.body.username });
+
   const accountSchema = Joi.object({
     username: Joi.string().required(),
     password: Joi.string().pattern(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.{8,})/).required(),
@@ -26,13 +29,17 @@ export const register = async (req, res) => {
   const user = await userService.createUser(value)
 
   if (user.success) {
+    logger.info('User registered successfully', { userId: user.user.PK, username: user.user.username });
     return res.status(201).json({ message: "User Created", user: user.user })
   } else {
+    logger.error('User registration failed', { error: user.message });
     return res.status(user.code).json({ message: user.message })
   }
 }
 
 export const login = async (req, res) => {
+  logger.info('Login request received', { username: req.body.username });
+
   const loginSchema = Joi.object({
     username: Joi.string().required(),
     password: Joi.string().pattern(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.{8,})/).required()
@@ -53,18 +60,24 @@ export const login = async (req, res) => {
   const user = await userService.loginUser(value)
 
   if (user.success) {
+    logger.info('User logged in successfully', { userId: user.token });
     res.status(200).json({ message: user.message, token: user.token })
   } else {
+    logger.warn('Login failed', { username: req.body.username });
     res.status(400).json({ message: user.message })
   }
 }
 
 export const getProfile = async (req, res) => {
+  logger.info('Fetching user profile', { userId: req.user?.userId });
+
   const userInfo = await userService.getUser(req.user?.userId)
 
   if (userInfo.success) {
+    logger.info('User profile fetched successfully', { userId: req.user?.userId });
     res.status(200).json({ username: userInfo.user.username, account: userInfo.user.account, picture: userInfo.user?.picture, googleId: userInfo.user?.googleId })
   } else {
+    logger.error('Failed to fetch user profile', { userId: req.user?.userId });
     res.status(500).json({ message: userInfo.message })
   }
 }

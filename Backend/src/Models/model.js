@@ -38,6 +38,7 @@ PROFILE methods
  * @throws {Error} - Logs an error message if the operation fails.
  */
 async function createUser(user) {
+    logger.info('Creating user in database', { username: user.username });
     const command = new PutCommand({
         TableName: tableName,
         Item: {
@@ -59,10 +60,10 @@ async function createUser(user) {
 
     try {
         await documentClient.send(command);
-        logger.info(`Successfully created user ${user.username}`);
+        logger.info('User created in database', { userId: user.PK, username: user.username });
         return user;
     } catch (error) {
-        logger.error(`Error while creating a user: ${error.message}`);
+        logger.error('Error while creating user in database', { username: user.username, error: error.message });
         return null;
     }
 }
@@ -92,6 +93,7 @@ async function createUser(user) {
  * @throws {Error} - Logs an error if there is an issue with the database operation.
  */
 async function getUser(userId) {
+    logger.info('Fetching user from database', { userId });
     const command = new GetCommand({
         TableName: tableName,
         Key: {
@@ -103,14 +105,14 @@ async function getUser(userId) {
     try {
         const response = await documentClient.send(command);
         if (response.Item) {
-            logger.info(`Retrieved user: ${JSON.stringify(response.Item)}`);
+            logger.info('User fetched from database', { userId });
             return response.Item;
         } else {
-            logger.warn(`User with ID ${userId} not found`);
+            logger.warn('User not found in database', { userId });
             return null;
         }
     } catch (error) {
-        logger.error(`Error getting user ${userId}: ${error.message}`);
+        logger.error('Error fetching user from database', { userId, error: error.message });
         return null;
     }
 }

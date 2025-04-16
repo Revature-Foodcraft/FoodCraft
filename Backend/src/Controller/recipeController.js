@@ -1,7 +1,9 @@
 import Joi from "joi";
 import * as recipeService from "../Services/recipeService.js";
+import { logger } from '../util/logger.js';
 
 export const getRecipe = async (req, res) => {
+    logger.info('Fetching recipe', { recipeId: req.params.recipeId });
     const { recipeId } = req.params;
 
     if (!recipeId) {
@@ -12,8 +14,10 @@ export const getRecipe = async (req, res) => {
         const recipe = await recipeService.getRecipe({ recipeId });
 
         if (recipe.success) {
+            logger.info('Recipe fetched successfully', { recipeId: req.params.recipeId });
             return res.status(200).json(recipe);
         } else {
+            logger.warn('Failed to fetch recipe', { recipeId: req.params.recipeId });
             return res.status(404).json({ message: recipe.message });
         }
     } catch (error) {
@@ -23,7 +27,7 @@ export const getRecipe = async (req, res) => {
 };
 
 export const createRecipe = async (req, res) => {
-    //FIXME
+    logger.info('Creating recipe', { name: req.body.name });
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string().optional(),
@@ -72,9 +76,11 @@ export const createRecipe = async (req, res) => {
             return res.status(500).json({ success: false, message: "Failed to create recipe in database" });
         }
 
+        logger.info('Recipe created successfully', { recipeId: newRecipe.PK });
         console.log("Recipe saved successfully:", newRecipe);
         return res.status(201).json({ success: true, message: "Recipe created successfully", recipe: newRecipe });
     } catch (error) {
+        logger.error('Failed to create recipe', { name: req.body.name });
         console.error("Error creating recipe:", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }

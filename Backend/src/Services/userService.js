@@ -5,10 +5,12 @@ import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { uploadImage, getSignedImageUrl, deleteImage } from "../util/s3.js";
 import { updateGoals as updateGoalsModel } from '../Models/model.js';
+import { logger } from '../util/logger.js';
 
 dotenv.config({ override: true })
 
 export async function createUser({ username, password, email = "", firstname = "", lastname = "", picture = "" }) {
+    logger.info('Creating user', { username });
     const hashPass = await hashPassword(password)
 
     const exist = await model.getUserByUsername(username)
@@ -43,8 +45,10 @@ export async function createUser({ username, password, email = "", firstname = "
         const newUser = await model.createUser(userObj)
 
         if (newUser) {
+            logger.info('User created successfully', { userId: userObj.PK, username });
             return { success: true, user: userObj }
         } else {
+            logger.error('Failed to create user', { username });
             return { success: false, code: 500, message: "Failed creating new user" }
         }
     } else {
@@ -53,6 +57,7 @@ export async function createUser({ username, password, email = "", firstname = "
 }
 
 export async function loginUser({ username, password }) {
+    logger.info('Login attempt', { username });
     const user = await model.getUserByUsername(username)
 
     try {
@@ -65,8 +70,10 @@ export async function loginUser({ username, password }) {
                     expiresIn: '5h'
                 })
 
+            logger.info('Login successful', { userId: user.PK });
             return { success: true, message: "Login Successful", token: token }
         } else {
+            logger.warn('Login failed', { username });
             return { success: false, message: "Login Failed: Incorrect Username or Password" }
         }
     } catch (error) {
@@ -75,6 +82,7 @@ export async function loginUser({ username, password }) {
 }
 
 export async function getUser(userId) {
+    logger.info('Fetching user', { userId });
     const user = await model.getUser(userId)
 
 
@@ -82,8 +90,10 @@ export async function getUser(userId) {
         const pictureUrl = await getSignedImageUrl(user.picture || "default-avatar-icon.jpg");
         user.picture = pictureUrl;
 
+        logger.info('User fetched successfully', { userId, username: user.username });
         return { success: true, user: user }
     } else {
+        logger.error('Failed to fetch user', { userId });
         return { success: false, message: "Failed to get user" }
     }
 }
