@@ -217,7 +217,6 @@ async function updateUser(updatedUser) {
                     ExpressionAttributeValues[attributeValue] = updatedUser.account[key]
                 })
             } else {
-                console.log("here")
                 const attributeKey = `#key${index}`;
                 const attributeValue = `:value${index}`;
                 updateExpression += `${attributeKey} = ${attributeValue}, `;
