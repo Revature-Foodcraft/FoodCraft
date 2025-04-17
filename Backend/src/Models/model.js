@@ -1340,7 +1340,7 @@ async function getDailyMacros(userId) {
  * @returns {Promise<Array>} - An array of review items.
  * @throws Will throw an error if the query fails.
  */
-export async function getReviewsByRecipe(recipeId) {
+async function getReviewsByRecipe(recipeId) {
     // Build the QueryCommand parameters.
     const command = new QueryCommand({
         TableName: tableName,
@@ -1429,6 +1429,7 @@ export {
     getReview,
     getAllReviews,
     deleteReview,
+    getReviewsByRecipe,
 
     // Ingredient-related functions
     createIngredient,
@@ -1443,6 +1444,8 @@ export {
     updateMacros,
     getDailyMacros,
     updateGoals
+
+
 };
 
 
