@@ -28,9 +28,10 @@ export const createRecipe = async (req, res) => {
         name: Joi.string().required(),
         description: Joi.string().optional(),
         review_id: Joi.string().optional(),
+        category: Joi.string().optional(),
+        cuisine: Joi.string().optional(),
         ingredients: Joi.array().items(
             Joi.object({
-                category: Joi.string().optional(),
                 name: Joi.string().required(),
                 amount: Joi.string().required()
             })

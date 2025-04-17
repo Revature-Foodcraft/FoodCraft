@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // Import useParams
+import { useParams } from 'react-router-dom';
 import '../css/Recipe.css';
-import lasagna from "../assets/lasagna.jpg";
-import orangec from "../assets/orange-chicken.jpg";
-import salad from "../assets/salad.jpg";
-import pizza from "../assets/pizza.jpg";
-import chickens from "../assets/chicken sandwich.jpg";
-import fishtacos from "../assets/fishTacos.jpg";
+import imageNotFound from '../assets/imageNotFound.jpg';
 
 const Recipe: React.FC = () => {
-    const { id } = useParams<{ id: string }>(); // Get the recipe ID from the URL
+    const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<any>(null);
     const [isApiRecipe, setIsApiRecipe] = useState(false);
 
     useEffect(() => {
         if (!id) return;
-        if (window.location.pathname.includes("/recipe/api/")) {
-            setIsApiRecipe(true);
+
+        const isApi = window.location.pathname.includes("/recipe/api/");
+        setIsApiRecipe(isApi);
+
+        if (isApi) {
             fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
                 .then(res => res.json())
                 .then(data => {
@@ -36,7 +34,8 @@ const Recipe: React.FC = () => {
                                 carbs: "N/A",
                                 protein: "N/A"
                             },
-                            pictures: { link: meal.strMealThumb },
+                            pictures: [ { link: meal.strMealThumb } ],
+                            youtube: meal.strYoutube,
                             user_id: "API"
                         });
                     }
@@ -53,19 +52,22 @@ const Recipe: React.FC = () => {
         return <p>Loading recipe...</p>;
     }
 
-    // Function to handle image URLs
-    const getImageUrl = (imageLink: string) => {
-        // Check if the image link is an S3 URL (from your DynamoDB storage)
-        if (imageLink && imageLink.includes('s3.amazonaws.com')) {
-            return imageLink; // If it's an S3 URL, return it directly
-        }
-        // If not an S3 URL, check if it's from the API (MealDB)
-        if (imageLink) {
-            return imageLink; // Assuming it's a valid link (like from the API)
-        }
-        // Return a fallback image if no link is provided
-        return lasagna; // Default fallback image
+    // Determine image URL for main image
+    const getImageUrl = (image: any) => {
+        if (typeof image === 'string') return image;
+        if (image?.link) return image.link;
+        return imageNotFound;
     };
+
+    // Extract YouTube thumbnail
+    const getYouTubeVideoId = (url: string) => {
+        if (!url) return null;
+        return url.split('v=')[1]?.split('&')[0];
+    };
+    
+
+    const youtubeVideoId = getYouTubeVideoId(recipe.youtube);
+
 
     return (
         <div className="containerRecipe">
@@ -85,7 +87,7 @@ const Recipe: React.FC = () => {
                             </li>
                         ))}
                     </ul>
-
+    
                     <h4>Instructions</h4>
                     <ol className="instructions-list">
                         {recipe.instructions.map((step: string, index: number) => (
@@ -99,37 +101,57 @@ const Recipe: React.FC = () => {
                         <p><strong>Protein:</strong> {recipe.macros?.protein} g</p>
                     </div>
                 </div>
-                <div className="middle-section">
-                    <div className="middle-top">
-                        <div className="review-box">
-                            <div className="review-header">
-                                <div className="review-avatar"></div>
-                                <p className="review-author">Recipe By: Foodcrafter</p>
+    
+                {/* NEW WRAPPER for side content */}
+                <div className="side-content-wrapper">
+                    <div className="middle-section">
+                        <div className="middle-top">
+                            <div className="review-box">
+                                <div className="review-header">
+                                    <div className="review-avatar"></div>
+                                    <p className="review-author">Recipe By: Foodcrafter</p>
+                                </div>
+                                <p className="review-text">"This recipe was amazing! The flavors were perfect."</p>
+                                <div className="review-stars">⭐⭐⭐⭐⭐</div>
                             </div>
-                            <p className="review-text">"This recipe was amazing! The flavors were perfect."</p>
-                            <div className="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div className="middle-bottom">
+                            {youtubeVideoId ? (
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+                                    title="YouTube video player"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="youtube-player"
+                                ></iframe>
+                            ) : (
+                                <p>No video available.</p>
+                            )}
                         </div>
                     </div>
-                    <div className="middle-bottom">Middle Bottom</div>
-                </div>
-                <div className="food-image">
-                    {/* Dynamically set image URL based on recipe data */}
-                    <img src={getImageUrl(recipe.pictures?.[0]?.link)} alt={recipe.name || "Recipe Image"} />
+    
+                    <div className="food-image">
+                        <img
+                            src={getImageUrl(recipe.pictures?.[0] || recipe.pictures)}
+                            alt={recipe.name || "Recipe Image"}
+                        />
+                    </div>
                 </div>
             </div>
+    
             <div className="recipeSuggestions">
                 <h2>Similar Recipes</h2>
                 <div className="suggestions-container">
-                    <div className="suggestion-box"><img src={lasagna} alt="Recipe 1" /><p>Lasagna</p></div>
-                    <div className="suggestion-box"><img src={orangec} alt="Recipe 2" /><p>Orange Chicken</p></div>
-                    <div className="suggestion-box"><img src={pizza} alt="Recipe 3" /><p>Pizza</p></div>
-                    <div className="suggestion-box"><img src={salad} alt="Recipe 4" /><p>Greek Salad</p></div>
-                    <div className="suggestion-box"><img src={chickens} alt="Recipe 5" /><p>Chicken Sandwich</p></div>
-                    <div className="suggestion-box"><img src={fishtacos} alt="Recipe 6" /><p>Fish Tacos</p></div>
+                    <div className="suggestion-box"><p>Lasagna</p></div>
+                    <div className="suggestion-box"><p>Orange Chicken</p></div>
+                    <div className="suggestion-box"><p>Pizza</p></div>
+                    <div className="suggestion-box"><p>Greek Salad</p></div>
+                    <div className="suggestion-box"><p>Chicken Sandwich</p></div>
+                    <div className="suggestion-box"><p>Fish Tacos</p></div>
                 </div>
             </div>
         </div>
     );
-};
-
+}    
 export default Recipe;
