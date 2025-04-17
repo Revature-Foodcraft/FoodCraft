@@ -18,14 +18,13 @@ html, body {
 
 .recipe-layout {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap; /* Ensures better layout on smaller screens */
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 20px;
     padding: 20px;
     width: 100%;
-    min-height: fit-content;
-    margin-bottom: 30px;
+    align-items: flex-start;
 }
+
 
 
 .ingredients-instructions {
@@ -39,28 +38,36 @@ html, body {
 }
 
 .middle-section {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    flex: 1;
 }
 
-.middle-top, .middle-bottom {
-    flex: 1;
+
+.middle-top,
+.middle-bottom {
     background-color: #e0e0e0;
     padding: 20px;
     border-radius: 10px;
-    max-height: 245px;
-    max-width: 600px;
+    height: 245px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.middle-bottom iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
 }
 
 .food-image {
-    flex: 2;
+    flex: 1;
+    max-width: 600px;
+    height: 510px; /* Match combined height of top + bottom */
     background-color: #d6d6d6;
     padding: 20px;
     border-radius: 10px;
-    max-height: 500px;
-    max-width: 600px;
+    box-sizing: border-box;
 }
 
 .recipeSuggestions {
@@ -99,7 +106,6 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    
 }
 .suggestion-box p {
     margin-top: 5px;
@@ -183,4 +189,33 @@ h2{
     font-size: 16px;
     color: #FFD700;
 }
+.youtube-thumbnail {
+    margin-top: 10px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
 
+@media screen and (max-width: 768px) {
+    .recipe-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ingredients-instructions,
+    .middle-section,
+    .food-image {
+        max-width: 100%;
+    }
+
+    .suggestions-container {
+        gap: 20px;
+    }
+}
+.side-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex: 1;
+}

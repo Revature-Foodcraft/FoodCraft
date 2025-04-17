@@ -25,7 +25,9 @@ const CuisineSelect: React.FC = () => {
     useEffect(() => {
         getCuisines();
     }, []);
-
+    // useEffect(() => {
+    //         console.log("Selected Cuisine:", selectedCuisine);
+    //     }, [selectedCuisine]);
     const handleSelect = (cuisineId: string) => {
         setSelectedCuisine((prev: string) => (prev === cuisineId ? "" : cuisineId));
     };

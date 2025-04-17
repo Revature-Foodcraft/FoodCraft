@@ -33,7 +33,7 @@ describe('loginUser', () => {
         expect(jwt.sign).toHaveBeenCalledWith(
             { userId: mockUser.PK },
             process.env.SECRET_KEY,
-            { expiresIn: '1h' }
+            { expiresIn: '5h' }
         );
         expect(result).toEqual({
             success: true,

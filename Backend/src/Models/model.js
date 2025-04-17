@@ -446,13 +446,13 @@ async function getUserByGoogleId(googleId) {
 /**
  * @async
  * @function addIngredientToFridge
- * @description Adds an ingredient to the user's fridge if not there. If the ingredient already exists, updates the amount and unit.
+ * @description Adds an ingredient to the user's fridge if not there. if ingredient already in the fridge add amount to it
  * @param {string} userId - The ID of the user.
  * @param {Object} ingredient - The ingredient object to add.
  * {
- *   id: "123",
- *   amount: "4",
- *   unit: "g"
+ * id:"123",
+ * amount:4
+ *
  * }
  * @returns {Promise<Array|null>} - Updated fridge array or null if an error occurs.
  */
@@ -472,9 +472,7 @@ async function addIngredientToFridge(userId, ingredient) {
 
         const existingIndex = currentFridge.findIndex((item) => item.id === ingredient.id);
         if (existingIndex !== -1) {
-            currentFridge[existingIndex].amount = ingredient.amount;
-            currentFridge[existingIndex].unit = ingredient.unit; // Ensure unit is updated
-
+            currentFridge[existingIndex].amount += ingredient.amount;
             const updateExistingCommand = new UpdateCommand({
                 TableName: tableName,
                 Key: {
@@ -488,7 +486,9 @@ async function addIngredientToFridge(userId, ingredient) {
                 ReturnValues: "ALL_NEW",
             });
             const updateResponse = await documentClient.send(updateExistingCommand);
+            logger.info(`Updated ingredient amount in fridge for user ${userId}`);
             return updateResponse.Attributes.fridge;
+
         }
 
         const addCommand = new UpdateCommand({
@@ -505,12 +505,15 @@ async function addIngredientToFridge(userId, ingredient) {
             },
             ReturnValues: "ALL_NEW",
         });
+
         const addResponse = await documentClient.send(addCommand);
+        logger.info(`Successfully added ingredient to fridge for user ${userId}`);
         return addResponse.Attributes.fridge;
     } catch (error) {
         logger.error(`Error adding ingredient to fridge for user ${userId}: ${error.message}`);
         return null;
     }
+
 }
 
 /**
@@ -563,54 +566,53 @@ async function removeIngredientFromFridge(userId, ingredientId) {
  * @description Changes the amount of an ingredient stored in the fridge.
  * @function updateIngredientFromFridge
  * @param {string} userId - The ID of the user.
- * @param {object} ingredient - The ingredient object with updated amount and unit.
+ * @param {object} ingredient - The ingredient object with updated amount.
+ * @example
  * {
  *   id: "123",
- *   amount: "5",
- *   unit: "kg"
+ *   amount: 5
  * }
  * @returns {Promise<Array|null>} - The updated fridge array or null if an error occurs.
  */
 async function updateIngredientFromFridge(userId, ingredient) {
-    const getCommand = new GetCommand({
+    const user = await getUser(userId);
+    if (!user || !user.fridge) {
+        logger.warn(`User ${userId} not found or fridge is empty.`);
+        return null;
+    }
+
+    const fridgeCopy = [...user.fridge];
+    const index = fridgeCopy.findIndex((ing) => ing.id === ingredient.id);
+    if (index === -1) {
+        logger.warn(
+            `Ingredient ${ingredient.id} not found in fridge for user ${userId}`
+        );
+        return null;
+    }
+
+    fridgeCopy[index].amount = ingredient.amount;
+
+    const command = new UpdateCommand({
         TableName: tableName,
         Key: {
-            PK: userId,
+            PK: `${userId}`,
             SK: "PROFILE",
         },
-        ProjectionExpression: "fridge",
+        UpdateExpression: "SET fridge = :updatedFridge",
+        ExpressionAttributeValues: {
+            ":updatedFridge": fridgeCopy,
+        },
+        ReturnValues: "ALL_NEW",
     });
 
     try {
-        const currentResponse = await documentClient.send(getCommand);
-        const currentFridge = (currentResponse.Item && currentResponse.Item.fridge) || [];
-
-        const index = currentFridge.findIndex((item) => item.id === ingredient.id);
-        if (index === -1) {
-            logger.warn(`Ingredient ${ingredient.id} not found in fridge for user ${userId}`);
-            return null;
-        }
-
-        currentFridge[index].amount = ingredient.amount;
-        currentFridge[index].unit = ingredient.unit;
-
-        const updateCommand = new UpdateCommand({
-            TableName: tableName,
-            Key: {
-                PK: userId,
-                SK: "PROFILE",
-            },
-            UpdateExpression: "SET fridge = :updatedFridge",
-            ExpressionAttributeValues: {
-                ":updatedFridge": currentFridge,
-            },
-            ReturnValues: "ALL_NEW",
-        });
-
-        const updateResponse = await documentClient.send(updateCommand);
-        return updateResponse.Attributes.fridge;
+        const response = await documentClient.send(command);
+        logger.info(`Successfully updated ingredient in fridge for user ${userId}`);
+        return response.Attributes.fridge;
     } catch (error) {
-        logger.error(`Error updating ingredient in fridge for user ${userId}: ${error.message}`);
+        logger.error(
+            `Error updating ingredient in fridge for user ${userId}: ${error.message}`
+        );
         return null;
     }
 }
@@ -670,7 +672,7 @@ async function createRecipe(recipe) {
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe,
-        ReturnValues: "ALL_NEW", // Ensures attributes are returned
+        ReturnValues: "NONE", // Ensures attributes are returned
     });
 
 
@@ -1022,7 +1024,7 @@ async function createReview(review) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Succesfully created review ${review.PK}`);
-        return response.Attributes;
+        return true;
     } catch (error) {
         logger.error(`Error while creating a review: ${error.message}`);
         return null;
@@ -1331,6 +1333,36 @@ async function getDailyMacros(userId) {
         return null;
     }
 }
+/**
+ * Retrieves all review items for a given recipe by querying the Global Secondary Index.
+ *
+ * @param {string} recipeId - The recipe identifier to fetch reviews for.
+ * @returns {Promise<Array>} - An array of review items.
+ * @throws Will throw an error if the query fails.
+ */
+export async function getReviewsByRecipe(recipeId) {
+    // Build the QueryCommand parameters.
+    const command = new QueryCommand({
+        TableName: tableName,
+        IndexName: "ReviewsIndex", // The GSI that has recipeId as its partition key.
+        KeyConditionExpression: "recipeId = :recipeId",
+        ExpressionAttributeValues: {
+            ":recipeId": recipeId,
+        },
+        // Optionally sort in descending order if you want the most recent reviews first (assuming dateCreated or similar is used as the sort key in the index)
+        ScanIndexForward: false,
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        // Return the items found, or an empty array if none are found.
+        return response.Items || [];
+    } catch (error) {
+        // Bubble up the error to the caller.
+        throw new Error(`Error retrieving reviews for recipe ${recipeId}: ${error.message}`);
+    }
+}
+
 
 /**
  * Updates the macro goals for a user.
@@ -1383,6 +1415,7 @@ export {
     deleteSavedRecipe,
     getUserByGoogleId,
 
+
     // Recipe-related functions
     createRecipe,
     getRecipe,
@@ -1406,8 +1439,10 @@ export {
     updateIngredientFromFridge,
     getAllIngredientsFromFridge,
 
-    // Macro Functions
+    //Macro Functions
     updateMacros,
     getDailyMacros,
     updateGoals
 };
+
+

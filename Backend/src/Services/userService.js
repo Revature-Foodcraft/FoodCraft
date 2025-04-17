@@ -16,8 +16,9 @@ export async function createUser({ username, password, email = "", firstname = "
     const exist = await model.getUserByUsername(username)
 
     if (!exist) {
+        let id = uuidv4();
         const userObj = {
-            PK: uuidv4(),
+            PK: id,
             SK: "PROFILE",
             username,
             password: hashPass,
@@ -26,6 +27,7 @@ export async function createUser({ username, password, email = "", firstname = "
                 lastname,
                 email
             },
+            user_id: id,
             picture,
             fridge: [],
             recipes: [],
@@ -162,8 +164,9 @@ export async function getAccount({ email, googleId, firstname = '', lastname = '
 
         return { success: true, message: "User Found", token: token }
     } else {
+        let id = uuidv4();
         const userObj = {
-            PK: uuidv4(),
+            PK: id,
             SK: "PROFILE",
             username: email,
             googleId,
@@ -173,6 +176,7 @@ export async function getAccount({ email, googleId, firstname = '', lastname = '
                 email,
             },
             picture: "",
+            user_id: id,
             fridge: [],
             recipes: [],
             daily_macros: {}
