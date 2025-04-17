@@ -306,6 +306,7 @@ async function getSavedRecipes(userId) {
         }
 
         const savedRecipeIds = profileData.Item.recipes || [];
+
         if (savedRecipeIds.length === 0) {
             return [];
         }
@@ -314,6 +315,7 @@ async function getSavedRecipes(userId) {
             PK: recipeId,
             SK: "RECIPE",
         }));
+
 
         const batchParams = {
             RequestItems: {

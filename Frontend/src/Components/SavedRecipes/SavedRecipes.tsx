@@ -5,88 +5,88 @@ import "../../css/SavedRecipes.css"
 import { Link } from 'react-router-dom';
 
 interface Recipe {
-   PK: string;
+  PK: string;
   name?: string;
   user_id?: string;
   description?: string;
 }
- 
+
 
 const SavedRecipes: React.FC = () => {
 
-    const [recipes, setRecipes] = React.useState<Recipe[]>([]);
-      const [loading, setLoading] = React.useState(true);
+  const [recipes, setRecipes] = React.useState<Recipe[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState('');
 
-    React.useEffect(() => {
+  React.useEffect(() => {
     const fetchRecipes = async () => {
-  try { 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error("No token found in localStorage");
-    }
-
-    const response = await fetch("http://localhost:5000/account/recipes", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    
-    if (!response.ok) {
-      let errorMessage = "";
       try {
-        const errorData = await response.json();
-        errorMessage = errorData.message ? errorData.message : "";
-      } catch (jsonError) {
-        errorMessage = "An unknown error occurred";
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
+
+        const response = await fetch("http://localhost:5000/user/recipes", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          let errorMessage = "";
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message ? errorData.message : "";
+          } catch (jsonError) {
+            errorMessage = "An unknown error occurred";
+          }
+          throw new Error(`${errorMessage}`);
+        }
+
+        const data = await response.json();
+        if (!data.recipes) {
+          throw new Error("Response does not contain recipes");
+        }
+
+        setRecipes(data.recipes);
+      } catch (err: any) {
+        console.error("Error fetching recipes:", err);
+        setError(`Failed to load recipes. ${err.message}`);
+      } finally {
+        setLoading(false);
       }
-      throw new Error(`${errorMessage}`);
-    }
-    
-    const data = await response.json();
-    if (!data.recipes) {
-      throw new Error("Response does not contain recipes");
-    }
-    
-    setRecipes(data.recipes);
-  } catch (err: any) {
-    console.error("Error fetching recipes:", err);
-    setError(`Failed to load recipes. ${err.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
+    };
 
     fetchRecipes();
   }, []);
 
 
-    return (
-        <div className='container'>
-            <div className='row text-center'>
-                <h3>Saved Recipes</h3>
-            </div>
+  return (
+    <div className='container'>
+      <div className='row text-center'>
+        <h3>Saved Recipes</h3>
+      </div>
 
-            {loading && (
+      {loading && (
         <div className='row'>
           <p>Loading recipes...</p>
         </div>
       )}
- {error && (
+      {error && (
         <div className='row'>
           <p className='text-danger'>{error}</p>
         </div>
       )}
 
-            
 
-            <div className="row" id="card-container">
+
+      <div className="row" id="card-container">
         {recipes.map((recipe) => {
           const title = recipe.name || recipe.name || "Untitled Recipe";
           const author = recipe.user_id || recipe.user_id || "Unknown Author";
-          
+
 
           return (
             <RecipeCard
@@ -104,13 +104,13 @@ const SavedRecipes: React.FC = () => {
         })}
       </div>
 
-            <div className='row m-3' >
-              <Link to="saveRecipe">
-                <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>Create new recipe</button>
-               </Link> 
-            </div>
-       </div>
-    )
+      <div className='row m-3' >
+        <Link to="saveRecipe">
+          <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>Create new recipe</button>
+        </Link>
+      </div>
+    </div>
+  )
 }
 
 export default SavedRecipes
