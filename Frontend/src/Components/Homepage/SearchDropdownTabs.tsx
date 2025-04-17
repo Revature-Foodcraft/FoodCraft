@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MealCategorySelect from "../Homepage/MealCategorySelect";
 import CuisineSelect from "../Homepage/CuisineSelect";
+import SortByDropdown from "./SortByDropdown";
 
 const SearchDropdownTabs: React.FC = () => {
     const [activeTab, setActiveTab] = useState<"meal" | "cuisine">("meal");
@@ -8,7 +9,7 @@ const SearchDropdownTabs: React.FC = () => {
         <div className="dropdownMenu">
             <div className="row">
                 {/* Sidebar Tabs */}
-                <div className="col-3 border-end">
+                <div className="col-3 border-end"> 
                     <ul className="nav flex-column nav-pills">
                         <li className="nav-item">
                             <button

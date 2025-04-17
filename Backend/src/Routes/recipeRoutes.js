@@ -1,7 +1,7 @@
 import express from 'express';
 import {
     getRecipe, createRecipe, updateRecipe,
-    createReview, getReviewsByRecipe
+    createReview, getReviewsByRecipe,getRecipes
 } from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js';
 
@@ -357,7 +357,7 @@ const recipeRouter = express.Router();
 recipeRouter.post('/addRecipe', authenticateToken, createRecipe);
 recipeRouter.get('/:recipeId', getRecipe);
 recipeRouter.put("/update/:recipeID", authenticateToken, updateRecipe);
-
+recipeRouter.get("/", getRecipes)
 recipeRouter.post(
     "/:recipeId/reviews",
     authenticateToken,

@@ -8,6 +8,7 @@ import CuisineSelect from './Homepage/CuisineSelect';
 import MealCategorySelect from './Homepage/MealCategorySelect';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SearchDropdownTabs from './Homepage/SearchDropdownTabs';
+import SortByDropdown from './Homepage/SortByDropdown';
 
 
 const Header: React.FC = () => {
@@ -63,7 +64,9 @@ const Header: React.FC = () => {
                                     placeholder="Search for recipes..."
                                     onChange={handleSearchChange}
                                 />
+                                <SortByDropdown/>
                                 <DisplayRecipe searchQuery={searchQuery} />
+                                
                                 </DisplayContext.Provider>
                             </div>
                         )}     
