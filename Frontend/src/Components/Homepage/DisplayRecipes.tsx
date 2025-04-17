@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {Pagination} from "react-bootstrap";
 import Fuse from "fuse.js";
 import { DisplayContext } from "../Contexts";
@@ -17,7 +17,8 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
     const [recipes, setRecipes] = useState<any[]>([])
     const[currentPage,setCurrentPage] = useState(1)
     const itemsPerPage = 18
-    
+    const hasSearched = useRef(false)
+
     const getRecipes = async () => {
         try {
             const searchParam = new URLSearchParams()
@@ -48,21 +49,29 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
 
     const getRecipesFromAPI = async () => {
         const searchParam = new URLSearchParams
-        if(selectedCuisine){
-            searchParam.append("a",selectedCuisine)
+        let baseURL = 'https://www.themealdb.com/api/json/v1/1/filter.php'
+        if(searchQuery){
+            searchParam.append("s", searchQuery)  
+            baseURL = 'https://www.themealdb.com/api/json/v1/1/search.php'
+        }else{
+            if(selectedCuisine){
+                searchParam.append("a",selectedCuisine)
+            }
+            if(mealCategory){
+                searchParam.append("c",mealCategory)
+            }
         }
-        if(mealCategory){
-            searchParam.append("c",mealCategory)
-        }
+        
+        
         try{
-            const data = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?${searchParam.toString()}`,{
+            const data = await fetch(`${baseURL}?${searchParam.toString()}`,{
             method:"GET"
             })
 
             const response = await data.json()
 
             const apiRecipes:any = []
-
+            console.log(response)
             response.meals.forEach( (meal:any)  => {
                 apiRecipes.push({
                     PK: meal.idMeal,
@@ -80,15 +89,34 @@ const DisplayRecipe: React.FC<SearchProp> = ({searchQuery})=>{
 
     }
     useEffect(()=>{
+        console.log("call from cuisine effect")
         getRecipes()
     },[selectedCuisine,mealCategory])
 
+    useEffect(()=>{
+        hasSearched.current = false
+        if(!searchQuery){
+            getRecipes()
+            console.log("call from search")
+            hasSearched.current = true
+        }
+    },[searchQuery])
+    
     const fuseOptions = {
         keys:['name'],
         threshold:0.4
     }
     const fuse = new Fuse(recipes,fuseOptions)
     const filteredRecipes = searchQuery ? fuse.search(searchQuery).map((result)=>result.item):recipes
+    
+    useEffect(() => {
+        if (searchQuery && filteredRecipes.length === 0 && !hasSearched.current) {
+            console.log("Filtered recipes are empty. Automatically searching MealDB.");
+            hasSearched.current = true;
+            getRecipesFromAPI();
+        } 
+    }, [filteredRecipes, searchQuery]);
+
     const totalPages = Math.ceil(filteredRecipes.length/itemsPerPage)
     const currentRecipes = filteredRecipes.slice((currentPage - 1) * itemsPerPage,currentPage * itemsPerPage);
     if(sortBy == "Rating"){
