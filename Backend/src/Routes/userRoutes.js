@@ -664,7 +664,7 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
 /**
  * @swagger
  * /user/recipes:
- *   POST:
+ *   post:
  *     summary: Retrieve all saved recipes for the authenticated user.
  *     description: Fetches a list of recipes saved by the authenticated user.
  *     security:
@@ -678,10 +678,10 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
  *             properties:
  *               recipeId:
  *                 type: string
- *                 description: recipe ID. Required.
+ *                 description: Recipe ID. Required.
  *     responses:
  *       200:
- *         description: message saying successfully added
+ *         description: Message saying successfully added
  *         content:
  *           application/json:
  *             schema:
@@ -690,9 +690,9 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
  *                 success:
  *                   type: boolean
  *                   example: true
- *                message:
- *                 type: string
- *                 example:"Recipe successfully added to list"
+ *                 message:
+ *                   type: string
+ *                   example: Recipe successfully added to list
  *       401:
  *         description: Unauthorized. Missing or invalid token.
  *         content:
@@ -725,9 +725,9 @@ userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
 /**
  * @swagger
  * /user/recipes:
- *   Delete:
- *     summary: delete recipe from the list
- *     description: delete recipe from the saved list
+ *   delete:
+ *     summary: Delete recipe from the list
+ *     description: Delete recipe from the saved list
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -742,7 +742,7 @@ userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
  *                 description: Recipe ID. Required.
  *     responses:
  *       200:
- *         description: message saying successfully deleted
+ *         description: Message saying successfully deleted
  *         content:
  *           application/json:
  *             schema:
@@ -751,9 +751,9 @@ userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
  *                 success:
  *                   type: boolean
  *                   example: true
- *                message:
- *                 type: string
- *                 example:"Recipe Successfully deleted from list"
+ *                 message:
+ *                   type: string
+ *                   example: Recipe successfully deleted from list
  *       401:
  *         description: Unauthorized. Missing or invalid token.
  *         content:
@@ -781,5 +781,6 @@ userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
  *                   type: string
  *                   example: Internal server error
  */
+
 userRouter.delete('/user/recipes', authenticateToken, deleteSavedRecipe);
 export default userRouter;

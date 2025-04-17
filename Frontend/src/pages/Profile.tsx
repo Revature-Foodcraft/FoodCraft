@@ -53,10 +53,11 @@ const Profile: React.FC = () => {
         headers:{"Authorization": `Bearer ${localStorage.getItem('token')}`,
           "googleToken": `Bearer ${credentialResponse.credential}`}
       })
-      
-      localStorage.removeItem('userInfo')
-      getUserInfo()
-      
+
+      if(response.status == 200){
+        localStorage.removeItem('userInfo')
+        getUserInfo()
+      }
     }catch(error:any){
       console.log(error.message)
     }

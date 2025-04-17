@@ -9,7 +9,21 @@ const Recipe: React.FC = () => {
     const [isApiRecipe, setIsApiRecipe] = useState(false);
 
     const handleSaveToList = async () => {
-        const response = await fetch("")
+        const response = await fetch("http://localhost:5000/user/recipes",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            },        
+            body:JSON.stringify({
+                "recipeId":id
+            })
+            
+        })
+
+        if(response.status == 200){
+            alert("Added to save list")
+        }
     }
     useEffect(() => {
         if (!id) return;
