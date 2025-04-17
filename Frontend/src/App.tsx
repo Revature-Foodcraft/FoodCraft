@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Header from './Components/Header';
 import Profile from './pages/Profile';
 import Recipe from './pages/Recipe';
-import CreateRecipe from './pages/createRecipe';
+import SaveRecipe from './pages/saveRecipe';
 import Reviews from './pages/Reviews'
 import { AuthContext } from './Components/Contexts';
 import { ProtectedRoute } from './Components/ProtectedRoutes';
@@ -42,7 +42,9 @@ const App: React.FC = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/recipes" element={<Recipe />} />
           <Route path="/recipes/reviews" element={<Reviews />}/>
-          <Route path="/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Account/></ProtectedRoute>} />
+          <Route path="/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Account/></ProtectedRoute>}>
+            <Route path="saveRecipe" element={<SaveRecipe />} />
+          </Route>
           <Route path="/recipe/:id" element={<Recipe/>}/>
           {/* <Route path='*' element={<Navigate to="/404"/>}/> */}
         </Routes>

@@ -13,7 +13,7 @@ export async function getRecipe({ recipeId }) {
             ? { success: true, recipe }
             : { success: false, code: 404, message: "Recipe not found" };
     } catch (error) {
-        console.error("Error fetching recipe:", error);
+        logger.error("Error fetching recipe:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
@@ -54,7 +54,7 @@ export async function createRecipe({
             ? { success: true, message: "Recipe created successfully", recipe: recipeObj }
             : { success: false, code: 500, message: "Failed to create recipe" };
     } catch (error) {
-        console.error("Error creating recipe:", error);
+        logger.error("Error creating recipe:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
@@ -76,7 +76,7 @@ export async function getSavedRecipes(userId) {
         return { success: true, recipes: response };
 
     } catch (error) {
-        console.error("Error fetching saved recipes:", error);
+        logger.error("Error fetching saved recipes:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
@@ -89,7 +89,7 @@ export async function updateRecipe(recipe) {
 
 export async function getRecipes(cuisine, category) {
     let recipes;
-    
+
     if (cuisine || category) {
         recipes = await model.getRecipesByParameters(cuisine, category)
     } else {
@@ -119,7 +119,7 @@ export async function deleteSavedRecipe(userId, recipeId) {
             return { success: false, code: 404, message: "Saved recipe not found" };
         }
     } catch (error) {
-        console.error("Error deleting saved recipe:", error);
+        logger.error("Error deleting saved recipe:", error);
         return { success: false, code: 500, message: "Internal server error" };
     }
 }

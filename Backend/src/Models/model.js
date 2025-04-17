@@ -657,7 +657,7 @@ async function createRecipe(recipe) {
     const command = new PutCommand({
         TableName: tableName,
         Item: recipe,
-        ReturnValues: "ALL_NEW", // Ensures attributes are returned
+        ReturnValues: "NONE", // Ensures attributes are returned
     });
 
 

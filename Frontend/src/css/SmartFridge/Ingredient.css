@@ -1,0 +1,88 @@
+/* Ingredient.css */
+
+.ingredient-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #fdf5e6;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.2s ease;
+}
+
+.ingredient-item:hover {
+  background-color: #f7e8d5;
+}
+
+.ingredient-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ingredient-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.ingredient-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.editable-text {
+  cursor: pointer;
+  padding: 2px 4px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.editable-text:hover {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+}
+
+.input-field {
+  width: 60%;
+  margin-right: 5px;
+  padding: 5px;
+}
+
+.btn-success {
+  background-color: #3182ce; /* Match color of 'add ingredient' button */
+  color: #fff;
+  border: none;
+  border-radius: 5px; /* Revert to original roundness */
+  padding: 5px 10px; /* Revert to original size */
+  font-size: 14px; /* Revert to original font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-success:hover {
+  background-color: #2b6cb0; /* Slightly darker blue on hover */
+}
+
+.ingredient-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ingredient-delete:hover {
+  background-color: #c53030;
+}
+
+.ingredient-delete svg {
+  font-size: 16px;
+}

@@ -28,9 +28,10 @@ export const createRecipe = async (req, res) => {
         name: Joi.string().required(),
         description: Joi.string().optional(),
         review_id: Joi.string().optional(),
+        category: Joi.string().optional(),
+        cuisine: Joi.string().optional(),
         ingredients: Joi.array().items(
             Joi.object({
-                category: Joi.string().required(),
                 name: Joi.string().required(),
                 amount: Joi.string().required()
             })
@@ -39,8 +40,8 @@ export const createRecipe = async (req, res) => {
         instructions: Joi.array().items(Joi.string()).optional(),
         pictures: Joi.array().items(
             Joi.object({
-                name: Joi.string().required(),
-                link: Joi.string().uri().required()
+                //name: Joi.string().required(),
+                link: Joi.string().pattern(/^https?:\/\/.+/).required()
             })
         ).optional(),
         rating: Joi.number().min(1).max(5).optional(),
@@ -132,21 +133,6 @@ export const getRecipes = async (req, res) => {
         res.status(200).json({ recipes: recipesList.recipes })
     } else {
         res.status(500).json({ message: "Failed to fetch recipes" })
-    }
-}
-
-export const getAllRecipes = async (req, res) => {
-    try {
-        const recipes = await recipeService.getAllRecipes();
-
-        if (recipes.success) {
-            return res.status(200).json({ success: true, recipes: recipes.recipes });
-        } else {
-            return res.status(404).json({ success: false, message: recipes.message });
-        }
-    } catch (error) {
-        console.error("Error fetching all recipes:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 

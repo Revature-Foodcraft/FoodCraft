@@ -4,7 +4,7 @@ import { authenticateToken } from "../Middleware/authTokenMiddleware.js"
 import { getAllIngredientsController } from "../Controller/ingredientController.js";
 
 const router = express.Router();
-router.use(authenticateToken)
+//router.use(authenticateToken)
 
 
 // This route will handle fetching all available ingredients

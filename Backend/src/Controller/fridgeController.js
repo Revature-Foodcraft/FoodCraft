@@ -5,9 +5,10 @@ export const addIngredientToFridge = async (req, res) => {
   const ingredientSchema = Joi.object({
     id: Joi.string().required(),
     amount: Joi.number().required(),
-    category: Joi.string().required,
+    category: Joi.string().required(),
+    name: Joi.string().required(),
+    unit: Joi.string().valid("g", "kg", "oz", "lb", "ml", "l", "qt").required(),
   });
-
 
   const { error, value } = ingredientSchema.validate(req.body);
 
@@ -75,7 +76,8 @@ export const removeIngredientFromFridge = async (req, res) => {
 export const updateIngredientFromFridge = async (req, res) => {
   const updateSchema = Joi.object({
     id: Joi.string().required(),
-    amount: Joi.string().required(),
+    amount: Joi.number().required(), // Ensure amount is validated as a number
+    unit: Joi.string().valid("g", "kg", "oz", "lb", "ml", "l", "qt").required(),
   });
 
   const { error, value } = updateSchema.validate(req.body);
@@ -99,7 +101,7 @@ export const updateIngredientFromFridge = async (req, res) => {
     if (result.success) {
       return res
         .status(200)
-        .json({ message: "Ingredient updated successfully", ingredient: result.ingredients });
+        .json({ message: "Ingredient updated successfully", ingredient: result.ingredient });
     } else {
       return res.status(result.code).json({ message: result.message });
     }

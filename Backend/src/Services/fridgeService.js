@@ -1,6 +1,4 @@
 import * as model from "../Models/model.js";
-import { v4 as uuidv4 } from 'uuid';
-
 
 async function addIngredient(userId, ingredient) {
   try {

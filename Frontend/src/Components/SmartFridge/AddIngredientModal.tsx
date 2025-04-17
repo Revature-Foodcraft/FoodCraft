@@ -1,12 +1,15 @@
 import React, { FormEvent, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/SmartFridge/SmartFridge.css";
+import "../../css/SmartFridge/AddIngredientModal.css";
 import { IngredientCategory } from "../../Types/Ingredient";
 
 interface AddIngredientModalProps {
     onSubmit: (newIngredient: {
         id: string;
-        amount: string;
+        amount: number;
+        category: string;
+        name: string;
+        unit: string;
     }) => void;
     onCancel: () => void;
 }
@@ -16,7 +19,8 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
         id: "",
         name: "",
         category: IngredientCategory.Meat,
-        amount: "",
+        amount: 0, // Changed to number
+        unit: "g",
     });
     const [suggestions, setSuggestions] = useState<
         Array<{ id: string; name: string }>
@@ -86,13 +90,21 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
 
     const handleFormSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!formData.id || !formData.amount) {
+
+        if (!formData.id || formData.amount <= 0 || !formData.name) { // Validate amount as a positive number
             console.error(
                 "Please select a suggested ingredient and fill all required fields."
             );
             return;
         }
-        onSubmit({ id: formData.id, amount: formData.amount });
+
+        onSubmit({
+            id: formData.id,
+            amount: formData.amount, // Ensure amount is passed as a number
+            category: formData.category || "Other",
+            name: formData.name,
+            unit: formData.unit,
+        });
     };
 
     return (
@@ -162,17 +174,36 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                         <div className="form-group">
                             <label>Amount:</label>
                             <input
-                                type="text"
+                                type="number"
                                 name="amount"
                                 value={formData.amount}
                                 onChange={(e) =>
-                                    setFormData((prev) => ({ ...prev, amount: e.target.value }))
+                                    setFormData((prev) => ({ ...prev, amount: Number(e.target.value) })) // Ensure amount is treated as a number
                                 }
                                 className="input-field"
                                 autoComplete="off"
                                 title=""
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label>Unit:</label>
+                            <select
+                                name="unit"
+                                value={formData.unit}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, unit: e.target.value }))
+                                }
+                                className="input-field"
+                            >
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                                <option value="ml">ml</option>
+                                <option value="l">l</option>
+                                <option value="qt">qt</option>
+                            </select>
                         </div>
                         <div className="modal-actions">
                             <button
