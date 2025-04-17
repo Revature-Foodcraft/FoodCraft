@@ -20,9 +20,10 @@ const MacroTracker: React.FC = () => {
     goals,
     updateGoals,
     fetchMacros,
+    goalsVisible,
+    setGoalsVisible
   } = useMacros();
 
-  const [goalsVisible, setGoalsVisible] = useState(false);
 
 
   const handleInputChange = (label: string, value: number) => {
