@@ -4,7 +4,6 @@ import Fuse from "fuse.js";
 import { DisplayContext } from "../Contexts";
 import { Link } from "react-router-dom";
 import StarRating from "../StarRating";
-import { CiSaveDown2 } from "react-icons/ci";
 
 interface SearchProp{
     searchQuery:string|null;

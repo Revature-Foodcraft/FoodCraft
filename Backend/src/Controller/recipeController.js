@@ -143,7 +143,7 @@ export const getRecipes = async (req, res) => {
 }
 
 export const deleteSavedRecipe = async (req, res) => {
-    const { recipeId } = req.params;
+    const { recipeId } = req.body;
     const { userId } = req.user;
 
     if (!recipeId) {
@@ -164,6 +164,26 @@ export const deleteSavedRecipe = async (req, res) => {
     }
 };
 
+export const updateSavedRecipe = async (req,res) => {
+    const {recipeId} = req.body
+    const {userId} = req.user
+
+    if(!recipeId){
+        return res.status(400).json({success:false, message:"Recipe ID is required"})
+    }
+    try{
+        const result = await recipeService.updateSavedRecipeList(recipeId,userId)
+
+        if(result.success){
+            return res.status(200).json({ success: true, message: "Recipe successfully added to list" });
+        }else{
+            return res.status(404).json({ success: false, message: result.message });
+        }
+    }catch (error){
+        console.error("Error adding to saved recipe:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+} 
 export const createReview = async (req, res) => {
     // 1. Validate request body
     const schema = Joi.object({
