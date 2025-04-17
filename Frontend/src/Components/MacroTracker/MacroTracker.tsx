@@ -79,7 +79,6 @@ const MacroTracker: React.FC = () => {
 
         {goalsVisible && (
           <div className="goal-input-wrapper">
-            <h5>Set Your Daily Goals</h5>
             <GoalInput currentGoals={goals} onSave={updateGoals} setGoalsVisible={setGoalsVisible} />
           </div>
         )}

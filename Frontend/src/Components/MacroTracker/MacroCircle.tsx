@@ -59,7 +59,7 @@ const MacroCircle: React.FC<MacroData> = ({ label, amount, goal }) => {
                     🔥
                 </text>
             </svg>
-            <div className="macro-circle-amount">{amount}/{goal}</div>
+            <div className="macro-circle-amount mt-4">{amount}/{goal}</div>
             <div className="macro-circle-label">{label}</div>
         </div>
     );
