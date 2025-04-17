@@ -1,4 +1,7 @@
 import React from 'react';
+import '../../css/AddToMacros.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 interface MacroData {
     label: string;
@@ -29,24 +32,26 @@ const AddToMacros: React.FC<AddToMacrosProps> = ({
     };
 
     return (
-        <div className="macro-inputs">
-            {macros.map(macro => (
-                <div key={macro.label}>
-                    <label htmlFor={macro.label}>{macro.label}</label>
-                    <input
-                        id={macro.label}
-                        type="number"
-                        value={inputValues[macro.label] || 0} // Default to 0 if undefined
-                        onChange={e =>
-                            onInputChange(
-                                macro.label,
-                                parseInt(e.target.value) || 0
-                            )
-                        }
-                    />
-                </div>
-            ))}
-            <button onClick={handleSubmit}>Add</button>
+        <div className="add-to-macros">
+            <div className="macro-inputs-row">
+                {macros.map(macro => (
+                    <div key={macro.label} className="macro-input">
+                        <label htmlFor={macro.label}>{macro.label}</label>
+                        <input
+                            id={macro.label}
+                            type="number"
+                            value={inputValues[macro.label] || 0} // Default to 0 if undefined
+                            onChange={e =>
+                                onInputChange(
+                                    macro.label,
+                                    parseInt(e.target.value) || 0
+                                )
+                            }
+                        />
+                    </div>
+                ))}
+            </div>
+            <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={handleSubmit}>Add</button>
         </div>
     );
 };

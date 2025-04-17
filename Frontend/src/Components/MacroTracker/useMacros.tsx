@@ -38,6 +38,7 @@ export const useMacros = (): UseMacrosReturn => {
     Protein: 0,
     Fats: 0,
     Carbs: 0,
+    Calories: 0, // Added Calories to ensure it is initialized
   });
   const [showInputs, setShowInputs] = useState<boolean>(false);
   const [goals, setGoals] = useState<Record<string, number>>({
@@ -105,7 +106,7 @@ export const useMacros = (): UseMacrosReturn => {
 
     const newProtein = currentProtein + inputValues.Protein;
     const newFats = currentFats + inputValues.Fats;
-    const newCarbs = currentCarbs + inputValues.Carbs;
+    const newCarbs = currentCarbs + inputValues.Carbs; // Corrected calculation
     const newCalories = currentCalories + inputValues.Calories;
 
     try {

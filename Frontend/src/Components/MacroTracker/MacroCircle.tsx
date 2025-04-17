@@ -1,6 +1,8 @@
 // MacroCircle.tsx
 import React from 'react';
-import './MacroTracker.css';
+import '../../css/MacroTracker.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 export interface MacroData {
     label: string;

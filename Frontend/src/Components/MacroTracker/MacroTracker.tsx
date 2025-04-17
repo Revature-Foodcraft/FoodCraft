@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import './MacroTracker.css';
+import React, { useEffect, useState } from 'react';
+import '../../css/MacroTracker.css';
 import AddToMacros from './AddToMacros';
 import MacroCircle, { MacroData } from './MacroCircle';
 import GoalInput from './GoalInput';
@@ -21,6 +21,9 @@ const MacroTracker: React.FC = () => {
     updateGoals,
     fetchMacros,
   } = useMacros();
+
+  const [goalsVisible, setGoalsVisible] = useState(false);
+
 
   const handleInputChange = (label: string, value: number) => {
     setInputValues(prev => ({
@@ -46,10 +49,16 @@ const MacroTracker: React.FC = () => {
         ))}
       </div>
 
-      <div className="macro-controls-wrapper">
-        <button className="macro-add-button" onClick={() => setShowInputs(!showInputs)}>
-          Add Macros
-        </button>
+      <div>
+        <div className="macro-controls-wrapper d-flex justify-content-between">
+          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={() => setShowInputs(!showInputs)}>
+            Add Macros
+          </button>
+          <button onClick={() => { setGoalsVisible(!goalsVisible); }} className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom">
+            Change Daily Goals
+          </button>
+        </div>
+
         {showInputs && (
           <AddToMacros
             macros={macros}
@@ -58,11 +67,13 @@ const MacroTracker: React.FC = () => {
             onSubmit={updateMacros}
           />
         )}
-      </div>
 
-      <div className="goal-input-wrapper">
-        <h5>Set Your Daily Goals</h5>
-        <GoalInput currentGoals={goals} onSave={updateGoals} />
+        {goalsVisible && (
+          <div className="goal-input-wrapper">
+            <h5>Set Your Daily Goals</h5>
+            <GoalInput currentGoals={goals} onSave={updateGoals} setGoalsVisible={setGoalsVisible} />
+          </div>
+        )}
       </div>
     </div>
   );

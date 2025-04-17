@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import './MacroTracker.css';
+import '../../css/MacroTracker.css';
+import '../../css/GoalInput.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 interface GoalInputProps {
     currentGoals: Record<string, number>;
     onSave: (newGoals: Record<string, number>) => void;
+    setGoalsVisible: (visible: boolean) => void; // Added setGoalsVisible prop
 }
 
-const GoalInput: React.FC<GoalInputProps> = ({ currentGoals, onSave }) => {
+const GoalInput: React.FC<GoalInputProps> = ({ currentGoals, onSave, setGoalsVisible }) => {
     const [goals, setGoals] = useState(currentGoals);
 
     const handleInputChange = (label: string, value: number) => {
@@ -18,6 +22,7 @@ const GoalInput: React.FC<GoalInputProps> = ({ currentGoals, onSave }) => {
 
     const handleSave = () => {
         onSave(goals);
+        setGoalsVisible(false); // Use setGoalsVisible prop to update visibility
     };
 
     return (
@@ -33,7 +38,7 @@ const GoalInput: React.FC<GoalInputProps> = ({ currentGoals, onSave }) => {
                     />
                 </div>
             ))}
-            <button onClick={handleSave}>Save Goals</button>
+            <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={handleSave}>Save Goals</button>
         </div>
     );
 };
