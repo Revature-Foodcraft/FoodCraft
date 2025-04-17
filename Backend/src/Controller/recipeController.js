@@ -23,7 +23,6 @@ export const getRecipe = async (req, res) => {
 };
 
 export const createRecipe = async (req, res) => {
-    //FIXME
     const recipeSchema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string().optional(),
