@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, updateGoals, authGoogle, linkGoogle } from '../Controller/userController.js';
-import { getSavedRecipes, deleteSavedRecipe } from '../Controller/recipeController.js';
+import { getSavedRecipes, deleteSavedRecipe , updateSavedRecipe} from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
 import { authenticateGoogleToken } from '../Middleware/googleAuthMiddleware.js';
@@ -664,14 +664,24 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
 /**
  * @swagger
  * /user/recipes:
- *   get:
+ *   POST:
  *     summary: Retrieve all saved recipes for the authenticated user.
  *     description: Fetches a list of recipes saved by the authenticated user.
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: string
+ *                 description: recipe ID. Required.
  *     responses:
  *       200:
- *         description: A list of saved recipes for the user.
+ *         description: message saying successfully added
  *         content:
  *           application/json:
  *             schema:
@@ -680,46 +690,9 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
  *                 success:
  *                   type: boolean
  *                   example: true
- *                 recipes:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "recipe-123"
- *                       name:
- *                         type: string
- *                         example: "Pasta"
- *                       description:
- *                         type: string
- *                         example: "A delicious pasta recipe."
- *                       ingredients:
- *                         type: array
- *                         items:
- *                           type: object
- *                           properties:
- *                             id:
- *                               type: string
- *                               example: "ingredient-1"
- *                             amount:
- *                               type: number
- *                               example: 2
- *                       instructions:
- *                         type: array
- *                         items:
- *                           type: string
- *                           example: "Boil water"
- *                       rating:
- *                         type: number
- *                         example: 4.5
- *                       category:
- *                         type: string
- *                         example: "Italian"
- *                       dateCreated:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-04-07T14:10:00.000Z"
+ *                message:
+ *                 type: string
+ *                 example:"Recipe successfully added to list"
  *       401:
  *         description: Unauthorized. Missing or invalid token.
  *         content:
@@ -747,5 +720,66 @@ userRouter.put('/macros/goals', authenticateToken, updateGoals);
  *                   type: string
  *                   example: Internal server error
  */
-userRouter.put('/user/recipes', authenticateToken, getSavedRecipes);
+userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
+
+/**
+ * @swagger
+ * /user/recipes:
+ *   Delete:
+ *     summary: delete recipe from the list
+ *     description: delete recipe from the saved list
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: string
+ *                 description: Recipe ID. Required.
+ *     responses:
+ *       200:
+ *         description: message saying successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                message:
+ *                 type: string
+ *                 example:"Recipe Successfully deleted from list"
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+userRouter.delete('/user/recipes', authenticateToken, deleteSavedRecipe);
 export default userRouter;

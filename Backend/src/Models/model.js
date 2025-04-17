@@ -351,40 +351,32 @@ async function getSavedRecipes(userId) {
 
 /**
  * @async
- * @function deleteSavedRecipe
- * @description Removes a recipe from the user's saved recipes list.
+ * @function updateSavedRecipeList
+ * @description Replace recipes list with new one.
  * @param {string} userId - The ID of the user.
- * @param {string} recipeId - The ID of the recipe to remove.
+ * @param {Array<string>} recipesList - List of saved Recipes
  * @returns {Promise<Array|null>} - The updated list of saved recipes or null if an error occurs.
  */
-async function deleteSavedRecipe(userId, recipeId) {
-    const user = await getUser(userId);
-    if (!user || !user.recipes) {
-        logger.warn(`User ${userId} not found or no saved recipes.`);
-        return null;
-    }
-
-    const updatedRecipes = user.recipes.filter((id) => id !== recipeId);
-
+async function updateSavedRecipeList(userId, recipesList) {
     const command = new UpdateCommand({
         TableName: tableName,
         Key: {
             PK: `${userId}`,
             SK: "PROFILE",
         },
-        UpdateExpression: "SET recipes = :updatedRecipes",
+        UpdateExpression: "SET recipes = :recipesList",
         ExpressionAttributeValues: {
-            ":updatedRecipes": updatedRecipes,
+            ":recipesList": recipesList,
         },
         ReturnValues: "ALL_NEW",
     });
 
     try {
         const response = await documentClient.send(command);
-        logger.info(`Successfully removed recipe ${recipeId} from user ${userId}'s saved recipes.`);
+        logger.info(`Successfully updated user ${userId}'s saved recipes list to ${recipesList}.`);
         return response.Attributes.recipes;
     } catch (error) {
-        logger.error(`Error removing recipe ${recipeId} for user ${userId}: ${error.message}`);
+        logger.error(`Error update saved recipe list for user ${userId}: ${error.message}`);
         return null;
     }
 }
@@ -1414,7 +1406,7 @@ export {
     getUserByUsername,
     updateUser,
     getSavedRecipes,
-    deleteSavedRecipe,
+    updateSavedRecipeList,
     getUserByGoogleId,
 
 

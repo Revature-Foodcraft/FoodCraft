@@ -109,7 +109,11 @@ export async function deleteSavedRecipe(userId, recipeId) {
     }
 
     try {
-        const result = await model.deleteSavedRecipe(userId, recipeId);
+        const recipesList = (await model.getUser(userId)).recipes
+        
+        const updatedRecipesList = recipesList.filter(recipe => recipe !== recipeId);
+
+        const result = await model.updateSavedRecipeList(userId, updatedRecipesList);
 
         if (result) {
             logger.info(`Deleted saved recipe with ID: ${recipeId} for user: ${userId}`);
@@ -123,7 +127,27 @@ export async function deleteSavedRecipe(userId, recipeId) {
         return { success: false, code: 500, message: "Internal server error" };
     }
 }
+export async function updateSavedRecipeList(recipeId,userId){
+    try{
+        const recipesList = (await model.getUser(userId)).recipes
 
+        console.log(recipesList)
+        recipesList.push(recipeId)
+
+        const result = await model.updateSavedRecipeList(userId,recipesList)
+        if(result){
+            logger.info(`Added recipe with ID: ${recipeId}  to save recipe list for user: ${userId}`);
+            return {success:true, message: "Succcessfully added to saved recipe list"}
+        }else{
+            logger.warn(`Failed to added recipe with ID: ${recipeId} to saved recipe list for user: ${userId}`);
+            return { success: false, code: 404, message: "Saved recipe not found" };
+        }
+        
+    }catch(error){
+        logger.error("Error adding to saved recipes:", error)
+        return {success:false, code:500, message: "Interal server error"}
+    }
+}
 /**
  * Creates a review as a separate record in the FoodCraft table.
  *
