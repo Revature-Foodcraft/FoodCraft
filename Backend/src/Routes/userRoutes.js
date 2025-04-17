@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, updateGoals, authGoogle, linkGoogle } from '../Controller/userController.js';
-import { getSavedRecipes, deleteSavedRecipe } from '../Services/recipeService.js';
+import { getSavedRecipes, deleteSavedRecipe } from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
 import { authenticateGoogleToken } from '../Middleware/googleAuthMiddleware.js';
