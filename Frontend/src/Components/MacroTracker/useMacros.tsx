@@ -26,11 +26,15 @@ interface UseMacrosReturn {
   updateMacros: () => Promise<void>;
   goals: Record<string, number>;
   updateGoals: (newGoals: Record<string, number>) => Promise<void>;
+  goalsVisible: boolean;
+  setGoalsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 
 export const useMacros = (): UseMacrosReturn => {
   const token = localStorage.getItem('token');
 
+  const [goalsVisible, setGoalsVisible] = useState<boolean>(false);
   const [macros, setMacros] = useState<MacroData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -184,5 +188,7 @@ export const useMacros = (): UseMacrosReturn => {
     updateMacros,
     goals,
     updateGoals,
+    goalsVisible,
+    setGoalsVisible
   };
 };
