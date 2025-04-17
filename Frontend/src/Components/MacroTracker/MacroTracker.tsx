@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import '../../css/MacroTracker.css';
 import AddToMacros from './AddToMacros';
 import MacroCircle, { MacroData } from './MacroCircle';
@@ -24,16 +24,24 @@ const MacroTracker: React.FC = () => {
     setGoalsVisible
   } = useMacros();
 
-
-
-  const handleInputChange = (label: string, value: number) => {
-    setInputValues(prev => ({
-      ...prev,
-      [label]: value,
-    }));
+  const handleToggleInputs = () => {
+    if (showInputs) {
+      setShowInputs(false);
+    } else {
+      setShowInputs(true);
+      setGoalsVisible(false);
+    }
   };
 
-  // Ensure macros are fetched only once when the component mounts
+  const handleToggleGoals = () => {
+    if (goalsVisible) {
+      setGoalsVisible(false);
+    } else {
+      setGoalsVisible(true);
+      setShowInputs(false);
+    }
+  };
+
   useEffect(() => {
     fetchMacros();
   }, []);
@@ -52,10 +60,10 @@ const MacroTracker: React.FC = () => {
 
       <div>
         <div className="macro-controls-wrapper d-flex justify-content-between">
-          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={() => setShowInputs(!showInputs)}>
+          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={handleToggleInputs}>
             Add Macros
           </button>
-          <button onClick={() => { setGoalsVisible(!goalsVisible); }} className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom">
+          <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={handleToggleGoals}>
             Change Daily Goals
           </button>
         </div>
@@ -64,7 +72,7 @@ const MacroTracker: React.FC = () => {
           <AddToMacros
             macros={macros}
             inputValues={inputValues}
-            onInputChange={handleInputChange}
+            onInputChange={(label, value) => setInputValues(prev => ({ ...prev, [label]: value }))}
             onSubmit={updateMacros}
           />
         )}

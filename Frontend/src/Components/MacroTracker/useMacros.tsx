@@ -34,7 +34,7 @@ interface UseMacrosReturn {
 export const useMacros = (): UseMacrosReturn => {
   const token = localStorage.getItem('token');
 
-  const [goalsVisible, setGoalsVisible] = useState(false);
+  const [goalsVisible, setGoalsVisible] = useState<boolean>(false);
   const [macros, setMacros] = useState<MacroData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
