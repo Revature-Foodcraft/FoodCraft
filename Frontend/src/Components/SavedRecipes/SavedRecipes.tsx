@@ -3,6 +3,7 @@ import RecipeCard from './RecipeCard.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../css/SavedRecipes.css"
 import { Link } from 'react-router-dom';
+import blankCookbook from "../../assets/blank_coockbook.png"
 
 interface Recipe {
   PK: string;
@@ -76,7 +77,10 @@ const SavedRecipes: React.FC = () => {
       )}
       {error && (
         <div className='row'>
-          <p className='text-danger'>{error}</p>
+          <p className='text-secondary'>
+            Oops! Looks like you haven't saved any recipes yet. Start building your collection now!
+          </p>
+          <img src={blankCookbook} alt="No Recipes Found" className="empty-recipes-img" />
         </div>
       )}
 
@@ -104,9 +108,11 @@ const SavedRecipes: React.FC = () => {
         })}
       </div>
 
-      <div className='row m-3' >
+      <div className='row m-3 text-center'>
         <Link to="saveRecipe">
-          <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>Create new recipe</button>
+          <button className='btn btn-primary btn-lg rounded-pill shadow-sm btn-custom'>
+            <span className="heavy-cross">✚</span>Add Recipe
+          </button>
         </Link>
       </div>
     </div>
