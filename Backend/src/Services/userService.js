@@ -37,10 +37,12 @@ export async function createUser({ username, password, email = "", firstname = "
                 protein: 0,
                 fats: 0,
                 carbs: 0,
+                calories: 0,
 
                 proteinGoal: 120,
                 fatsGoal: 70,
-                carbsGoal: 200
+                carbsGoal: 200,
+                caloriesGoal: 2000
             }
         }
 
