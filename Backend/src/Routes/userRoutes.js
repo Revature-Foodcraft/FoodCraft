@@ -661,4 +661,91 @@ userRouter.put('/macros', authenticateToken, updateMacros);
  */
 userRouter.put('/macros/goals', authenticateToken, updateGoals);
 
+/**
+ * @swagger
+ * /user/recipes:
+ *   get:
+ *     summary: Retrieve all saved recipes for the authenticated user.
+ *     description: Fetches a list of recipes saved by the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of saved recipes for the user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 recipes:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "recipe-123"
+ *                       name:
+ *                         type: string
+ *                         example: "Pasta"
+ *                       description:
+ *                         type: string
+ *                         example: "A delicious pasta recipe."
+ *                       ingredients:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
+ *                               example: "ingredient-1"
+ *                             amount:
+ *                               type: number
+ *                               example: 2
+ *                       instructions:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                           example: "Boil water"
+ *                       rating:
+ *                         type: number
+ *                         example: 4.5
+ *                       category:
+ *                         type: string
+ *                         example: "Italian"
+ *                       dateCreated:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-04-07T14:10:00.000Z"
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+userRouter.put('/user/recipes', authenticateToken, getSavedRecipes);
 export default userRouter;

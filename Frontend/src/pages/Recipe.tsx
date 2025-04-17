@@ -8,6 +8,9 @@ const Recipe: React.FC = () => {
     const [recipe, setRecipe] = useState<any>(null);
     const [isApiRecipe, setIsApiRecipe] = useState(false);
 
+    const handleSaveToList = async () => {
+        const response = await fetch("")
+    }
     useEffect(() => {
         if (!id) return;
 
@@ -71,10 +74,15 @@ const Recipe: React.FC = () => {
 
     return (
         <div className="containerRecipe">
-            <h1>{recipe.name}</h1>
+            <div className='d-flex justify-content-around'>
+                <h1>{recipe.name}</h1>
+                <button className='btn' onClick={handleSaveToList}><img src={"/src/assets/floppy.svg"}/> Save To Recipe List</button>
+            </div>
+            
             <div className="recipe-layout">
                 <div className="ingredients-instructions">
-                    <h3 className="recipe-name text-center">{recipe.name}</h3>
+                        <h3 className="recipe-name text-center">{recipe.name}</h3>
+                    
                     <div className="recipe-author">
                         <div className="author-avatar"></div>
                         <p className="author-name">Recipe By: User {recipe.user_id}</p>
