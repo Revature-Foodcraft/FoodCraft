@@ -1,6 +1,9 @@
 import express from 'express';
-import { getRecipe, createRecipe, updateRecipe, getAllRecipes } from '../Controller/recipeController.js';
-import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
+import {
+    getRecipe, createRecipe, updateRecipe, getAllRecipes,
+    createReview, getReviewsByRecipe
+} from '../Controller/recipeController.js';
+import { authenticateToken } from '../Middleware/authTokenMiddleware.js';
 
 /**
  * @swagger
@@ -351,8 +354,20 @@ import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
  */
 
 const recipeRouter = express.Router();
-recipeRouter.post('/addRecipe', authenticateToken, createRecipe)
+recipeRouter.post('/addRecipe', authenticateToken, createRecipe);
 recipeRouter.get('/:recipeId', getRecipe);
 recipeRouter.get('/', getAllRecipes);
-recipeRouter.put("/update/:recipeID", authenticateToken, updateRecipe)
+recipeRouter.put("/update/:recipeID", authenticateToken, updateRecipe);
+
+recipeRouter.post(
+    "/:recipeId/reviews",
+    authenticateToken,
+    createReview
+);
+recipeRouter.get(
+    "/:recipeId/reviews",
+    getReviewsByRecipe
+);
+
+
 export default recipeRouter;

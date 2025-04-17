@@ -1009,7 +1009,7 @@ async function createReview(review) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Succesfully created review ${review.PK}`);
-        return response.Attributes;
+        return true;
     } catch (error) {
         logger.error(`Error while creating a review: ${error.message}`);
         return null;
@@ -1316,6 +1316,36 @@ async function getDailyMacros(userId) {
     } catch (error) {
       logger.error(`Error retrieving daily_macros for user ${userId}: ${error.message}`);
       return null;
+    }
+  }
+
+  /**
+ * Retrieves all review items for a given recipe by querying the Global Secondary Index.
+ *
+ * @param {string} recipeId - The recipe identifier to fetch reviews for.
+ * @returns {Promise<Array>} - An array of review items.
+ * @throws Will throw an error if the query fails.
+ */
+export async function getReviewsByRecipe(recipeId) {
+    // Build the QueryCommand parameters.
+    const command = new QueryCommand({
+      TableName: tableName,
+      IndexName: "ReviewsIndex", // The GSI that has recipeId as its partition key.
+      KeyConditionExpression: "recipeId = :recipeId",
+      ExpressionAttributeValues: {
+        ":recipeId": recipeId,
+      },
+      // Optionally sort in descending order if you want the most recent reviews first (assuming dateCreated or similar is used as the sort key in the index)
+      ScanIndexForward: false,
+    });
+  
+    try {
+      const response = await documentClient.send(command);
+      // Return the items found, or an empty array if none are found.
+      return response.Items || [];
+    } catch (error) {
+      // Bubble up the error to the caller.
+      throw new Error(`Error retrieving reviews for recipe ${recipeId}: ${error.message}`);
     }
   }
   
