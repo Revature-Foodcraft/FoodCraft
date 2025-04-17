@@ -1,123 +1,92 @@
 import React from 'react';
-import RecipeCard from './RecipeCard';
+import RecipeCard from './RecipeCard.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import "../../css/SavedRecipes.css";
+import "../../css/SavedRecipes.css"
+import { Link } from 'react-router-dom';
 
 interface Recipe {
-  PK: string;
+   PK: string;
   name?: string;
   user_id?: string;
   description?: string;
 }
+ 
 
 const SavedRecipes: React.FC = () => {
-  const [recipes, setRecipes] = React.useState<Recipe[]>([]);
-  const [loading, setLoading] = React.useState(true);
+
+    const [recipes, setRecipes] = React.useState<Recipe[]>([]);
+      const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState('');
 
-  // Centralized fetch function
-  const fetchRecipes = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error("No token found in localStorage");
-      }
-
-      const response = await fetch("http://localhost:5000/user/recipes", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        let errorMessage = '';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message ? errorData.message : '';
-        } catch (jsonError) {
-          errorMessage = 'An unknown error occurred';
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      if (!data.recipes) {
-        throw new Error("Response does not contain recipes");
-      }
-
-      setRecipes(data.recipes);
-    } catch (err: any) {
-      console.error("Error fetching recipes:", err);
-      setError(`Failed to load recipes. ${err.message}`);
-    } finally {
-      setLoading(false);
+    React.useEffect(() => {
+    const fetchRecipes = async () => {
+  try { 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error("No token found in localStorage");
     }
-  };
 
-  // Initial data fetch on mount
-  React.useEffect(() => {
+    const response = await fetch("http://localhost:5000/account/recipes", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      let errorMessage = "";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message ? errorData.message : "";
+      } catch (jsonError) {
+        errorMessage = "An unknown error occurred";
+      }
+      throw new Error(`${errorMessage}`);
+    }
+    
+    const data = await response.json();
+    if (!data.recipes) {
+      throw new Error("Response does not contain recipes");
+    }
+    
+    setRecipes(data.recipes);
+  } catch (err: any) {
+    console.error("Error fetching recipes:", err);
+    setError(`Failed to load recipes. ${err.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
+
     fetchRecipes();
   }, []);
 
-  const onDeleteHandler = async (recipeId: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error("No token found in localStorage");
-      }
 
-      const response = await fetch(`http://localhost:5000/user/recipes/${recipeId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
+    return (
+        <div className='container'>
+            <div className='row text-center'>
+                <h3>Saved Recipes</h3>
+            </div>
 
-      if (!response.ok) {
-        let errorMessage = '';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message ? errorData.message : '';
-        } catch (jsonError) {
-          errorMessage = 'An unknown error occurred';
-        }
-        throw new Error(errorMessage);
-      }
-
-      await fetchRecipes();
-    } catch (err: any) {
-      console.error("Error deleting recipe:", err);
-      setError(`Failed to delete recipe. ${err.message}`);
-    }
-  };
-
-  return (
-    <div className='container'>
-      <div className='row text-center'>
-        <h3>Saved Recipes</h3>
-      </div>
-
-      {loading && (
+            {loading && (
         <div className='row'>
           <p>Loading recipes...</p>
         </div>
       )}
-      {error && (
+ {error && (
         <div className='row'>
           <p className='text-danger'>{error}</p>
         </div>
       )}
 
-      {/* Make sure the parent id matches the data-bs-parent in RecipeCard */}
-      <div className="accordion accordion-flush" id="accordionFlushExample">
+            
+
+            <div className="row" id="card-container">
         {recipes.map((recipe) => {
-          const title = recipe.name || "Untitled Recipe";
-          const author = recipe.user_id || "Unknown Author";
+          const title = recipe.name || recipe.name || "Untitled Recipe";
+          const author = recipe.user_id || recipe.user_id || "Unknown Author";
+          
 
           return (
             <RecipeCard
@@ -125,22 +94,23 @@ const SavedRecipes: React.FC = () => {
               title={title}
               author={author}
               id={recipe.PK}
-              description={recipe.description || "No description available"}
-              onDelete={() => onDeleteHandler(recipe.PK)}
+              description={
+                recipe.description ||
+                "No description available"
+              }
+              onDelete={() => console.log(`Delete recipe with id ${recipe.PK}`)}
             />
           );
         })}
       </div>
 
-      <div className='row m-3'>
-        <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>
-          Create new recipe
-        </button>
-      </div>
-    </div>
+            <div className='row m-3' >
+              <Link to="saveRecipe">
+                <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>Create new recipe</button>
+               </Link> 
+            </div>
+       </div>
+    )
+}
 
-
-  );
-};
-
-export default SavedRecipes;
+export default SavedRecipes

@@ -1,6 +1,6 @@
 import Joi from "joi";
 import * as recipeService from "../Services/recipeService.js";
-
+import {logger} from "../util/logger.js"; 
 export const getRecipe = async (req, res) => {
     const { recipeId } = req.params;
 
@@ -27,9 +27,10 @@ export const createRecipe = async (req, res) => {
         name: Joi.string().required(),
         description: Joi.string().optional(),
         review_id: Joi.string().optional(),
+        category: Joi.string().optional(),
+        cuisine: Joi.string().optional(),
         ingredients: Joi.array().items(
             Joi.object({
-                category: Joi.string().required(),
                 name: Joi.string().required(),
                 amount: Joi.string().required()
             })
@@ -38,8 +39,8 @@ export const createRecipe = async (req, res) => {
         instructions: Joi.array().items(Joi.string()).optional(),
         pictures: Joi.array().items(
             Joi.object({
-                name: Joi.string().required(),
-                link: Joi.string().uri().required()
+                //name: Joi.string().required(),
+                link: Joi.string().pattern(/^https?:\/\/.+/).required()
             })
         ).optional(),
         rating: Joi.number().min(1).max(5).optional(),
@@ -59,6 +60,7 @@ export const createRecipe = async (req, res) => {
 
     const recipeObj = {
         ...value,
+        reviews: [],
         dateCreated: new Date().toISOString()
     };
 
@@ -154,3 +156,85 @@ export const deleteSavedRecipe = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
+export const createReview = async (req, res) => {
+  // 1. Validate request body
+  const schema = Joi.object({
+    comment: Joi.string().min(1).required(),
+    rating:  Joi.number().min(1).max(5).required()
+  });
+
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    const messages = error.details.map(d => d.message.replace(/"/g, ""));
+    return res.status(400).json({ success: false, message: messages });
+  }
+
+  const { comment, rating } = value;
+  const { recipeId } = req.params;
+  const user_id = req.user.userId; // make sure your auth middleware sets req.user
+
+  if (!recipeId) {
+    return res.status(400).json({ success: false, message: "recipeId is required in the URL." });
+  }
+
+  try {
+    // 2. Call the service to create the review
+    
+    const result = await recipeService.createReview({
+        recipeId,
+        user_id: user_id,
+        comment,
+        rating
+    });
+
+    if (!result.success) {
+      // service should return { success: false, code, message }
+      return res
+        .status(result.code || 500)
+        .json({ success: false, message: result.message });
+    }
+
+    // 3. Return the newly created review
+    return res
+      .status(201)
+      .json({ success: true, review: result.review });
+  } catch (err) {
+    logger.error("Error in createReview controller:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+/**
+ * GET /recipes/:recipeId/reviews
+ * Retrieve all reviews for a given recipe
+ */
+export const getReviewsByRecipe = async (req, res) => {
+  const { recipeId } = req.params;
+
+  if (!recipeId) {
+    return res.status(400).json({ success: false, message: "recipeId is required in the URL." });
+  }
+
+  try {
+    const result = await recipeService.getReviewsByRecipe(recipeId);
+
+    if (!result.success) {
+      return res
+        .status(result.code || 500)
+        .json({ success: false, message: result.message });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, reviews: result.reviews });
+  } catch (err) {
+    logger.error("Error in getReviewsByRecipe controller:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+

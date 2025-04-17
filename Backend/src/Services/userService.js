@@ -13,8 +13,9 @@ export async function createUser({ username, password, email = "", firstname = "
     const exist = await model.getUserByUsername(username)
 
     if (!exist) {
+        let id = uuidv4();
         const userObj = {
-            PK: uuidv4(),
+            PK: id,
             SK: "PROFILE",
             username,
             password: hashPass,
@@ -23,6 +24,7 @@ export async function createUser({ username, password, email = "", firstname = "
                 lastname,
                 email
             },
+            user_id: id,
             picture,
             fridge: [],
             recipes: [],
@@ -139,7 +141,7 @@ export async function updateProfile(userId,{ username, firstname, lastname, emai
 
 export async function getAccount({email,googleId,firstname ='',lastname =''}) {
     const user = await model.getUserByGoogleId(googleId)
-
+    
     if(user){
         const token = jwt.sign({
             userId: user.PK
@@ -151,8 +153,9 @@ export async function getAccount({email,googleId,firstname ='',lastname =''}) {
         
         return {success:true, message:"User Found", token:token}
     }else{
+        let id = uuidv4();
         const userObj = {
-            PK: uuidv4(),
+            PK: id,
             SK: "PROFILE",
             username:email,
             googleId,
@@ -161,6 +164,7 @@ export async function getAccount({email,googleId,firstname ='',lastname =''}) {
                 lastname,
                 email,
             },
+            user_id: id,
             picture:"",
             fridge: [],
             recipes: [],

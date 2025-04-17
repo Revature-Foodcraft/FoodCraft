@@ -21,7 +21,6 @@ export async function getRecipe({ recipeId }) {
 export async function createRecipe({
     name,
     description,
-    reviews = [],
     ingredients = [],
     instructions = [],
     pictures = [],
@@ -38,7 +37,6 @@ export async function createRecipe({
         PK: uuidv4(),
         SK: "RECIPE",
         name,
-        reviews,
         description,
         ingredients,
         instructions,
@@ -123,5 +121,83 @@ export async function deleteSavedRecipe(userId, recipeId) {
     } catch (error) {
         logger.error("Error deleting saved recipe:", error);
         return { success: false, code: 500, message: "Internal server error" };
+    }
+}
+
+/**
+ * Creates a review as a separate record in the FoodCraft table.
+ *
+ * @param {Object} reviewData - Contains recipeId, user_id, and comment.
+ * @returns {Promise<Object>} Returns an object indicating success or error.
+ */
+export async function createReview({ recipeId, user_id, comment,rating }) {
+    // Validate required fields
+    if (!recipeId || !user_id || !comment|| !rating) {
+        return {
+            success: false,
+            code: 400,
+            message: "Missing required fields: recipeId, user_id, and comment are required"
+        };
+    }
+
+    // Build the review object
+    const reviewObj = {
+        PK: `REVIEW#${uuidv4()}`,      // Create a unique key for the review row.
+        SK: "REVIEW",                 // Use a constant to indicate this row is a review.
+        recipeId,                     // Include the recipeId so you can later query reviews for that recipe.
+        user_id,
+        comment,
+        rating,
+        dateCreated: new Date().toISOString(),
+    };
+
+    try {
+        const newReview = await model.createReview(reviewObj);
+        return newReview
+            ? {
+                  success: true,
+                  message: "Review created successfully",
+                  review: reviewObj
+              }
+            : {
+                  success: false,
+                  code: 500,
+                  message: "Failed to create review"
+              };
+    } catch (error) {
+        logger.error("Error creating review:", error);
+        return {
+            success: false,
+            code: 500,
+            message: "Internal server error"
+        };
+    }
+} 
+
+/**
+ * Retrieves all reviews for a given recipe.
+ *
+ * @param {string} recipeId - The ID of the recipe to fetch reviews for.
+ * @returns {Promise<Object>} Returns an object with success flag and reviews data.
+ */
+export async function getReviewsByRecipe(recipeId) {
+    if (!recipeId) {
+        return { success: false, code: 400, message: "Missing required field: recipeId" };
+    }
+
+    try {
+        // This model method should query your FoodCraft table using the configured GSI that indexes on recipeId.
+        const reviews = await model.getReviewsByRecipe(recipeId);
+        return {
+            success: true,
+            reviews
+        };
+    } catch (error) {
+        logger.error(`Error retrieving reviews for recipe ${recipeId}:`, error);
+        return {
+            success: false,
+            code: 500,
+            message: "Internal server error"
+        };
     }
 }
