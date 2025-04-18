@@ -27,17 +27,19 @@ const GoalInput: React.FC<GoalInputProps> = ({ currentGoals, onSave, setGoalsVis
 
     return (
         <div className="goal-inputs">
-            {Object.keys(goals).map(label => (
-                <div key={label}>
-                    <label htmlFor={label}>{label}</label>
-                    <input
-                        id={label}
-                        type="number"
-                        value={goals[label]}
-                        onChange={e => handleInputChange(label, parseInt(e.target.value) || 0)}
-                    />
-                </div>
-            ))}
+            <div className="macro-inputs-row">
+                {Object.keys(goals).map(label => (
+                    <div key={label} className="macro-input">
+                        <label htmlFor={label}>{label}</label>
+                        <input
+                            id={label}
+                            type="number"
+                            value={goals[label]}
+                            onChange={e => handleInputChange(label, parseInt(e.target.value) || 0)}
+                        />
+                    </div>
+                ))}
+            </div>
             <button className="btn btn-warning btn-lg rounded-pill shadow-sm btn-custom" onClick={handleSave}>Save Goals</button>
         </div>
     );

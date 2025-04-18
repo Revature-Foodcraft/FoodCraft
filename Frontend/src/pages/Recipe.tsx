@@ -11,6 +11,23 @@ const Recipe: React.FC = () => {
     const [isApiRecipe, setIsApiRecipe] = useState(false);
     const [similarRecipes, setSimilarRecipes] = useState<any[]>([]);
 
+    const handleSaveToList = async () => {
+        const response = await fetch("http://localhost:5000/user/recipes",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            },        
+            body:JSON.stringify({
+                "recipeId":id
+            })
+            
+        })
+
+        if(response.status == 200){
+            alert("Added to save list")
+        }
+    }
     useEffect(() => {
         if (!id) return;
     
@@ -102,10 +119,15 @@ const Recipe: React.FC = () => {
 
     return (
         <div className="containerRecipe">
-            <h1>{recipe.name}</h1>
+            <div className='d-flex justify-content-around'>
+                <h1>{recipe.name}</h1>
+                <button className='btn' onClick={handleSaveToList}><img src={"/src/assets/floppy.svg"}/> Save To Recipe List</button>
+            </div>
+            
             <div className="recipe-layout">
                 <div className="ingredients-instructions">
-                    <h3 className="recipe-name text-center">{recipe.name}</h3>
+                        <h3 className="recipe-name text-center">{recipe.name}</h3>
+                    
                     <div className="recipe-author">
                         <div className="author-avatar"></div>
                         <p className="author-name">Recipe By: User {recipe.user_id}</p>

@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, updateGoals, authGoogle, linkGoogle } from '../Controller/userController.js';
-import { getSavedRecipes, deleteSavedRecipe } from '../Services/recipeService.js';
+import { getSavedRecipes, deleteSavedRecipe , updateSavedRecipe} from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
 import { authenticateGoogleToken } from '../Middleware/googleAuthMiddleware.js';
@@ -661,4 +661,126 @@ userRouter.put('/macros', authenticateToken, updateMacros);
  */
 userRouter.put('/macros/goals', authenticateToken, updateGoals);
 
+/**
+ * @swagger
+ * /user/recipes:
+ *   post:
+ *     summary: Retrieve all saved recipes for the authenticated user.
+ *     description: Fetches a list of recipes saved by the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: string
+ *                 description: Recipe ID. Required.
+ *     responses:
+ *       200:
+ *         description: Message saying successfully added
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Recipe successfully added to list
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+userRouter.post('/user/recipes', authenticateToken, updateSavedRecipe);
+
+/**
+ * @swagger
+ * /user/recipes:
+ *   delete:
+ *     summary: Delete recipe from the list
+ *     description: Delete recipe from the saved list
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: string
+ *                 description: Recipe ID. Required.
+ *     responses:
+ *       200:
+ *         description: Message saying successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Recipe successfully deleted from list
+ *       401:
+ *         description: Unauthorized. Missing or invalid token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error occurred.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+userRouter.delete('/user/recipes', authenticateToken, deleteSavedRecipe);
 export default userRouter;

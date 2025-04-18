@@ -36,7 +36,7 @@ const AddToMacros: React.FC<AddToMacrosProps> = ({
             <div className="macro-inputs-row">
                 {macros.map(macro => (
                     <div key={macro.label} className="macro-input">
-                        <label htmlFor={macro.label}>{macro.label}</label>
+                        <label htmlFor={macro.label} className='fw-bold'>{macro.label}</label>
                         <input
                             id={macro.label}
                             type="number"
