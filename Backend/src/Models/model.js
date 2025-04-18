@@ -957,24 +957,30 @@ async function getAllRecipes() {
  */
 async function getRecipesByParameters(cuisine, category) {
     const filterExpression = [];
-    const expressionAttributeValue = {
+    const expressionAttributeValues = {
         ":SK": "RECIPE"
     };
+    const expressionAttributeNames = {};
 
     if (cuisine) {
-        filterExpression.push("cuisine = :cuisine");
-        expressionAttributeValue[":cuisine"] = cuisine;
+        filterExpression.push("#cuisine = :cuisine");
+        expressionAttributeValues[":cuisine"] = cuisine;
+        expressionAttributeNames["#cuisine"] = "cuisine";
     }
+
     if (category) {
-        filterExpression.push("category = :category");
-        expressionAttributeValue[":category"] = category;
+        filterExpression.push("#category = :category");
+        expressionAttributeValues[":category"] = category;
+        expressionAttributeNames["#category"] = "category";
     }
+
     const command = new QueryCommand({
         TableName: tableName,
         IndexName: "SK-index",
         KeyConditionExpression: "SK = :SK",
         FilterExpression: filterExpression.join(" AND "),
-        ExpressionAttributeValues: expressionAttributeValue
+        ExpressionAttributeValues: expressionAttributeValues,
+        ExpressionAttributeNames: expressionAttributeNames
     });
 
     try {

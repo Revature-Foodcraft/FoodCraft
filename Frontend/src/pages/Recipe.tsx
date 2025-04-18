@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import '../css/Recipe.css';
 import imageNotFound from '../assets/imageNotFound.jpg';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const Recipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<any>(null);
     const [isApiRecipe, setIsApiRecipe] = useState(false);
+    const [similarRecipes, setSimilarRecipes] = useState<any[]>([]);
 
     useEffect(() => {
         if (!id) return;
-
+    
         const isApi = window.location.pathname.includes("/recipe/api/");
         setIsApiRecipe(isApi);
-
+    
         if (isApi) {
             fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
                 .then(res => res.json())
@@ -36,18 +39,46 @@ const Recipe: React.FC = () => {
                             },
                             pictures: [ { link: meal.strMealThumb } ],
                             youtube: meal.strYoutube,
-                            user_id: "API"
+                            user_id: "API",
+                            category: meal.strCategory || "Unknown" // You might need to adjust this depending on your data
                         });
+    
+                        // Fetch similar recipes based on category
+                        fetchSimilarRecipes(meal.strCategory);
                     }
                 });
         } else {
             fetch(`http://localhost:5000/recipes/${id}`)
                 .then(response => response.json())
-                .then(data => setRecipe(data.recipe))
+                .then(data => {
+                    setRecipe(data.recipe);
+                    fetchSimilarRecipes(data.recipe.category); // fetch similar recipes based on category
+                })
                 .catch(error => console.error("Error fetching recipe:", error));
         }
     }, [id]);
-
+    
+    // New function to fetch similar recipes
+    const fetchSimilarRecipes = (category: string) => {
+        fetch(`http://localhost:5000/recipes?category=${category}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.recipes) {
+                    setSimilarRecipes(data.recipes.map((recipe: any) => ({
+                        id: recipe.PK, // 👈 This is the actual ID!
+                        name: recipe.name,
+                        picture: recipe.pictures?.[0] || imageNotFound,
+                        user_id: recipe.user_id
+                    })));
+                    
+                    
+                }
+            })
+            .catch(error => console.error("Error fetching similar recipes:", error));
+    };
+    
+    
+    
     if (!recipe) {
         return <p>Loading recipe...</p>;
     }
@@ -141,16 +172,36 @@ const Recipe: React.FC = () => {
             </div>
     
             <div className="recipeSuggestions">
-                <h2>Similar Recipes</h2>
-                <div className="suggestions-container">
-                    <div className="suggestion-box"><p>Lasagna</p></div>
-                    <div className="suggestion-box"><p>Orange Chicken</p></div>
-                    <div className="suggestion-box"><p>Pizza</p></div>
-                    <div className="suggestion-box"><p>Greek Salad</p></div>
-                    <div className="suggestion-box"><p>Chicken Sandwich</p></div>
-                    <div className="suggestion-box"><p>Fish Tacos</p></div>
-                </div>
-            </div>
+    <h2>Similar Recipes</h2>
+    <div className="suggestions-container">
+        {similarRecipes.length > 0 ? (
+            similarRecipes.map((similarRecipe, index) => (
+                <Link
+                    to={
+                        similarRecipe.user_id === "API"
+                            ? `/recipe/api/${similarRecipe.id}`
+                            : `/recipe/${similarRecipe.id}`
+                    }
+                    key={index}
+                    className="suggestion-box"
+                >
+                    <img
+                        src={similarRecipe.picture}
+                        alt={similarRecipe.name || "Recipe Image"}
+                        className="suggestion-image"
+                    />
+                    <p>{similarRecipe.name}</p>
+                </Link>
+            ))
+        ) : (
+            <p>No similar recipes found.</p>
+        )}
+    </div>
+    </div>
+
+
+
+
         </div>
     );
 }    

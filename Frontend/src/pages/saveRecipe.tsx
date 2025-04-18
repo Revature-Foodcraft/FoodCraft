@@ -97,7 +97,7 @@ const CreateRecipe: React.FC = () => {
         
         const recipeData = {
             name,
-            description,
+            // description,
             ingredients: formattedIngredients,
             macros,
             instructions,
@@ -142,7 +142,7 @@ const CreateRecipe: React.FC = () => {
                 />
             </div>
 
-            <div className="mb-4">
+            {/* <div className="mb-4">
                 <textarea
                     className="form-control"
                     rows={3}
@@ -150,7 +150,7 @@ const CreateRecipe: React.FC = () => {
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                 />
-            </div>
+            </div> */}
 
             <div className="row mb-3 g-3">
                 <h4>Type</h4>

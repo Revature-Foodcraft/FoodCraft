@@ -4,13 +4,31 @@
   align-items: center;
   padding-top: 40px;
   text-align: center;
+  
   background-color: #fff;
   min-height: 100vh;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
+  background-color: #dda663ee;
+  
 }
 
+.title, .featuredRecipies h2{
+  color: #ffffff;
+}
+
+body {
+  background-image: url('../assets/containerBackground.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: "Rockwell", "Georgia", serif;
+  
+  
+
+}
 .title {
   font-size: 2.5rem;
   margin-bottom: 40px;

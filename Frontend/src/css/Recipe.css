@@ -12,9 +12,16 @@ html, body {
 .containerRecipe {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100vh;
+
     background: white;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 1650px;
+    width: 100%;
+    background-color: #dda663ee;
 }
+
 
 .recipe-layout {
     display: flex;
@@ -34,7 +41,7 @@ html, body {
     border-radius: 10px;
     max-height: 500px;
     overflow-y: auto;
-    max-width: 800px;
+    max-width: 550px;
 }
 
 .middle-section {
@@ -47,7 +54,7 @@ html, body {
 
 .middle-top,
 .middle-bottom {
-    background-color: #e0e0e0;
+    background-color: #ffffffe7;
     padding: 20px;
     border-radius: 10px;
     height: 245px;
@@ -59,12 +66,15 @@ html, body {
     height: 100%;
     border-radius: 10px;
 }
+h1,h2{
+    color: #ffffff;
+}
 
 .food-image {
     flex: 1;
     max-width: 600px;
     height: 510px; /* Match combined height of top + bottom */
-    background-color: #d6d6d6;
+    background-color: #ffffffe7;
     padding: 20px;
     border-radius: 10px;
     box-sizing: border-box;
@@ -77,16 +87,17 @@ html, body {
 
 .suggestions-container {
     display: flex;
-    gap: 75px;
-    overflow-x: auto;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 30px;
     padding: 10px 0;
-    justify-content: center;
 }
+
 
 .suggestion-box {
     width: 180px; /* Adjust width as needed */
     height: 220px; /* Adjust height as needed */
-    background-color: #c7893e;
+    background-color: #ffffff;
     border-radius: 10px;
     overflow: hidden;
     display: flex;
@@ -201,16 +212,15 @@ h2{
     .recipe-layout {
         flex-direction: column;
         align-items: center;
+        padding: 10px;
     }
 
     .ingredients-instructions,
     .middle-section,
     .food-image {
         max-width: 100%;
-    }
-
-    .suggestions-container {
-        gap: 20px;
+        height: auto;
+        padding: 15px;
     }
 }
 .side-content-wrapper {
@@ -218,4 +228,16 @@ h2{
     flex-direction: row;
     gap: 20px;
     flex: 1;
+}
+@media screen and (max-width: 768px) {
+    .suggestions-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .suggestion-box {
+        width: 80%;
+        height: auto;
+    }
 }

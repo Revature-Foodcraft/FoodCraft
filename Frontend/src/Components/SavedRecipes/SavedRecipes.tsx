@@ -3,7 +3,7 @@ import RecipeCard from './RecipeCard.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../css/SavedRecipes.css"
 import { Link } from 'react-router-dom';
-
+import { Outlet } from 'react-router-dom';
 interface Recipe {
    PK: string;
   name?: string;
@@ -109,6 +109,7 @@ const SavedRecipes: React.FC = () => {
                 <button className='btn btn-warning btn-lg rounded-pill shadow-sm btn-custom'>Create new recipe</button>
                </Link> 
             </div>
+            <Outlet />
        </div>
     )
 }
