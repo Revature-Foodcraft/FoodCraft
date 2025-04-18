@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import RecipeCard from './RecipeCard.tsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../css/SavedRecipes.css"
@@ -16,11 +16,11 @@ interface Recipe {
 
 const SavedRecipes: React.FC = () => {
 
-  const [recipes, setRecipes] = React.useState<Recipe[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState('');
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchRecipes = async () => {
       try {
         const token = localStorage.getItem('token');
