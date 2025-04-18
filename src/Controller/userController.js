@@ -189,6 +189,70 @@ export const updateMacros = async (req, res) => {
   }
 };
 
+export const getUserById = async (req, res) => {
+  const { user_id } = req.params;
+
+  // 1. Basic param validation
+  if (!user_id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "User ID is required in the URL." });
+  }
+
+  try {
+    // 2. Call the service
+    const result = await userService.getUser(user_id);
+
+    if (!result.success) {
+      // userService should return { success: false, code?, message }
+      return res
+        .status(result.code || 404)
+        .json({ success: false, message: result.message });
+    }
+
+    // 3. Return the user object
+    return res
+      .status(200)
+      .json({ success: true, user: result.user });
+  } catch (err) {
+    logger.error("Error in getUserById controller:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const getUsersByIds = async (req, res) => {
+  const { ids } = req.query;
+  if (!ids) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Query parameter `ids` is required" });
+  }
+
+  // Split into an array and dedupe
+  const idArray = Array.from(new Set(ids.split(",")));
+
+  try {
+    const result = await userService.getUsersByIds(idArray);
+
+    if (!result.success) {
+      return res
+        .status(result.code || 500)
+        .json({ success: false, message: result.message });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, users: result.users });
+  } catch (err) {
+    logger.error("Error in getUsersByIds controller:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const updateGoals = async (req, res) => {
   const goalsSchema = Joi.object({
     proteinGoal: Joi.number().required(),

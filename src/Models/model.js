@@ -67,6 +67,24 @@ async function createUser(user) {
         return null;
     }
 }
+export async function batchGetUsers(idArray) {
+    const keys = idArray.map(id => ({
+      PK: id,
+      SK: "PROFILE",            // or whatever your user sort key is
+    }));
+  
+    const params = {
+      RequestItems: {
+        [tableName]: {
+          Keys: keys,
+        }
+      }
+    };
+  
+    const { Responses } = await documentClient.send(new BatchGetCommand(params));
+    // Responses[TABLE] is an array of user items
+    return Responses[tableName] || [];
+  }
 
 /**
  * @async

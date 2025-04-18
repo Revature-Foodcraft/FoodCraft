@@ -1,5 +1,6 @@
 import express from 'express';
-import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, updateGoals, authGoogle, linkGoogle } from '../Controller/userController.js';
+import { login, register, getProfile, updateProfile, getDailyMacros, updateMacros, 
+    updateGoals, authGoogle, linkGoogle, getUserById,  getUsersByIds} from '../Controller/userController.js';
 import { getSavedRecipes, deleteSavedRecipe , updateSavedRecipe} from '../Controller/recipeController.js';
 import { authenticateToken } from '../Middleware/authTokenMiddleware.js'
 import { upload } from '../util/multer.js';
@@ -114,6 +115,10 @@ userRouter.post('/users', register);
  *                   example: Error message
  */
 userRouter.post('/login', login);
+
+userRouter.get('/users/:user_id', getUserById)
+
+userRouter.get("/users", getUsersByIds);
 /**
  * @swagger
  * /auth/google:
