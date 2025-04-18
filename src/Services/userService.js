@@ -292,7 +292,7 @@ export async function updateMacros(userId, newDailyMacros) {
             return { success: false, code: 500, message: "Failed updating daily macros" };
         }
     } catch (error) {
-        console.error("Error in updateMacros service:", error);
+        logger.error("Error in updateMacros service:", error);
         return { success: false, code: 500, message: error.message };
     }
 }

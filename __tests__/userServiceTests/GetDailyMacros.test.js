@@ -1,107 +1,98 @@
-import {getDailyMacros} from "../../src/Services/userService.js";
+import { getDailyMacros } from "../../src/Services/userService.js";
 import * as model from "../../src/Models/model.js";
 
 jest.mock("../../src/Models/model.js")
 
 describe('getDailyMacros', () => {
-    afterEach(() => {
+    const userId = 'user1';
+    const fixedTime = new Date('2025-04-18T13:38:41.715Z');
+
+    beforeEach(() => {
         jest.clearAllMocks();
+        jest.useFakeTimers('modern');
+        jest.setSystemTime(fixedTime);
     });
 
-    it('should return null if no daily_macros are found for the user', async () => {
-        model.getDailyMacros.mockResolvedValue(null); 
+    afterEach(() => {
+        jest.useRealTimers();
+    });
 
-        const userId = '123';
+    it('should return null if model.getDailyMacros returns null', async () => {
+        model.getDailyMacros.mockResolvedValue(null);
 
         const result = await getDailyMacros(userId);
-
-        expect(model.getDailyMacros).toHaveBeenCalledWith(userId); 
+        expect(model.getDailyMacros).toHaveBeenCalledWith(userId);
         expect(result).toBeNull();
     });
 
-    it('should return the daily_macros as-is if the stored date is today', async () => {
-        const today = new Date().toISOString();
-        const mockDailyMacros = {
-            date: today,
-            protein: 50,
-            fats: 20,
-            carbs: 100,
+    it('should return dailyMacros if the stored date is today', async () => {
+        const dailyMacros = {
+            date: fixedTime.toISOString(),
+            protein: 100,
+            fats: 50,
+            carbs: 200,
+            calories: 1800,
         };
 
-        model.getDailyMacros.mockResolvedValue(mockDailyMacros); 
-
-        const userId = '123';
+        model.getDailyMacros.mockResolvedValue(dailyMacros);
 
         const result = await getDailyMacros(userId);
-
         expect(model.getDailyMacros).toHaveBeenCalledWith(userId);
-        expect(result).toEqual(mockDailyMacros); 
+        expect(model.updateMacros).not.toHaveBeenCalled();
+        expect(result).toEqual(dailyMacros);
     });
 
-    it('should reset and update daily_macros if the stored date is not today', async () => {
-        const fixedTimestamp = '2025-04-15T20:26:38.564Z';
-        jest.spyOn(Date, 'now').mockReturnValue(new Date(fixedTimestamp).getTime());
-
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const mockDailyMacros = {
-            date: yesterday.toISOString(),
-            protein: 50,
-            fats: 20,
-            carbs: 100,
+    it('should reset and update daily_macros if the stored date is not today and updateMacros returns an updated value', async () => {
+        const oldMacros = {
+            date: '2025-04-17T10:00:00.000Z',
+            protein: 120,
+            fats: 60,
+            carbs: 250,
+            calories: 2000,
         };
+        model.getDailyMacros.mockResolvedValue(oldMacros);
 
         const updatedDailyMacros = {
-            ...mockDailyMacros,
-            date: new Date().toISOString(),
+            ...oldMacros,
+            date: fixedTime.toISOString(),
             protein: 0,
             fats: 0,
             carbs: 0,
+            calories: 0,
         };
 
-        const mockUpdateResult = { daily_macros: updatedDailyMacros };
-
-        model.getDailyMacros.mockResolvedValue(mockDailyMacros); 
-        model.updateMacros.mockResolvedValue(mockUpdateResult); 
-
-        const userId = '123';
+        model.updateMacros.mockResolvedValue({ daily_macros: updatedDailyMacros });
 
         const result = await getDailyMacros(userId);
-
         expect(model.getDailyMacros).toHaveBeenCalledWith(userId);
         expect(model.updateMacros).toHaveBeenCalledWith(userId, updatedDailyMacros);
-        expect(result).toEqual(updatedDailyMacros); 
+        expect(result).toEqual(updatedDailyMacros);
     });
 
-    it('should return the updated daily_macros if updateMacros fails but values were reset', async () => {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const mockDailyMacros = {
-            date: yesterday.toISOString(),
-            protein: 50,
-            fats: 20,
-            carbs: 100,
+    it('should reset and return updated daily_macros if updateMacros returns a falsy update', async () => {
+        const oldMacros = {
+            date: '2025-04-17T09:00:00.000Z',
+            protein: 150,
+            fats: 70,
+            carbs: 300,
+            calories: 2200,
         };
+        model.getDailyMacros.mockResolvedValue(oldMacros);
 
         const updatedDailyMacros = {
-            ...mockDailyMacros,
-            date: new Date().toISOString(),
+            ...oldMacros,
+            date: fixedTime.toISOString(),
             protein: 0,
             fats: 0,
             carbs: 0,
+            calories: 0,
         };
 
-        model.getDailyMacros.mockResolvedValue(mockDailyMacros); 
-        model.updateMacros.mockResolvedValue(null); 
-
-        const userId = '123';
-
+        model.updateMacros.mockResolvedValue(null);
 
         const result = await getDailyMacros(userId);
-
-
         expect(model.getDailyMacros).toHaveBeenCalledWith(userId);
         expect(model.updateMacros).toHaveBeenCalledWith(userId, updatedDailyMacros);
-        expect(result).toEqual(updatedDailyMacros); 
+        expect(result).toEqual(updatedDailyMacros);
     });
 });
