@@ -123,8 +123,9 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                 <div className="modal-body">
                     <form onSubmit={handleFormSubmit}>
                         <div className="form-group" style={{ position: "relative" }}>
-                            <label>Name:</label>
+                            <label htmlFor="ingredient-name">Name:</label>
                             <input
+                                id="ingredient-name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
@@ -152,8 +153,9 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                             )}
                         </div>
                         <div className="form-group">
-                            <label>Category:</label>
+                            <label htmlFor="ingredient-category">Category:</label>
                             <select
+                                id="ingredient-category"
                                 name="category"
                                 value={formData.category}
                                 onChange={(e) =>
@@ -172,8 +174,9 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Amount:</label>
+                            <label htmlFor="ingredient-amount">Amount:</label>
                             <input
+                                id="ingredient-amount"
                                 type="number"
                                 name="amount"
                                 value={formData.amount}
@@ -187,8 +190,9 @@ function AddIngredientModal({ onSubmit, onCancel }: AddIngredientModalProps) {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Unit:</label>
+                            <label htmlFor="ingredient-unit">Unit:</label>
                             <select
+                                id="ingredient-unit"
                                 name="unit"
                                 value={formData.unit}
                                 onChange={(e) =>
