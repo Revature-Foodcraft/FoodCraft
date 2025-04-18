@@ -7,8 +7,8 @@ interface RecipeCardProps {
   id: string;
   title: string;
   author: string;
-  description?: string;  // Optional additional text
-  onDelete?: () => void; // Optional deletion callback
+  description?: string;
+  onDelete?: () => void;
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ title, author, description, onDelete, id }) => {

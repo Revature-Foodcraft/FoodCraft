@@ -63,6 +63,42 @@ const SavedRecipes: React.FC = () => {
     fetchRecipes();
   }, []);
 
+  const deleteHandler = async (recipeId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
+      const response = await fetch("http://localhost:5000/user/recipes", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ recipeId })
+      });
+
+      if (!response.ok) {
+        let errorMessage = "";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message ? errorData.message : "";
+        } catch (jsonError) {
+          errorMessage = "An unknown error occurred";
+        }
+        throw new Error(`${errorMessage}`);
+      }
+
+      // Refetch recipes after successful deletion
+      const updatedRecipes = recipes.filter(recipe => recipe.PK !== recipeId);
+      setRecipes(updatedRecipes);
+    } catch (err: any) {
+      console.error("Error deleting recipe:", err);
+      setError(`Failed to delete recipe. ${err.message}`);
+    }
+  };
+
 
   return (
     <div className='container'>
@@ -102,7 +138,7 @@ const SavedRecipes: React.FC = () => {
                 recipe.description ||
                 "No description available"
               }
-              onDelete={() => console.log(`Delete recipe with id ${recipe.PK}`)}
+              onDelete={() => deleteHandler(recipe.PK)}
             />
           );
         })}
