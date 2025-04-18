@@ -1,5 +1,5 @@
 import * as bcrypt from "../../src/util/bcrypt.js"
-import {createUser} from "../../src/Services/userService.js"
+import { createUser } from "../../src/Services/userService.js"
 import * as model from "../../src/Models/model.js"
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,12 +15,12 @@ describe('createUser', () => {
   });
 
   it('should create a new user successfully when username is not in use', async () => {
-    const input = { 
-      username: 'testUser', 
-      password: 'testPassword', 
+    const input = {
+      username: 'testUser',
+      password: 'testPassword',
       email: 'test@example.com',
-      firstname: 'Test', 
-      lastname: 'User', 
+      firstname: 'Test',
+      lastname: 'User',
       picture: 'test.jpg'
     };
 
@@ -49,10 +49,13 @@ describe('createUser', () => {
         protein: 0,
         fats: 0,
         carbs: 0,
+        calories: 0,
         proteinGoal: 120,
         fatsGoal: 70,
         carbsGoal: 200,
+        caloriesGoal: 2000,
       },
+      user_id: 'uuid-123',
     };
 
     expect(bcrypt.hashPassword).toHaveBeenCalledWith(input.password);
@@ -63,8 +66,8 @@ describe('createUser', () => {
   });
 
   it('should create a new user and use default values for optional fields when not provided', async () => {
-    const input = { 
-      username: 'defaultUser', 
+    const input = {
+      username: 'defaultUser',
       password: 'defaultPass'
     };
 
@@ -93,10 +96,13 @@ describe('createUser', () => {
         protein: 0,
         fats: 0,
         carbs: 0,
+        calories: 0,
         proteinGoal: 120,
         fatsGoal: 70,
         carbsGoal: 200,
+        caloriesGoal: 2000,
       },
+      user_id: 'uuid-default',
     };
 
     expect(bcrypt.hashPassword).toHaveBeenCalledWith(input.password);
@@ -107,12 +113,12 @@ describe('createUser', () => {
   });
 
   it('should return failure when model.createUser fails', async () => {
-    const input = { 
-      username: 'testUser', 
-      password: 'testPassword', 
+    const input = {
+      username: 'testUser',
+      password: 'testPassword',
       email: 'test@example.com',
-      firstname: 'Test', 
-      lastname: 'User', 
+      firstname: 'Test',
+      lastname: 'User',
       picture: 'test.jpg'
     };
 
@@ -122,17 +128,16 @@ describe('createUser', () => {
     model.createUser.mockResolvedValue(null);
 
     const result = await createUser(input);
-
     expect(result).toEqual({ success: false, code: 500, message: "Failed creating new user" });
   });
 
   it('should return failure when username is already in use', async () => {
-    const input = { 
-      username: 'testUser', 
-      password: 'testPassword', 
+    const input = {
+      username: 'testUser',
+      password: 'testPassword',
       email: 'test@example.com',
-      firstname: 'Test', 
-      lastname: 'User', 
+      firstname: 'Test',
+      lastname: 'User',
       picture: 'test.jpg'
     };
 
@@ -140,7 +145,6 @@ describe('createUser', () => {
     model.getUserByUsername.mockResolvedValue({ PK: 'existing-user' });
 
     const result = await createUser(input);
-
     expect(result).toEqual({ success: false, code: 400, message: "Username is already in use" });
   });
 });

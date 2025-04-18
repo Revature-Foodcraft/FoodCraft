@@ -1,63 +1,73 @@
 import { updateMacros } from "../../src/Services/userService.js";
 import * as model from "../../src/Models/model.js";
+import { logger } from "../../src/util/logger.js";
 
 jest.mock("../../src/Models/model.js")
+jest.mock("../../src/util/logger.js")
 
 describe('updateMacros', () => {
-    const userId = '123';
-    const newDailyMacros = { 
-        protein: 0, 
-        fats: 0, 
-        carbs: 0 
-    };
-
-    afterEach(() => {
+    beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should return success response when updatedUser has daily_macros', async () => {
-        const dummyUpdatedUser = {
-            daily_macros: { 
-                protein: 100, 
-                fats: 50, 
-                carbs: 200 
-            }
-        };
-        model.updateMacros.mockResolvedValue(dummyUpdatedUser);
-
-        const result = await updateMacros(userId, newDailyMacros);
-
-        expect(model.updateMacros).toHaveBeenCalledWith(userId, newDailyMacros);
-        expect(result).toEqual({
-            success: true,
-            daily_macros: dummyUpdatedUser.daily_macros,
+    it('should return an error object if newDailyMacros is missing or not an object', async () => {
+        const response = await updateMacros('user1', null);
+        expect(response).toEqual({
+            success: false,
+            code: 500,
+            message: "Invalid input: newDailyMacros must be an object"
         });
     });
 
-    it('should return failure when updatedUser does not have daily_macros', async () => {
+    it('should return an error object if any required field is not a number', async () => {
+        const invalidMacros = { protein: 'invalid', fats: 30, carbs: 40, calories: 2000 };
+        const response = await updateMacros('user1', invalidMacros);
+        expect(response).toEqual({
+            success: false,
+            code: 500,
+            message: "Invalid input: protein must be a number"
+        });
+    });
+
+    it('should update macros successfully when valid input is provided', async () => {
+        const newDailyMacros = { protein: 150, fats: 70, carbs: 250, calories: 2000 };
+        const updatedUserResponse = { daily_macros: newDailyMacros };
+
+        model.updateMacros.mockResolvedValue(updatedUserResponse);
+
+        const response = await updateMacros('user1', newDailyMacros);
+        expect(model.updateMacros).toHaveBeenCalledWith('user1', newDailyMacros);
+        expect(response).toEqual({
+            success: true,
+            daily_macros: newDailyMacros
+        });
+    });
+
+    it('should return an error object if updatedUser does not have daily_macros', async () => {
+        const newDailyMacros = { protein: 150, fats: 70, carbs: 250, calories: 2000 };
+
         model.updateMacros.mockResolvedValue({});
 
-        const result = await updateMacros(userId, newDailyMacros);
-
-        expect(model.updateMacros).toHaveBeenCalledWith(userId, newDailyMacros);
-        expect(result).toEqual({
+        const response = await updateMacros('user1', newDailyMacros);
+        expect(model.updateMacros).toHaveBeenCalledWith('user1', newDailyMacros);
+        expect(response).toEqual({
             success: false,
             code: 500,
-            message: "Failed updating daily macros",
+            message: "Failed updating daily macros"
         });
     });
 
-    it('should handle errors and return failure with error message', async () => {
-        const errorMessage = "Database connection failed";
-        model.updateMacros.mockRejectedValue(new Error(errorMessage));
+    it('should handle errors thrown by model.updateMacros gracefully', async () => {
+        const newDailyMacros = { protein: 150, fats: 70, carbs: 250, calories: 2000 };
 
-        const result = await updateMacros(userId, newDailyMacros);
+        model.updateMacros.mockRejectedValue(new Error('Database error'));
 
-        expect(model.updateMacros).toHaveBeenCalledWith(userId, newDailyMacros);
-        expect(result).toEqual({
+        const response = await updateMacros('user1', newDailyMacros);
+        expect(logger.error).toHaveBeenCalledWith("Error in updateMacros service:", expect.any(Error));
+        expect(response).toEqual({
             success: false,
             code: 500,
-            message: errorMessage,
+            message: "Database error"
         });
     });
 });
