@@ -691,7 +691,7 @@ async function createRecipe(recipe) {
     try {
         const response = await documentClient.send(command);
         logger.info(`Successfully created recipe ${recipe.PK}`);
-        return response.Attributes;
+        return response;
     } catch (error) {
         logger.error(`Error while creating a recipe: ${error.message}`);
         return null;
