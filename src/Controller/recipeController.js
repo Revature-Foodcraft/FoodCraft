@@ -177,7 +177,7 @@ export const updateSavedRecipe = async (req,res) => {
         if(result.success){
             return res.status(200).json({ success: true, message: "Recipe successfully added to list" });
         }else{
-            return res.status(404).json({ success: false, message: result.message });
+            return res.status(result.code).json({ success: false, message: result.message });
         }
     }catch (error){
         console.error("Error adding to saved recipe:", error);
