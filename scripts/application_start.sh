@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/ubuntu/FoodCraft-Backend
-node index.js > dev/null 2>&1 &
+nohup npm start > output.log 2>&1 &
