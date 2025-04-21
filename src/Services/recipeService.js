@@ -82,7 +82,7 @@ export async function getSavedRecipes(userId) {
 }
 
 export async function updateRecipe(recipe) {
-    const updatedRecipe = await recipeService.updateRecipe(recipe);
+    const updatedRecipe = await model.updateRecipe(recipe);
 
     return updatedRecipe;
 }
@@ -130,10 +130,18 @@ export async function deleteSavedRecipe(userId, recipeId) {
 export async function updateSavedRecipeList(recipeId,userId){
     try{
         const recipesList = (await model.getUser(userId)).recipes
+        const recipe =  await model.getRecipe(recipeId)
 
-        console.log(recipesList)
-        recipesList.push(recipeId)
-
+        if(recipe){
+            if(!recipesList.includes(recipeId)){
+                recipesList.push(recipeId)
+            }else{
+                return {success:false, code:400, message:"Already in list"}
+            }
+        }else{
+            return {success:false, code:400, message:"Failed to find recipe"}
+        }
+        
         const result = await model.updateSavedRecipeList(userId,recipesList)
         if(result){
             logger.info(`Added recipe with ID: ${recipeId}  to save recipe list for user: ${userId}`);
@@ -163,7 +171,10 @@ export async function createReview({ recipeId, user_id, comment,rating }) {
             message: "Missing required fields: recipeId, user_id, and comment are required"
         };
     }
-
+    const recipe = await model.getRecipe(recipeId)
+    if(!recipe){
+        return {success:false, code:400,message: "Invalid RecipeId"}
+    }
     // Build the review object
     const reviewObj = {
         PK: `REVIEW#${uuidv4()}`,      // Create a unique key for the review row.

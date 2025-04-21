@@ -258,6 +258,9 @@ userRouter.get('/user/profile', authenticateToken, getProfile);
  *               firstname:
  *                 type: string
  *                 description: The user's first name. Optional.
+ *               username:
+ *                 type: string
+ *                 description: The user's username name. Optional.
  *               lastname:
  *                 type: string
  *                 description: The user's last name. Optional.
