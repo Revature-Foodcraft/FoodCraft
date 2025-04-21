@@ -13,19 +13,20 @@ const app = express();
 const PORT = 5000;
 
 
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://my-frontend-react-prod.s3-website.us-east-2.amazonaws.com"
 ];
 
 app.use(cors({
-  origin: allowedOrigins
+  origin: allowedOrigins,
+  credentials: true
 }));
 
 
 
 
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/", userRouter);
 app.use("/fridge", fridgeRoutes);
