@@ -152,6 +152,16 @@ export async function updateProfile(userId, { username, firstname, lastname, ema
     }
 }
 
+
+export async function getUsersByIds(idArray) {
+    try {
+        const users = await model.batchGetUsers(idArray);
+        return { success: true, users };
+    } catch (err) {
+        return { success: false, code: 500, message: err.message };
+    }
+}
+
 export async function getAccount({ email, googleId, firstname = '', lastname = '' }) {
     const user = await model.getUserByGoogleId(googleId)
 
