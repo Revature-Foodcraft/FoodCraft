@@ -171,10 +171,10 @@ export async function createReview({ recipeId, user_id, comment,rating }) {
             message: "Missing required fields: recipeId, user_id, and comment are required"
         };
     }
-    const recipe = await model.getRecipe(recipeId)
-    if(!recipe){
-        return {success:false, code:400,message: "Invalid RecipeId"}
-    }
+    //const recipe = await model.getRecipe(recipeId)
+    //if(!recipe){
+    //    return {success:false, code:400,message: "Invalid RecipeId"}
+    //}
     // Build the review object
     const reviewObj = {
         PK: `REVIEW#${uuidv4()}`,      // Create a unique key for the review row.

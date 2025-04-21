@@ -62,7 +62,7 @@ export const login = async (req, res) => {
   if (user.success) {
     logger.info('User logged in successfully', { userId: user.token });
     res.status(200).json({ message: user.message, token: user.token })
-  } else {
+  } else {cd 
     logger.warn('Login failed', { username: req.body.username });
     res.status(400).json({ message: user.message })
   }
