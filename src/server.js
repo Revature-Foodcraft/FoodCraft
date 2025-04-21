@@ -12,22 +12,14 @@ import s3Router from './Routes/s3Router.js';
 const app = express();
 const PORT = 5000;
 
-const corsOptions = {
-  origin: "http://localhost:5173", // Specify your front-end origin
-  credentials: true, // Allow credentials (cookies, headers, etc.)
-};
 
-const allowedOrigins = ['http://localhost:5173', 'http://my-frontend-react-prod.s3-website.us-east-2.amazonaws.com'];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://my-frontend-react-prod.s3-website.us-east-2.amazonaws.com"
+];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
+  origin: allowedOrigins
 }));
 
 
