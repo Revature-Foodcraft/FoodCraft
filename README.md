@@ -73,6 +73,10 @@ To deploy the application using Docker:
 
 API documentation is available at `/api-docs` when the server is running. It is generated using Swagger.
 
+## Frontend Implementation
+
+The frontend implementation of this project can be found [here](https://github.com/Revature-Foodcraft/FoodCraft-Frontend).
+
 ## Contributing
 
 1. Fork the repository.
@@ -93,7 +97,3 @@ API documentation is available at `/api-docs` when the server is running. It is 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For any questions or feedback, please contact [your-email@example.com].
